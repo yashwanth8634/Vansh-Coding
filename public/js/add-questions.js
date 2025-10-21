@@ -143,6 +143,60 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelEditBtn.addEventListener('click', resetForm);
   }
 
+  if (questionList) {
+    questionList.addEventListener('click', async (e) => {
+      // Find the closest button with the delete action
+      const deleteButton = e.target.closest('[data-action="delete-question"]');
+      if (!deleteButton) return; // Exit if it wasn't a delete button click
+
+      const questionId = deleteButton.dataset.id;
+      const questionDiv = document.getElementById(`question-${questionId}`);
+      const questionText = questionDiv ? questionDiv.querySelector('p').textContent.substring(0, 50) + '...' : 'this question';
+
+      // 1. Show confirmation dialog
+      if (!confirm(`Are you sure you want to delete the question starting with:\n"${questionText}"\n\nThis cannot be undone.`)) {
+          return; // Stop if user clicks cancel
+      }
+
+      // 2. Clear any old messages
+      messageDiv.textContent = '';
+      messageDiv.className = 'mt-4 text-sm font-medium';
+
+      // 3. Make API call
+      try {
+        const response = await fetch(`/api/questions/${questionId}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // 4. On success, remove the question from the page
+          if (questionDiv) {
+            questionDiv.remove();
+          }
+          // Update the count
+          questionCount.textContent = parseInt(questionCount.textContent, 10) - 1;
+          messageDiv.textContent = result.message;
+          messageDiv.classList.add('text-green-600');
+
+          // If the form was in edit mode for *this* question, reset it
+          if (currentEditId === questionId) {
+            resetForm();
+          }
+
+        } else {
+          // 5. On failure, show the error
+          messageDiv.textContent = `Error: ${result.message}`;
+          messageDiv.classList.add('text-red-600');
+        }
+      } catch (err) {
+        messageDiv.textContent = `Network Error: ${err.message}`;
+        messageDiv.classList.add('text-red-600');
+      }
+    });
+  }
+
   // --- HELPER FUNCTIONS ---
   function resetForm() {
     currentEditId = null;
@@ -174,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function createQuestionHTML(q) {
     const questionDiv = document.createElement('div');
     questionDiv.id = `question-${q._id}`;
-    questionDiv.className = 'border border-gray-200 p-4 rounded-lg';
+    questionDiv.className = 'border border-gray-200 p-4 rounded-lg'; // Matches EJS style
 
     let optionsHTML = '';
     q.options.forEach(opt => {
@@ -189,26 +243,36 @@ document.addEventListener('DOMContentLoaded', () => {
       ? `<img src="${q.imageUrl}" alt="Question Image" class="w-full max-h-40 object-cover rounded-md mb-3">` 
       : '';
 
+    // Added the delete button here
     questionDiv.innerHTML = `
       ${imageHTML}
       <p class="font-medium text-gray-800 break-words">${q.questionText}</p>
       <ul class="list-disc list-inside text-sm text-gray-600 my-2 space-y-1">
         ${optionsHTML}
       </ul>
-      <button 
-        data-action="edit-question"
-        data-id="${q._id}"
-        data-text="${q.questionText}"
-        data-imageurl="${q.imageUrl || ''}"
-        data-opt1="${q.options[0]}"
-        data-opt2="${q.options[1]}"
-        data-opt3="${q.options[2]}"
-        data-opt4="${q.options[3]}"
-        data-correct="${q.correctAnswer}"
-        class="text-gray-500 hover:text-indigo-600 transition-colors mt-2"
-        title="Edit Question">
-        <span class="material-symbols-outlined">edit</span>
-      </button>
+      <div class="flex items-center space-x-3 mt-2">
+        <button 
+          data-action="edit-question"
+          data-id="${q._id}"
+          data-text="${q.questionText}"
+          data-imageurl="${q.imageUrl || ''}"
+          data-opt1="${q.options[0]}"
+          data-opt2="${q.options[1]}"
+          data-opt3="${q.options[2]}"
+          data-opt4="${q.options[3]}"
+          data-correct="${q.correctAnswer}"
+          class="text-gray-500 hover:text-indigo-600 transition-colors"
+          title="Edit Question">
+          <span class="material-symbols-outlined">edit</span>
+        </button>
+        <button
+          data-action="delete-question"
+          data-id="${q._id}"
+          class="text-gray-500 hover:text-red-600 transition-colors"
+          title="Delete Question">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+      </div>
     `;
     return questionDiv;
   }

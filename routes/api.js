@@ -398,4 +398,37 @@ router.put('/questions/:questionId', protect, async (req, res) => {
     }
 });
 
+router.delete('/questions/:questionId', protect, async (req, res) => {
+    try {
+        const { questionId } = req.params;
+
+        // 1. Find the question to make sure it exists
+        const question = await Question.findById(questionId);
+        if (!question) {
+            return res.status(404).json({ message: 'Question not found.' });
+        }
+
+        // 2. Find the Question Bank that contains this question
+        //    (We need to remove the reference from the bank)
+        const bank = await QuestionBank.findOne({ questions: questionId });
+        if (bank) {
+            // Remove the question ID from the bank's 'questions' array
+            bank.questions.pull(questionId);
+            await bank.save();
+        }
+
+        // 3. Delete the Question document itself
+        await Question.findByIdAndDelete(questionId);
+
+        // 4. Clear the cache as deleting a question affects tests
+        testCache.flushAll();
+
+        res.json({ message: 'Question deleted successfully.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while deleting question.' });
+    }
+});
+
 module.exports = router;
