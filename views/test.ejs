@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Attempt Test</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Albert Sans', 'Noto Sans', 'sans-serif'],
+            display: ['Montserrat', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+
+  <div id="login-container" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100 w-full max-w-md">
+      <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 font-display text-gray-800">Test Portal</h2>
+      <p class="text-center text-gray-600 mb-6">Please enter your Roll Number to begin.</p>
+      <form id="start-test-form" class="space-y-4">
+        <div>
+          <label for="roll-no" class="sr-only">Roll Number</label>
+          <input type="text" id="roll-no" placeholder="Enter Your Roll Number" required class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500">
+        </div>
+        
+        <input type="hidden" id="unique-link" value="<%= uniqueLink %>">
+        
+        <button type="submit" id="start-test-btn" class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Start Test</button>
+      </form>
+      <p id="login-error" class="text-red-600 mt-4 text-center font-medium"></p>
+    </div>
+  </div>
+
+  <div id="test-container" class="hidden">
+    <div id="header" class="bg-white shadow-md p-4 flex justify-between items-center fixed w-full top-0 left-0 z-10 px-4 sm:px-6">
+      <h2 id="test-title" class="text-lg sm:text-xl font-bold font-display">Test in Progress...</h2>
+      <div id="timer" class="text-base sm:text-lg font-semibold bg-red-600 text-white px-3 py-2 rounded-lg">
+        Time: <span>--:--</span>
+      </div>
+    </div>
+    
+    <div class="pt-24 pb-28">
+      <div id="question-area" class="container max-w-3xl mx-auto p-4 md:p-8">
+        </div>
+    </div>
+    
+    <div id="footer" class="bg-white shadow-inner p-4 fixed w-full bottom-0 left-0 z-10 border-t border-gray-200">
+        <div class="container max-w-3xl mx-auto">
+            <button id="submit-test-btn" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold text-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+              Submit Test Now
+            </button>
+        </div>
+    </div>
+  </div>
+
+  <div id="results-container" class="hidden min-h-screen flex items-center justify-center p-4 py-12">
+    <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100 w-full max-w-2xl mx-auto">
+      <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 font-display">Test Completed!</h2>
+      <div id="score" class="text-4xl sm:text-5xl font-bold text-center text-indigo-600 mb-8"></div>
+      <h3 class="text-xl sm:text-2xl font-semibold mb-4">Your Results:</h3>
+      <div id="results-breakdown" class="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+        </div>
+    </div>
+  </div>
+
+  <div id="warning-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+    <div class="bg-white p-6 md:p-8 rounded-xl shadow-xl w-full max-w-lg text-center">
+      <span class="material-symbols-outlined text-red-500 text-6xl">warning</span>
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 my-4 font-display">Warning!</h2>
+      <p class="text-base sm:text-lg text-gray-700 mb-6">You have left the test window. This is not allowed.</p>
+      <p class="text-gray-600 mb-8">If you do this again, your test will be **automatically submitted**.</p>
+      <div class="flex flex-col sm:flex-row-reverse gap-3">
+        <button id="return-to-test" class="w-full sm:w-auto bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Return to Test</button>
+        <button id="submit-anyway" class="w-full sm:w-auto bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 font-medium transition-colors duration-150">Submit Test Now</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/test.js"></script>
+</body>
+</html>
