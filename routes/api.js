@@ -214,7 +214,7 @@ router.post('/test/start', async (req, res) => {
     if (!uniqueLink || !rollNo) {
       return res.status(400).json({ message: 'Link and Roll No are required.' });
     }
-    rollNo = rollNo.trim().toLowerCase();
+    rollNo = rollNo.trim().toUpperCase();
 
     const cacheKey = `test-${uniqueLink}`;
     let cachedTest = testCache.get(cacheKey);

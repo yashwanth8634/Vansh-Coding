@@ -1,83 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Admin Login</title>
+  <head>
+    <meta charset="UTF-8" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
-  
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Albert Sans', 'Noto Sans', 'sans-serif'],
-            display: ['Montserrat', 'sans-serif'],
+    <title>Admin Login</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&family=Noto+Sans:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Albert Sans", "Noto Sans", "sans-serif"],
+              display: ["Montserrat", "sans-serif"],
+            },
           },
         },
-      },
-    }
-  </script>
+      };
+    </script>
+  </head>
+  <body class="bg-gray-50 font-sans text-gray-900">
+    <div class="min-h-screen flex items-center justify-center p-4">
+      <div
+        class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100 w-full max-w-sm"
+      >
+        <h2
+          class="text-2xl sm:text-3xl font-bold text-center mb-6 font-display text-gray-800"
+        >
+          Admin Login
+        </h2>
 
-</head>
-<body class="bg-gray-50 font-sans text-gray-900">
+        <form id="login-form" class="space-y-4">
+          <div>
+            <label for="username" class="sr-only">Username</label>
+            <input
+              type="text"
+              id="username"
+              placeholder="Username"
+              required
+              class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500"
+            />
+          </div>
+          <div>
+            <label for="password" class="sr-only">Password</label>
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              required
+              class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500"
+            />
+          </div>
 
-  <div class="min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100 w-full max-w-sm">
-      
-      <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 font-display text-gray-800">Admin Login</h2>
-      
-      <form id="login-form" class="space-y-4">
-        <div>
-          <label for="username" class="sr-only">Username</label>
-          <input type="text" id="username" placeholder="Username" required class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500">
-        </div>
-        <div>
-          <label for="password" class="sr-only">Password</label>
-          <input type="password" id="password" placeholder="Password" required class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500">
-        </div>
-        
-        <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Login</button>
-      </form>
-      
-      <p id="login-error" class="text-red-600 mt-4 text-center font-medium"></p>
+          <button
+            type="submit"
+            class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Login
+          </button>
+        </form>
+
+        <p
+          id="login-error"
+          class="text-red-600 mt-4 text-center font-medium"
+        ></p>
+      </div>
     </div>
-  </div>
 
-  <script>
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const errorP = document.getElementById('login-error');
-      errorP.textContent = ''; 
-      
-      try {
-        const res = await fetch('/api/admin/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+    <script>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+          const errorP = document.getElementById("login-error");
+          errorP.textContent = "";
+
+          try {
+            const res = await fetch("/api/admin/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, password }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+              window.location.href = "/admin";
+            } else {
+              errorP.textContent = data.message || "Login failed.";
+            }
+          } catch (err) {
+            errorP.textContent = "An error occurred. Please try again.";
+          }
         });
-        
-        const data = await res.json();
-        
-        if (res.ok) {
-          window.location.href = '/admin';
-        } else {
-          errorP.textContent = data.message || 'Login failed.';
-        }
-      } catch (err) {
-        errorP.textContent = 'An error occurred. Please try again.';
-      }
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
