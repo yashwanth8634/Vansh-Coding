@@ -7,6 +7,7 @@ const { caches } = require('../utils/cache');
 
 const Test = require('../models/Test');
 const Attempt = require('../models/Attempt');
+const CodingTest = require('../models/CodingTest');
 
 // GET /admin/test/:testId/results - Page to view attempts (cached, protected)
 router.get('/admin/test/:testId/results', protect, async (req, res) => {
@@ -47,6 +48,28 @@ router.get('/test/:link', async (req, res) => {
     res.render('test', { uniqueLink: uniqueLink });
   } catch (error) {
     res.status(500).send('Error loading test page');
+  }
+});
+
+// GET /coding/test/:link - Show the student coding workspace with all questions
+router.get('/coding/test/:link', async (req, res) => {
+  try {
+    const test = await CodingTest.findOne({ uniqueLink: req.params.link }).populate({
+      path: 'codingBank',
+      populate: { path: 'challenges' }
+    });
+
+    if (!test) {
+      return res.status(404).send('Coding test link not found.');
+    }
+    if (new Date() > test.linkExpiresAt) {
+      return res.status(400).send('This test link has expired.');
+    }
+
+    res.render('coding-workspace', { test });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error loading coding workspace');
   }
 });
 
