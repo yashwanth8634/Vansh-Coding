@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coding Challenges | Command Center</title>
+  <title>Coding Challenges | Admin</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="/css/vansh2k26-theme.css">
   
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
@@ -39,39 +40,39 @@
     ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
   </style>
 </head>
-<body class="flex h-screen overflow-hidden antialiased selection:bg-white/30">
+<body class="vc-admin flex h-screen overflow-hidden antialiased selection:bg-white/30">
 
   <aside class="w-20 md:w-64 glass-sidebar flex flex-col shrink-0 z-20">
     <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-white/10 shrink-0">
       <span class="material-symbols-outlined text-[24px] text-white">terminal</span>
-      <span class="ml-3 font-semibold tracking-tight text-white hidden md:block">VanshCoding</span>
+      <span class="ml-3 font-semibold tracking-tight text-white hidden md:block">VanshCoding Admin</span>
     </div>
     
     <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-2">
-      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3 hidden md:block">Analytics</div>
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3 hidden md:block">Main</div>
       <a href="/admin" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
         <span class="material-symbols-outlined text-[20px]">space_dashboard</span>
         <span class="text-sm hidden md:block">Overview</span>
       </a>
 
-      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Objective Tasks</div>
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">MCQ Section</div>
       <a href="/admin/banks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
         <span class="material-symbols-outlined text-[20px]">folder_open</span>
-        <span class="text-sm hidden md:block">MCQ Banks</span>
+        <span class="text-sm hidden md:block">Question Banks</span>
       </a>
       <a href="/admin/tests" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
         <span class="material-symbols-outlined text-[20px]">link</span>
-        <span class="text-sm hidden md:block">MCQ Links</span>
+        <span class="text-sm hidden md:block">Tests</span>
       </a>
 
-      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Engineering</div>
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Coding Section</div>
       <a href="/admin/coding/banks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
         <span class="material-symbols-outlined text-[20px]">data_object</span>
-        <span class="text-sm hidden md:block">Coding Banks</span>
+        <span class="text-sm hidden md:block">Coding Environments</span>
       </a>
       <a href="/admin/coding/tests" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
         <span class="material-symbols-outlined text-[20px]">api</span>
-        <span class="text-sm hidden md:block">Coding Links</span>
+        <span class="text-sm hidden md:block">Coding Sessions</span>
       </a>
       <a href="/admin/coding" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg">
         <span class="material-symbols-outlined text-[20px]">code_blocks</span>
@@ -80,7 +81,7 @@
     </nav>
     
     <div class="p-4 border-t border-white/10 shrink-0">
-      <form action="/api/auth/logout" method="POST">
+      <form action="/api/admin/logout" method="POST">
         <button type="submit" class="w-full flex items-center justify-center md:justify-start gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">
           <span class="material-symbols-outlined text-[20px]">logout</span>
           <span class="text-sm font-medium hidden md:block">Sign Out</span>
@@ -94,9 +95,9 @@
 
     <header class="h-16 glass-nav flex items-center justify-between px-6 lg:px-10 shrink-0 z-10 relative">
       <div class="flex items-center gap-2 text-sm text-gray-400">
-        <span class="text-gray-500 font-medium tracking-tight">Engineering</span>
+        <span class="text-gray-500 font-medium tracking-tight">Coding Section</span>
         <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-        <span class="text-white font-medium">Algorithmic Challenges</span>
+        <span class="text-white font-medium">Coding Challenges</span>
       </div>
     </header>
 
@@ -106,8 +107,8 @@
         <!-- Creator Form -->
         <div class="space-y-6">
           <div>
-            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Build Challenge</h1>
-            <p class="text-gray-400 font-light text-sm">Design coding problems with strict I/O validation circuits.</p>
+            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Create New Challenge</h1>
+            <p class="text-gray-400 font-light text-sm">Define a new coding problem.</p>
           </div>
           
           <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
@@ -121,7 +122,7 @@
                   placeholder="e.g., Two Sum">
               </div>
               <div>
-                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Complexity Rating</label>
+                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Difficulty</label>
                 <select id="difficulty" class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white appearance-none focus:bg-[#111] focus:border-white/30 transition-all outline-none cursor-pointer">
                   <option value="Easy" class="bg-[#111]">Easy</option>
                   <option value="Medium" class="bg-[#111]">Medium</option>
@@ -130,7 +131,7 @@
               </div>
               <div>
                 <label class="flex justify-between items-center text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
-                  <span>Problem Statement</span>
+                  <span>Problem Description</span>
                   <span class="bg-white/10 text-white border border-white/10 px-2 py-0.5 rounded text-[10px] tracking-widest normal-case">Markdown</span>
                 </label>
                 <textarea id="description" rows="5" required 
@@ -141,7 +142,7 @@
               <!-- Test Cases -->
               <div class="border-t border-white/10 pt-5 mt-2">
                 <div class="flex justify-between items-center mb-4">
-                  <h3 class="text-sm font-medium text-white">Validation I/O Circuits</h3>
+                  <h3 class="text-sm font-medium text-white">Test Cases</h3>
                   <button type="button" onclick="addTestCase()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border border-white/10 flex items-center gap-1">
                     <span class="material-symbols-outlined text-[14px]">add</span> Add Case
                   </button>
@@ -167,14 +168,14 @@
                       <div class="w-4 h-4 rounded border border-white/20 flex items-center justify-center mr-2 bg-black group-hover/toggle:border-white/40 peer-checked:bg-white transition-all">
                         <span class="material-symbols-outlined text-black text-[12px] opacity-0 peer-checked:opacity-100 hidden">check</span>
                       </div>
-                      <span class="text-xs text-gray-400 select-none group-hover/toggle:text-gray-300">Conceal from candidate (Final verification only)</span>
+                      <span class="text-xs text-gray-400 select-none group-hover/toggle:text-gray-300">Hidden from student</span>
                     </label>
                   </div>
                 </div>
               </div>
 
               <button type="submit" class="w-full bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] mt-4 flex items-center justify-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">publish</span> Publish Challenge
+                <span class="material-symbols-outlined text-[18px]">add_circle</span> Create Challenge
               </button>
             </form>
           </div>
@@ -183,8 +184,8 @@
         <!-- Existing List -->
         <div class="space-y-6">
           <div>
-            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Algorithm Registry</h1>
-            <p class="text-gray-400 font-light text-sm">Review published code challenges available for environments.</p>
+            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Existing Challenges</h1>
+            <p class="text-gray-400 font-light text-sm">List of available challenges.</p>
           </div>
           
           <div class="glass-card rounded-2xl p-2 h-max max-h-[calc(100vh-150px)] overflow-y-auto">
@@ -208,7 +209,7 @@
                       <%= c.difficulty %>
                     </span>
                     <span class="inline-flex items-center text-[10px] font-semibold text-gray-400 tracking-wider uppercase border border-white/10 bg-white/5 px-2 py-0.5 rounded">
-                      <%= c.testCases.length %> Circuits
+                      <%= c.testCases.length %> Test Cases
                     </span>
                   </div>
                 </div>
@@ -216,7 +217,7 @@
               <% if(challenges.length === 0) { %>
                 <div class="text-gray-500 text-center py-16 text-sm font-medium bg-black/20 rounded-xl border border-dashed border-white/10 flex flex-col items-center">
                   <span class="material-symbols-outlined text-4xl mb-3 opacity-50">data_array</span>
-                  Registry is empty. Draft an algorithm.
+                  No challenges found.
                 </div>
               <% } %>
             </div>
@@ -252,7 +253,7 @@
                 <div class="w-4 h-4 rounded border border-white/20 flex items-center justify-center mr-2 bg-black toggler-box transition-all">
                    <div class="w-2 h-2 rounded-sm bg-white hidden toggler-inner"></div>
                 </div>
-                <span class="text-xs text-gray-400 select-none group-hover/toggle:text-gray-300">Conceal from candidate (Final verification only)</span>
+                <span class="text-xs text-gray-400 select-none group-hover/toggle:text-gray-300">Hidden from student</span>
             </label>
         `;
         container.appendChild(div);

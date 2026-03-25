@@ -1,98 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Test Results</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&family=Noto+Sans:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ["Albert Sans", "Noto Sans", "sans-serif"],
-              display: ["Montserrat", "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
-    <style>
-      .material-symbols-outlined {
-        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-        font-size: 24px;
-      }
-    </style>
-  </head>
-  <body
-    class="bg-[radial-gradient(circle_at_top_right,_#fef3c7,_#f8fafc_40%,_#f8fafc)] font-sans text-gray-900"
-  >
-    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-      <div
-        class="container max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center"
-      >
-        <h1 class="text-xl sm:text-2xl font-bold font-display text-indigo-600">
-          Test Results
-        </h1>
-        <a
-          href="/admin"
-          class="bg-gray-500 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-gray-600 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 text-sm sm:text-base"
-        >
-          &larr; Back to Dashboard
-        </a>
-      </div>
-    </nav>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Results | Admin</title>
 
-    <div class="container max-w-7xl mx-auto p-4 md:p-8">
-      <h2 class="text-2xl sm:text-3xl font-bold font-display mb-4">
-        Test:
-        <span class="text-indigo-600"><%= test.questionBank.title %></span>
-      </h2>
-      <p class="text-gray-600 mb-6 text-sm sm:text-base">
-        <%= test.numQuestions %> Questions | <%= test.duration %> Minutes |
-        Created: <%= new Date(test.createdAt).toLocaleDateString() %>
-      </p>
-      <div class="mb-6">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="/css/vansh2k26-theme.css">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+    .glass-nav { background: rgba(0, 0, 0, 0.6); border-bottom: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
+    .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .grid-bg {
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+  </style>
+</head>
+<body class="vc-admin min-h-screen relative overflow-x-hidden antialiased selection:bg-white/30">
+
+  <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
+
+  <nav class="h-16 glass-nav flex items-center justify-between px-6 lg:px-10 shrink-0 z-20 relative">
+    <div class="flex items-center gap-4">
+      <a href="/admin/tests" class="text-gray-500 hover:text-white transition-colors flex items-center">
+        <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+      </a>
+      <div class="h-4 w-px bg-white/20"></div>
+      <span class="text-white font-medium tracking-tight">VanshCoding</span>
+    </div>
+    <div class="text-sm text-gray-400 font-mono hidden sm:block">
+      /admin/test/<%= test._id %>/results
+    </div>
+  </nav>
+
+  <main class="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 py-10">
+    <div class="glass-card rounded-2xl p-6 md:p-8 border border-white/10 shadow-2xl">
+      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 border-b border-white/10 pb-6 mb-6">
+        <div>
+          <h1 class="text-3xl font-semibold tracking-tight text-white mb-2"><%= test.questionBank ? test.questionBank.title : 'Deleted Bank' %></h1>
+          <p class="text-xs font-mono uppercase tracking-wider text-gray-500"><%= test.numQuestions %> Questions · <%= test.duration %> Minutes · Created <%= new Date(test.createdAt).toLocaleDateString() %></p>
+        </div>
         <button
           type="button"
           id="export-csv"
-          class="bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+          class="bg-white text-black hover:bg-gray-200 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors"
         >
           Export Attempts CSV
         </button>
       </div>
+
       <div class="mb-6">
         <form id="search-form">
-          <label
-            for="search-rollno"
-            class="block text-sm font-medium text-gray-700 mb-1"
-            >Search by Roll No:</label
-          >
+          <label for="search-rollno" class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Search by Roll No</label>
           <div class="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               id="search-rollno"
-              class="w-full sm:max-w-sm p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500"
+              class="w-full sm:max-w-sm px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-lg text-sm text-white placeholder-gray-600 focus:bg-[#111] focus:border-white/30 outline-none"
               placeholder="Enter roll no..."
             />
             <button
               type="submit"
-              class="w-full sm:w-auto bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              class="w-full sm:w-auto bg-white/10 border border-white/10 text-white py-3 px-4 rounded-lg hover:bg-white/15 font-medium transition-colors"
             >
               Search
             </button>
             <button
               type="button"
               id="clear-search"
-              class="w-full sm:w-auto bg-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-300 font-medium transition-colors duration-150"
+              class="w-full sm:w-auto bg-transparent border border-white/10 text-gray-300 py-3 px-4 rounded-lg hover:bg-white/5 hover:text-white font-medium transition-colors"
             >
               Clear
             </button>
@@ -100,87 +89,71 @@
         </form>
       </div>
 
-      <div
-        class="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-100 overflow-x-auto"
-      >
-        <h3 class="text-lg sm:text-xl font-semibold mb-4">
+      <div class="overflow-x-auto border border-white/10 rounded-xl bg-black/40">
+        <div class="px-4 py-3 border-b border-white/10 text-sm font-medium text-gray-300">
           All Attempts (<span id="attempt-count"><%= attempts.length %></span>)
-        </h3>
-        <table class="w-full min-w-max">
+        </div>
+        <table class="w-full min-w-[720px] text-left border-collapse">
           <thead>
-            <tr class="border-b text-left text-gray-600">
-              <th class="p-3">Roll No</th>
-              <th class="p-3">Score</th>
-              <th class="p-3">Submitted At</th>
-              <th class="p-3">Details</th>
+            <tr class="bg-white/5 border-b border-white/10 text-gray-400 text-xs uppercase tracking-wider">
+              <th class="p-4">Roll No</th>
+              <th class="p-4">Score</th>
+              <th class="p-4">Submitted At</th>
+              <th class="p-4 text-right">Details</th>
             </tr>
           </thead>
-          <tbody id="results-table-body">
+          <tbody id="results-table-body" class="divide-y divide-white/10">
             <% if (attempts.length === 0) { %>
-            <tr id="no-results-row">
-              <td colspan="4" class="p-4 text-center text-gray-500">
-                No one has attempted this test yet.
-              </td>
-            </tr>
-            <% } else { %> <% attempts.forEach(attempt => { %>
-            <tr class="border-b last:border-0 hover:bg-gray-50">
-              <td class="p-3 font-medium"><%= attempt.studentRollNo %></td>
-              <td class="p-3">
-                <%= attempt.score %> / <%= test.numQuestions %>
-              </td>
-              <td class="p-3">
-                <%= new Date(attempt.submittedAt).toLocaleString() %>
-              </td>
-
-              <td class="p-3">
-                <button
-                  data-action="view-details"
-                  data-rollno="<%= attempt.studentRollNo %>"
-                  class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 transition-colors"
-                >
-                  View
-                </button>
-              </td>
-            </tr>
-            <% }); %> <% } %>
+              <tr id="no-results-row">
+                <td colspan="4" class="p-14 text-center text-gray-500">No one has attempted this test yet.</td>
+              </tr>
+            <% } else { %>
+              <% attempts.forEach(attempt => { %>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="p-4 font-medium text-white"><%= attempt.studentRollNo %></td>
+                  <td class="p-4 text-gray-300"><%= attempt.score %> / <%= test.numQuestions %></td>
+                  <td class="p-4 text-gray-400 text-sm"><%= new Date(attempt.submittedAt).toLocaleString() %></td>
+                  <td class="p-4 text-right">
+                    <button
+                      data-action="view-details"
+                      data-rollno="<%= attempt.studentRollNo %>"
+                      class="bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 border border-white/10 hover:border-white/20 px-3 py-1.5 rounded-md text-xs font-medium transition-all"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } %>
           </tbody>
         </table>
       </div>
     </div>
+  </main>
 
-    <input type="hidden" id="test-id" value="<%= test._id %>" />
+  <input type="hidden" id="test-id" value="<%= test._id %>" />
 
-    <div
-      id="analysis-modal"
-      class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
-    >
-      <div class="bg-white p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-3xl">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl sm:text-2xl font-bold font-display">
-            Analysis for <span id="modal-rollno" class="text-indigo-600"></span>
-          </h2>
-          <button
-            id="modal-close"
-            class="text-gray-500 hover:text-gray-800"
-            title="Close"
-          >
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-        <p class="text-lg font-semibold mb-4">
-          Final Score: <span id="modal-score"></span>
-        </p>
-        <div
-          id="modal-body"
-          class="space-y-6 max-h-[70vh] overflow-y-auto pr-2"
-        ></div>
+  <div id="analysis-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div class="bg-[#0a0a0a] p-6 sm:p-8 rounded-xl border border-white/10 shadow-2xl w-full max-w-3xl">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl sm:text-2xl font-semibold text-white tracking-tight">
+          Analysis for <span id="modal-rollno" class="text-gray-300"></span>
+        </h2>
+        <button id="modal-close" class="text-gray-500 hover:text-white" title="Close">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
+      <p class="text-sm font-mono uppercase tracking-wider text-gray-400 mb-4">
+        Final Score: <span id="modal-score" class="text-white"></span>
+      </p>
+      <div id="modal-body" class="space-y-6 max-h-[70vh] overflow-y-auto pr-2"></div>
     </div>
+  </div>
 
-    <script>
-      const initialAttemptsData = <%- JSON.stringify(attempts) %>;
-      const testTotalQuestions = <%= test.numQuestions %>;
-    </script>
-    <script src="/js/test-results.js"></script>
-  </body>
+  <script>
+    const initialAttemptsData = <%- JSON.stringify(attempts) %>;
+    const testTotalQuestions = <%= test.numQuestions %>;
+  </script>
+  <script src="/js/test-results.js"></script>
+</body>
 </html>

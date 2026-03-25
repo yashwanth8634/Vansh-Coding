@@ -7,6 +7,10 @@ const codingBankSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  description: {
+    type: String,
+    required: false,
+  },
   challenges: [
     {
       type: mongoose.Schema.Types.ObjectId,

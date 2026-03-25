@@ -16,6 +16,11 @@ const codingTestSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  durationMinutes: {
+    type: Number,
+    default: 30,
+    min: 1,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

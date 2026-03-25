@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= test.codingBank.title %> | Exec Workspace</title>
+  <title><%= test.codingBank.title %> | Mr & Ms Coder Coding Round</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="/css/vansh2k26-theme.css">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
@@ -53,6 +54,48 @@
 
   <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
+  <div id="start-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-6">
+    <div class="glass-card rounded-2xl w-full max-w-md p-8 border border-white/10 shadow-2xl">
+      <div class="text-center mb-6">
+        <div class="mx-auto w-12 h-12 border border-white/20 bg-white/5 rounded-xl flex items-center justify-center mb-4">
+          <span class="material-symbols-outlined text-white text-[22px]">schedule</span>
+        </div>
+        <h2 class="text-2xl font-semibold tracking-tight text-white">Start Coding Session</h2>
+        <p class="text-sm text-gray-400 mt-2">Enter your roll number. Timer starts after you begin.</p>
+      </div>
+
+      <div class="space-y-4">
+        <input id="start-roll-no" type="text" placeholder="Roll Number" class="w-full bg-[#0a0a0a] text-white placeholder-gray-600 border border-white/10 focus:bg-[#111] focus:border-white/30 rounded-lg px-4 py-3 text-sm font-medium outline-none uppercase tracking-widest text-center" required>
+        <button id="start-session-btn" class="w-full bg-white text-black hover:bg-gray-200 py-3 rounded-xl text-sm font-semibold transition-colors">Start Now</button>
+        <p id="start-modal-error" class="hidden text-red-400 text-xs text-center font-medium"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="security-warning-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100] items-center justify-center p-6">
+    <div class="glass-card rounded-2xl shadow-2xl p-8 md:p-10 w-full max-w-md text-center border border-red-500/30">
+      <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto mb-6">
+        <span class="material-symbols-outlined text-[32px]">security</span>
+      </div>
+
+      <h2 class="text-2xl font-semibold text-white tracking-tight mb-2">Warning!</h2>
+      <p class="text-sm font-light text-gray-400 mb-6 leading-relaxed">You left fullscreen or switched tabs.</p>
+
+      <div class="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mb-8">
+        <p class="text-[11px] text-red-400 uppercase tracking-widest leading-relaxed">If this happens again, your coding session will be automatically submitted.</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button id="return-to-coding" class="flex-1 bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors">
+          Return to Session
+        </button>
+        <button id="submit-coding-now" class="w-full sm:w-max bg-transparent text-gray-500 hover:text-white border border-transparent hover:border-white/10 py-3 px-4 rounded-xl text-sm transition-colors">
+          Submit Now
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Top Nav Pill -->
   <nav class="glass-nav rounded-2xl h-16 md:h-20 flex items-center justify-between px-6 shrink-0 z-10 shadow-lg relative overflow-hidden">
     <div class="absolute top-0 right-1/2 w-48 h-10 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -63,13 +106,16 @@
       </div>
       <div>
         <h1 class="font-semibold text-sm md:text-base tracking-tight leading-none text-white"><%= test.codingBank.title %></h1>
-        <p class="text-gray-500 text-[10px] font-mono uppercase tracking-widest hidden sm:block mt-1">Live Assessment Frame</p>
+        <p class="text-gray-500 text-[10px] font-mono uppercase tracking-widest hidden sm:block mt-1">Vansh2k26 Coding Arena</p>
       </div>
     </div>
-    <div class="flex items-center gap-4 relative z-10">
-      <input type="text" id="roll-no" placeholder="Roll Number" class="bg-[#0a0a0a] text-white placeholder-gray-600 border border-white/10 focus:bg-[#111] focus:border-white/30 rounded-lg px-4 py-2 text-sm font-medium outline-none transition-all uppercase tracking-widest text-center w-36 md:w-48 shadow-inner" required>
-      <button id="final-submit-btn" class="bg-white text-black hover:bg-gray-200 px-6 py-2 rounded-lg text-sm font-semibold shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-transform active:scale-[0.98] flex items-center gap-2">
-        <span class="material-symbols-outlined text-[18px]">publish</span> <span class="hidden sm:inline">Commit Session</span>
+      <div class="flex items-center gap-4 relative z-10">
+        <div id="session-timer" class="bg-[#0a0a0a] text-white border border-white/10 rounded-lg px-4 py-2 text-sm font-mono tracking-widest min-w-[88px] text-center">
+          --:--
+        </div>
+        <input type="text" id="roll-no" placeholder="Roll Number" class="bg-[#0a0a0a] text-white placeholder-gray-600 border border-white/10 focus:bg-[#111] focus:border-white/30 rounded-lg px-4 py-2 text-sm font-medium outline-none transition-all uppercase tracking-widest text-center w-36 md:w-48 shadow-inner" required>
+        <button id="final-submit-btn" class="bg-white text-black hover:bg-gray-200 px-6 py-2 rounded-lg text-sm font-semibold shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-transform active:scale-[0.98] flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">publish</span> <span class="hidden sm:inline">Submit Final Test</span>
       </button>
     </div>
   </nav>
@@ -80,7 +126,7 @@
     <!-- LEFT MOST: Question Navigator -->
     <div class="w-full h-24 md:h-full md:w-20 lg:w-64 glass-card rounded-2xl flex flex-col shrink-0 overflow-hidden shadow-2xl">
       <div class="px-5 py-4 border-b border-white/10 bg-[#050505] shrink-0 hidden lg:flex items-center justify-between">
-        <h3 class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Execution Modules</h3>
+        <h3 class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Question Bank</h3>
         <span class="material-symbols-outlined text-[16px] text-gray-500">format_list_bulleted</span>
       </div>
       <div class="flex-1 overflow-x-auto md:overflow-x-hidden md:overflow-y-auto p-3 flex md:flex-col gap-2" id="question-tabs">
@@ -104,7 +150,7 @@
         <div class="flex items-center gap-3 mb-2">
           <span id="current-q-diff" class="text-[10px] px-2 py-0.5 border rounded uppercase tracking-widest font-mono">--</span>
         </div>
-        <h2 id="current-q-title" class="text-xl font-semibold text-white tracking-tight">Loading Constraint...</h2>
+        <h2 id="current-q-title" class="text-xl font-semibold text-white tracking-tight">Loading...</h2>
       </div>
       <div id="current-q-desc" class="p-6 md:p-8 overflow-y-auto flex-1 prose prose-invert prose-sm max-w-none text-gray-300 font-normal leading-relaxed">
         <!-- Markdown -->
@@ -125,7 +171,7 @@
           </select>
         </div>
         <button id="run-btn" class="flex items-center gap-2 text-white bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-1.5 rounded-lg text-xs font-medium transition-all active:scale-[0.98]">
-          <span class="material-symbols-outlined text-[16px]">play_arrow</span> Run <span class="hidden xl:inline">Check</span>
+          <span class="material-symbols-outlined text-[16px]">play_arrow</span> Run <span class="hidden xl:inline">Code</span>
         </button>
       </div>
 
@@ -136,7 +182,7 @@
       <div id="console-drawer" class="h-[45px] bg-[#0a0a0a] border-t border-white/10 flex flex-col shrink-0 transition-all duration-300 z-10 relative">
         <div class="flex items-center justify-between px-6 h-[45px] cursor-pointer select-none group hover:bg-[#111] transition-colors" id="console-toggle">
           <h3 class="text-gray-400 hover:text-white text-xs font-semibold flex items-center gap-2 uppercase tracking-widest transition-colors">
-            <span class="material-symbols-outlined text-[16px]">terminal</span> Output Intercept
+            <span class="material-symbols-outlined text-[16px]">terminal</span> Execution Console
           </h3>
           <div class="flex items-center gap-4">
             <span id="status-badge" class="hidden text-[10px] px-2 py-0.5 border rounded uppercase tracking-widest font-mono"></span>
@@ -144,7 +190,7 @@
           </div>
         </div>
         <div class="flex-1 overflow-y-auto p-4 md:p-6 text-[13px] font-mono whitespace-pre-wrap bg-[#050505] leading-relaxed text-gray-300 border-t border-white/5" id="console-output">
-          <span class="text-gray-600">Awaiting execution trace...</span>
+          <span class="text-gray-600">Waiting for execution...</span>
         </div>
       </div>
     </div>
@@ -166,6 +212,7 @@
       const data = JSON.parse(document.getElementById('server-data').textContent);
       const testId = data.testId;
       const challenges = data.challenges;
+      const sessionDurationMinutes = <%= Number(test.durationMinutes || 30) %>;
 
       const submissions = {};
       challenges.forEach(c => {
@@ -189,6 +236,22 @@
       const consoleIcon = document.getElementById('console-icon');
       const statusBadge = document.getElementById('status-badge');
       const outputDiv = document.getElementById('console-output');
+      const sessionTimerEl = document.getElementById('session-timer');
+      const rollNoInput = document.getElementById('roll-no');
+      const startModal = document.getElementById('start-modal');
+      const startRollNoInput = document.getElementById('start-roll-no');
+      const startSessionBtn = document.getElementById('start-session-btn');
+      const startModalError = document.getElementById('start-modal-error');
+      const runBtn = document.getElementById('run-btn');
+      const finalSubmitBtn = document.getElementById('final-submit-btn');
+      const securityWarningModal = document.getElementById('security-warning-modal');
+      const returnToCodingBtn = document.getElementById('return-to-coding');
+      const submitCodingNowBtn = document.getElementById('submit-coding-now');
+      let sessionTimeLeftSeconds = Math.max(1, sessionDurationMinutes) * 60;
+      let sessionTimerId = null;
+      let hasSubmitted = false;
+      let hasStarted = false;
+      let warningCount = 0;
 
       function loadChallenge(id) {
         submissions[activeChallengeId].code = editor.getValue();
@@ -226,9 +289,134 @@
         editor.setOption('mode', mode);
       }
 
+      function renderSessionTimer() {
+        const minutes = Math.floor(sessionTimeLeftSeconds / 60);
+        const seconds = sessionTimeLeftSeconds % 60;
+        sessionTimerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }
+
+      function startSessionTimer() {
+        renderSessionTimer();
+        sessionTimerId = setInterval(() => {
+          if (hasSubmitted) {
+            clearInterval(sessionTimerId);
+            return;
+          }
+
+          sessionTimeLeftSeconds -= 1;
+          if (sessionTimeLeftSeconds <= 0) {
+            clearInterval(sessionTimerId);
+            sessionTimeLeftSeconds = 0;
+            renderSessionTimer();
+            submitFinal(true);
+            return;
+          }
+
+          renderSessionTimer();
+        }, 1000);
+      }
+
+      function lockWorkspaceUntilStart() {
+        tabs.forEach((tab) => {
+          tab.disabled = true;
+          tab.classList.add('opacity-50', 'cursor-not-allowed');
+        });
+        langSelect.disabled = true;
+        runBtn.disabled = true;
+        finalSubmitBtn.disabled = true;
+        rollNoInput.readOnly = true;
+        editor.setOption('readOnly', 'nocursor');
+        sessionTimerEl.textContent = '--:--';
+      }
+
+      function unlockWorkspaceAfterStart() {
+        tabs.forEach((tab) => {
+          tab.disabled = false;
+          tab.classList.remove('opacity-50', 'cursor-not-allowed');
+        });
+        langSelect.disabled = false;
+        runBtn.disabled = false;
+        finalSubmitBtn.disabled = false;
+        rollNoInput.readOnly = false;
+        editor.setOption('readOnly', false);
+      }
+
+      function addSecurityListeners() {
+        window.addEventListener('beforeunload', (event) => {
+          if (!hasSubmitted && hasStarted) {
+            event.preventDefault();
+            event.returnValue = '';
+          }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (hasStarted && !hasSubmitted && document.hidden) {
+            handleWarning();
+          }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+          if (hasStarted && !hasSubmitted && !document.fullscreenElement) {
+            handleWarning();
+            document.documentElement.requestFullscreen().catch(() => {});
+          }
+        });
+      }
+
+      function handleWarning() {
+        if (hasSubmitted) return;
+        warningCount += 1;
+
+        if (warningCount === 1) {
+          securityWarningModal.classList.remove('hidden');
+          securityWarningModal.classList.add('flex');
+          return;
+        }
+
+        submitFinal(true);
+      }
+
       langSelect.addEventListener('change', (e) => updateCodeMirrorMode(e.target.value));
       tabs.forEach(t => t.addEventListener('click', () => loadChallenge(t.dataset.id)));
       loadChallenge(activeChallengeId);
+      lockWorkspaceUntilStart();
+
+      startSessionBtn.addEventListener('click', () => {
+        const enteredRollNo = startRollNoInput.value.trim();
+        if (!enteredRollNo) {
+          startModalError.textContent = 'Roll number is required to start.';
+          startModalError.classList.remove('hidden');
+          return;
+        }
+
+        hasStarted = true;
+        rollNoInput.value = enteredRollNo;
+        startModal.classList.add('hidden');
+        startModalError.classList.add('hidden');
+        unlockWorkspaceAfterStart();
+        document.documentElement.requestFullscreen().catch(() => {});
+        addSecurityListeners();
+        startSessionTimer();
+      });
+
+      returnToCodingBtn.addEventListener('click', () => {
+        securityWarningModal.classList.add('hidden');
+        securityWarningModal.classList.remove('flex');
+        document.documentElement.requestFullscreen().catch(() => {});
+      });
+
+      submitCodingNowBtn.addEventListener('click', async () => {
+        securityWarningModal.classList.add('hidden');
+        securityWarningModal.classList.remove('flex');
+        await submitFinal(true);
+      });
+
+      startRollNoInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          startSessionBtn.click();
+        }
+      });
 
       consoleToggle.addEventListener('click', () => {
         if (consoleDrawer.style.height === '40%') {
@@ -245,8 +433,9 @@
       }
 
       document.getElementById('run-btn').addEventListener('click', async () => {
+        if (!hasStarted) return;
         forceOpenConsole();
-        outputDiv.innerHTML = '<span class="text-white animate-pulse font-mono tracking-widest">Executing on container...</span>';
+        outputDiv.innerHTML = '<span class="text-white animate-pulse font-mono tracking-widest">Executing code...</span>';
         setStatus('Running', 'warn');
         document.getElementById('run-btn').disabled = true;
 
@@ -290,15 +479,29 @@
       });
 
       document.getElementById('final-submit-btn').addEventListener('click', async () => {
-        const rollNo = document.getElementById('roll-no').value.trim();
-        if(!rollNo) return alert('Enter your Candidate ID to commit.');
-        if(!confirm('Acknowledge: Committing this payload will lock all buffers permanently.')) return;
+        await submitFinal(false);
+      });
+
+      async function submitFinal(isAutoSubmit) {
+        if (!hasStarted) {
+          return;
+        }
+
+        if (hasSubmitted) return;
+        const rollNo = rollNoInput.value.trim();
+        if(!rollNo) return alert('Enter your Roll Number to submit.');
+        if(!isAutoSubmit && !confirm('Are you absolutely certain? This will lock your answers and submit the test.')) return;
+
+        hasSubmitted = true;
+        if (sessionTimerId) {
+          clearInterval(sessionTimerId);
+        }
 
         submissions[activeChallengeId].code = editor.getValue();
         submissions[activeChallengeId].language = langSelect.value;
         
         forceOpenConsole();
-        outputDiv.innerHTML = '<span class="text-white animate-pulse font-mono tracking-widest">Grading buffers against hidden I/O records...</span>';
+        outputDiv.innerHTML = '<span class="text-white animate-pulse font-mono tracking-widest">Grading submission against hidden server test cases...</span>';
         setStatus('Commit', 'warn');
         document.getElementById('final-submit-btn').disabled = true;
 
@@ -313,9 +516,12 @@
           });
           
           if(res.ok) {
-            outputDiv.innerHTML = `<span class="text-green-400 font-medium block mb-2">Payload successfully archived.</span><div class="text-gray-500 text-xs">Final execution grade mapped to candidate footprint.</div>`;
+            if (document.fullscreenElement) {
+              document.exitFullscreen().catch(() => {});
+            }
+            outputDiv.innerHTML = `<span class="text-green-400 font-medium block mb-2">Test Successfully Archived! 🎉</span><div class="text-gray-500 text-xs">Your final score has been logged. You may close this window.</div>`;
             setStatus('Archived', 'ok');
-            setTimeout(() => { document.body.innerHTML = `<div class="h-screen w-full flex items-center justify-center bg-[#000] relative"><div class="absolute inset-0 grid-bg pointer-events-none z-0"></div><div class="text-center p-12 bg-[#0a0a0a] shadow-2xl rounded-2xl border border-white/10 relative z-10"><span class="material-symbols-outlined text-white text-4xl mb-6 block bg-white/5 border border-white/10 w-20 h-20 rounded-xl mx-auto flex items-center justify-center">task_alt</span><h1 class="text-2xl font-semibold text-white tracking-tight">Session Committed</h1><p class="text-gray-500 font-mono text-xs uppercase tracking-widest mt-4">Safe terminal closure permitted</p></div></div>`; }, 3000);
+            setTimeout(() => { document.body.innerHTML = `<div class="h-screen w-full flex items-center justify-center bg-[#000] relative"><div class="absolute inset-0 grid-bg pointer-events-none z-0"></div><div class="text-center p-12 bg-[#0a0a0a] shadow-2xl rounded-2xl border border-white/10 relative z-10"><span class="material-symbols-outlined text-white text-4xl mb-6 block bg-white/5 border border-white/10 w-20 h-20 rounded-xl mx-auto flex items-center justify-center">task_alt</span><h1 class="text-2xl font-semibold text-white tracking-tight">Assessment Complete</h1><p class="text-gray-500 font-mono text-xs uppercase tracking-widest mt-4">Safe to exit</p></div></div>`; }, 3000);
           } else {
             const data = await res.json();
             outputDiv.innerHTML = `<span class="text-red-400">${data.message || 'System fault during commit.'}</span>`;
@@ -324,10 +530,11 @@
         } catch(e) {
           outputDiv.innerHTML = `<span class="text-red-400">Network fault: ${e.message}</span>`;
           setStatus('Error', 'err');
+          hasSubmitted = false;
         } finally {
           document.getElementById('final-submit-btn').disabled = false;
         }
-      });
+      }
 
       function escapeHtml(unsafe) { return unsafe.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
     });

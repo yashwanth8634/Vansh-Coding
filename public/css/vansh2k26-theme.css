@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  --v-bg: #f7f6f3;
+  --v-bg-soft: #fbfaf8;
+  --v-ink: #1c1a18;
+  --v-muted: #6b6660;
+  --v-card: rgba(255, 255, 255, 0.76);
+  --v-stroke: rgba(28, 26, 24, 0.12);
+  --v-accent-pink: #ef4d8d;
+  --v-accent-mint: #21c5a5;
+}
+
+body.vc-admin {
+  --v-bg: #f5f3ef;
+  --v-ink: #1f1b17;
+  --v-muted: #716a63;
+  --v-card: rgba(255, 255, 255, 0.86);
+  --v-stroke: rgba(28, 26, 24, 0.14);
+}
+
+body {
+  font-family: 'Manrope', sans-serif !important;
+  background:
+    radial-gradient(1200px 700px at -10% -20%, rgba(239, 77, 141, 0.14), transparent 50%),
+    radial-gradient(1000px 600px at 110% -10%, rgba(33, 197, 165, 0.14), transparent 55%),
+    var(--v-bg) !important;
+  color: var(--v-ink) !important;
+}
+
+.glass-nav,
+.glass-sidebar,
+.glass-header,
+.glass-card,
+.glass-modal {
+  background: var(--v-card) !important;
+  border-color: var(--v-stroke) !important;
+  color: var(--v-ink) !important;
+  backdrop-filter: blur(14px);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.nav-item {
+  color: var(--v-muted) !important;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  color: var(--v-ink) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+}
+
+input,
+select,
+textarea {
+  color: var(--v-ink) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8b857f !important;
+}
+
+body.vc-admin .text-white { color: #1f1b17 !important; }
+body.vc-admin .text-gray-300 { color: #4f4943 !important; }
+body.vc-admin .text-gray-400 { color: #6f6861 !important; }
+body.vc-admin .text-gray-500 { color: #8a837c !important; }
+
+body.vc-admin .bg-white\/5 { background-color: rgba(28, 26, 24, 0.04) !important; }
+body.vc-admin .bg-white\/10 { background-color: rgba(28, 26, 24, 0.08) !important; }
+
+body.vc-admin .border-white\/10 { border-color: rgba(28, 26, 24, 0.12) !important; }
+body.vc-admin .border-white\/20 { border-color: rgba(28, 26, 24, 0.18) !important; }
+
+body.vc-admin [class*='bg-[#000]'],
+body.vc-admin [class*='bg-[#0a0a0a]'],
+body.vc-admin [class*='bg-[#050505]'],
+body.vc-admin [class*='bg-black/20'],
+body.vc-admin [class*='bg-black/40'],
+body.vc-admin [class*='bg-black/50'],
+body.vc-admin [class*='bg-black/80'] {
+  background-color: rgba(255, 255, 255, 0.72) !important;
+  color: #1f1b17 !important;
+}
+
+body.vc-admin main[class*='bg-[#000]'] {
+  background: transparent !important;
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(28, 26, 24, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(28, 26, 24, 0.05) 1px, transparent 1px) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(28, 26, 24, 0.2) !important;
+}

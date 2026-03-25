@@ -2,7 +2,6 @@
 // Admin authentication routes (register, login, logout)
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 
@@ -81,7 +80,12 @@ router.post('/logout', (req, res) => {
     httpOnly: true,
     expires: new Date(0),
   });
-  res.json({ message: 'Logged out successfully.' });
+
+  if (req.accepts('json') && !req.accepts('html')) {
+    return res.json({ message: 'Logged out successfully.', redirectTo: '/' });
+  }
+
+  return res.redirect('/');
 });
 
 module.exports = router;

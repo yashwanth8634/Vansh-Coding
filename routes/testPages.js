@@ -66,6 +66,10 @@ router.get('/coding/test/:link', async (req, res) => {
       return res.status(400).send('This test link has expired.');
     }
 
+    if (!test.codingBank || !test.codingBank.challenges || test.codingBank.challenges.length === 0) {
+      return res.status(400).send('This coding test has no challenges configured.');
+    }
+
     res.render('coding-workspace', { test });
   } catch (error) {
     console.error(error);

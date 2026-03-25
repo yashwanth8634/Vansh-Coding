@@ -4,6 +4,7 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const CodingChallenge = require('../models/CodingChallenge');
 const CodingAttempt = require('../models/CodingAttempt');
+const CodingTest = require('../models/CodingTest');
 
 // Rate limiting specifically to prevent DDoS on execution APIs
 const executionLimiter = rateLimit({
@@ -90,15 +91,45 @@ router.post('/submit', executionLimiter, async (req, res) => {
   const { studentRollNo, testId, submissions } = req.body;
   // submissions: [ { challengeId, code, language } ]
   
-  if (!studentRollNo || !testId || !submissions) {
+  if (!studentRollNo || !testId || !Array.isArray(submissions)) {
     return res.status(400).json({ message: 'Missing fields' });
   }
 
+  if (submissions.length === 0) {
+    return res.status(400).json({ message: 'At least one submission is required' });
+  }
+
   try {
+    const codingTest = await CodingTest.findById(testId).populate('codingBank', 'challenges');
+    if (!codingTest || !codingTest.codingBank) {
+      return res.status(404).json({ message: 'Coding test not found' });
+    }
+
+    if (new Date() > codingTest.linkExpiresAt) {
+      return res.status(400).json({ message: 'This coding test link has expired.' });
+    }
+
+    const allowedChallengeIds = new Set(
+      (codingTest.codingBank.challenges || []).map((id) => id.toString()),
+    );
+
+    const requestedChallengeIds = submissions
+      .map((sub) => sub.challengeId)
+      .filter(Boolean)
+      .map((id) => id.toString());
+
+    const uniqueRequestedChallengeIds = [...new Set(requestedChallengeIds)];
+    const fetchedChallenges = await CodingChallenge.find({ _id: { $in: uniqueRequestedChallengeIds } });
+    const challengeMap = new Map(fetchedChallenges.map((challenge) => [challenge._id.toString(), challenge]));
+
     const finalAnswers = [];
     
     // Evaluate each submission sequentially to respect Wandbox compiler limits
     for (const sub of submissions) {
+      if (!sub.challengeId || !allowedChallengeIds.has(sub.challengeId.toString())) {
+        continue;
+      }
+
       if (!sub.code || sub.code.trim() === '') {
         finalAnswers.push({
           challenge: sub.challengeId,
@@ -108,7 +139,7 @@ router.post('/submit', executionLimiter, async (req, res) => {
         continue;
       }
       
-      const challenge = await CodingChallenge.findById(sub.challengeId);
+      const challenge = challengeMap.get(sub.challengeId.toString());
       if (!challenge) continue;
 
       let passedCases = 0;

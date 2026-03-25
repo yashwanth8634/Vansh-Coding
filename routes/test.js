@@ -19,7 +19,11 @@ const { caches, invalidateQuestionData } = require('../utils/cache');
 // POST /api/banks
 router.post('/banks', protect, async (req, res) => {
   try {
-    const { title } = req.body;
+    const title = (req.body.title || '').trim();
+    if (!title) {
+      return res.status(400).json({ message: 'Bank title is required.' });
+    }
+
     const newBank = new QuestionBank({ title });
     await newBank.save();
     
@@ -111,21 +115,33 @@ router.delete('/banks/:bankId', protect, async (req, res) => {
 router.post('/tests', protect, async (req, res) => {
   try {
     const { questionBankId, numQuestions, duration, linkExpiryHours } = req.body;
+    const parsedNumQuestions = Number.parseInt(numQuestions, 10);
+    const parsedDuration = Number.parseInt(duration, 10);
+    const parsedExpiryHours = Number.parseInt(linkExpiryHours, 10);
+
+    if (!questionBankId || Number.isNaN(parsedNumQuestions) || Number.isNaN(parsedDuration) || Number.isNaN(parsedExpiryHours)) {
+      return res.status(400).json({ message: 'Invalid test configuration.' });
+    }
+
+    if (parsedNumQuestions <= 0 || parsedDuration <= 0 || parsedExpiryHours <= 0) {
+      return res.status(400).json({ message: 'numQuestions, duration, and linkExpiryHours must be greater than zero.' });
+    }
+
     const bank = await QuestionBank.findById(questionBankId).populate('questions');
     if (!bank) {
       return res.status(404).json({ message: 'Question bank not found' });
     }
-    if (bank.questions.length < numQuestions) {
+    if (bank.questions.length < parsedNumQuestions) {
         return res.status(400).json({ message: `Bank only has ${bank.questions.length} questions.` });
     }
     
     const expires = new Date();
-    expires.setHours(expires.getHours() + parseInt(linkExpiryHours, 10));
+    expires.setHours(expires.getHours() + parsedExpiryHours);
 
     const newTest = new Test({
       questionBank: questionBankId,
-      numQuestions,
-      duration,
+      numQuestions: parsedNumQuestions,
+      duration: parsedDuration,
       linkExpiresAt: expires,
     });
     await newTest.save();
@@ -299,6 +315,25 @@ router.get('/tests/:testId/search', protect, async (req, res) => {
     res.json(attempts);
   } catch (error) {
     res.status(500).json({ message: 'Error searching attempts.' });
+  }
+});
+
+// DELETE /api/tests/:testId
+router.delete('/tests/:testId', protect, async (req, res) => {
+  try {
+    const { testId } = req.params;
+    const deletedTest = await Test.findByIdAndDelete(testId);
+    if (!deletedTest) {
+      return res.status(404).json({ message: 'Test not found.' });
+    }
+
+    await Attempt.deleteMany({ test: testId });
+    invalidateQuestionData();
+
+    res.json({ message: 'Test and related attempts deleted successfully.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error deleting test.' });
   }
 });
 

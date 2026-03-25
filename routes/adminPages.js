@@ -34,7 +34,6 @@ router.get('/', protect, async (req, res) => {
           codingBanks: codingBanks || 0,
           codingTests: codingTests || 0,
           codingChallenges: codingChallenges || 0,
-          users: 142, // Mock aesthetic cohort size
           questions: banks.reduce((sum, b) => sum + (b.questions ? b.questions.length : 0), 0)
       };
 

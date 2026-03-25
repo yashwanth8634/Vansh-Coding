@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     alert(submitMessage);
 
-    testContainer.innerHTML = '<h1 class="text-xl font-medium text-gray-400 text-center mt-40 animate-pulse tracking-widest uppercase">Transmitting Data...</h1>';
+    testContainer.innerHTML = '<h1 class="text-xl font-medium text-gray-400 text-center mt-40 animate-pulse tracking-widest uppercase">Submitting... Please wait.</h1>';
 
     try {
         const response = await fetch('/api/test/submit', {
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
         displayResults(results);
 
     } catch (err) {
-        testContainer.innerHTML = `<h1 class="text-xl font-medium text-center mt-40 text-red-500 font-mono">Transmission Error: ${err.message}</h1>`;
+        testContainer.innerHTML = `<h1 class="text-xl font-medium text-center mt-40 text-red-500 font-mono">Error: ${err.message}</h1>`;
     }
   }
 
@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resultsContainer.style.display = 'flex';
     if(warningModal) warningModal.style.display = 'none';
 
-    scoreDisplay.textContent = `Grade: ${results.score} / ${results.total}`;
+    scoreDisplay.textContent = `You Scored: ${results.score} / ${results.total}`;
 
     resultsBreakdown.innerHTML = '';
     results.results.forEach((item, index) => {
@@ -317,18 +317,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isCorrect) {
           answerHtml = `
             <div class="mt-4 p-4 bg-[#050505] rounded-xl border border-white/10">
-              <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Detected Match (Exact)</span>
-              <span class="text-white font-medium text-sm">${item.selectedOption || 'NULL_DATA'}</span>
+              <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Your Answer (Correct)</span>
+              <span class="text-white font-medium text-sm">${item.selectedOption || 'Not Answered'}</span>
             </div>`;
         } else {
           answerHtml = `
             <div class="mt-4 flex flex-col md:flex-row gap-3">
               <div class="flex-1 p-4 bg-[#050505] rounded-xl border border-red-500/20">
-                <span class="text-[10px] font-mono uppercase tracking-widest text-red-400 block mb-1">Recorded Value</span>
-                <span class="text-gray-500 font-medium text-sm line-through">${item.selectedOption || 'NULL_DATA'}</span>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-red-400 block mb-1">Your Answer</span>
+                <span class="text-gray-500 font-medium text-sm line-through">${item.selectedOption || 'Not Answered'}</span>
               </div>
               <div class="flex-1 p-4 bg-[#050505] rounded-xl border border-green-500/20">
-                <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Expected Control</span>
+                <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Correct Answer</span>
                 <span class="text-white font-medium text-sm">${item.correctAnswer}</span>
               </div>
             </div>`;

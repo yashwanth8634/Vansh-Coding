@@ -97,19 +97,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const tr = document.createElement('tr');
-            tr.className = "border-b last:border-0 hover:bg-gray-50";
+            tr.className = 'hover:bg-white/[0.02] transition-colors';
 
             const score = attempt.score;
             const total = isInitial ? testTotalQuestions : (attempt.answers ? attempt.answers.length : testTotalQuestions);
 
             tr.innerHTML = `
-                <td class="p-3 font-medium">${attempt.studentRollNo}</td>
-                <td class="p-3">${score} / ${total}</td>
-                <td class="p-3">${new Date(attempt.submittedAt).toLocaleString()}</td>
-                <td class="p-3">
+                <td class="p-4 font-medium text-white">${attempt.studentRollNo}</td>
+                <td class="p-4 text-gray-300">${score} / ${total}</td>
+                <td class="p-4 text-gray-400 text-sm">${new Date(attempt.submittedAt).toLocaleString()}</td>
+                <td class="p-4 text-right">
                     <button data-action="view-details" 
                             data-rollno="${attempt.studentRollNo}"
-                            class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 transition-colors">
+                            class="bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 border border-white/10 hover:border-white/20 px-3 py-1.5 rounded-md text-xs font-medium transition-all">
                         View
                     </button>
                 </td>
@@ -167,30 +167,30 @@ document.addEventListener('DOMContentLoaded', () => {
         modalBody.innerHTML = '';
 
         if (!attempt.answers || attempt.answers.length === 0) {
-            modalBody.innerHTML = '<p class="text-gray-600">No detailed answer data found for this attempt.</p>';
+            modalBody.innerHTML = '<p class="text-gray-500">No detailed answer data found for this attempt.</p>';
             modal.classList.remove('hidden');
             return;
         }
 
         attempt.answers.forEach((answer, index) => {
             const isCorrect = answer.isCorrect;
-            const bgColor = isCorrect ? 'bg-green-50' : 'bg-red-50';
-            const borderColor = isCorrect ? 'border-green-300' : 'border-red-300';
+            const bgColor = isCorrect ? 'bg-green-500/5' : 'bg-red-500/5';
+            const borderColor = isCorrect ? 'border-green-500/20' : 'border-red-500/20';
 
             const optionsHtml = (answer.options || []).map(option => {
-                let styles = 'text-gray-700';
+                let styles = 'text-gray-300';
                 let marker = '';
 
                 if (option === answer.correctAnswer) {
-                    styles = 'text-green-700 font-bold';
+                    styles = 'text-green-400 font-bold';
                     marker = ' (Correct)';
                 }
                 if (option === answer.selectedOption && !isCorrect) {
-                    styles = 'text-red-700 font-bold';
+                    styles = 'text-red-400 font-bold';
                     marker = ' (Your Answer)';
                 }
                 if (option === answer.selectedOption && isCorrect) {
-                    styles = 'text-green-700 font-bold';
+                    styles = 'text-green-400 font-bold';
                     marker = ' (Your Answer)';
                 }
 
@@ -199,14 +199,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Add image HTML if it exists
             const imageHTML = answer.imageUrl
-                ? `<img src="${answer.imageUrl}" alt="Question Content" class="w-full rounded-lg mb-3 max-h-48 object-contain">`
+                ? `<img src="${answer.imageUrl}" alt="Question Content" class="w-full rounded-lg mb-3 max-h-48 object-contain border border-white/10">`
                 : '';
 
             const questionCard = document.createElement('div');
-            questionCard.className = `p-4 border ${borderColor} ${bgColor} rounded-lg`;
+            questionCard.className = `p-4 border ${borderColor} ${bgColor} rounded-lg bg-[#050505]`;
             questionCard.innerHTML = `
                 ${imageHTML}
-                <p class="font-semibold text-lg text-gray-800">${index + 1}. ${answer.questionText}</p>
+                <p class="font-semibold text-lg text-white">${index + 1}. ${answer.questionText}</p>
                 <ul class="list-disc list-inside mt-2 space-y-1">
                     ${optionsHtml}
                 </ul>
