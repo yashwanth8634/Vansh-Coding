@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const timerDisplay = document.querySelector('#timer span');
   const questionArea = document.getElementById('question-area');
   const submitTestBtn = document.getElementById('submit-test-btn');
+  const progressText = document.getElementById('progress-text');
+  const questionNav = document.getElementById('question-nav');
+  const questionNavButtons = document.getElementById('question-nav-buttons');
 
   // Results elements
   const scoreDisplay = document.getElementById('score');
@@ -81,11 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
     addSecurityListeners();
     displayQuestions(testData.questions);
     startTimer(testData.duration);
+    updateProgress();
   }
 
   // --- 3. DISPLAY QUESTIONS (UPDATED) ---
   function displayQuestions(questions) {
     questionArea.innerHTML = '';
+    if (questionNavButtons) questionNavButtons.innerHTML = '';
     questions.forEach((q, index) => {
       // Create options HTML
       const optionsHtml = q.options.map(option => `
@@ -103,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Create question card
       const questionCard = document.createElement('div');
       questionCard.className = 'bg-white p-5 sm:p-6 rounded-xl shadow-lg border border-gray-100 mb-6';
+      questionCard.id = `question-card-${q._id}`;
       questionCard.innerHTML = `
         ${imageHTML}
         <h3 class="text-lg sm:text-xl font-semibold mb-5 text-gray-900">${index + 1}. ${q.questionText}</h3>
@@ -111,7 +117,51 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
       questionArea.appendChild(questionCard);
+
+      if (questionNavButtons) {
+        const navButton = document.createElement('button');
+        navButton.type = 'button';
+        navButton.dataset.questionId = q._id;
+        navButton.className = 'w-9 h-9 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors';
+        navButton.textContent = `${index + 1}`;
+        navButton.addEventListener('click', () => {
+          const target = document.getElementById(`question-card-${q._id}`);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        questionNavButtons.appendChild(navButton);
+      }
     });
+    if (questionNav) questionNav.classList.remove('hidden');
+    attachProgressListeners();
+  }
+
+  function attachProgressListeners() {
+    questionArea.querySelectorAll('input[type="radio"]').forEach((input) => {
+      input.addEventListener('change', updateProgress);
+    });
+  }
+
+  function updateProgress() {
+    const questionDivs = questionArea.querySelectorAll('[data-question-id]');
+    const total = questionDivs.length;
+    let answered = 0;
+
+    questionDivs.forEach((div) => {
+      const qId = div.dataset.questionId;
+      const selected = div.querySelector(`input[name="question-${qId}"]:checked`);
+      if (selected) answered++;
+
+      const navButton = questionNavButtons
+        ? questionNavButtons.querySelector(`button[data-question-id="${qId}"]`)
+        : null;
+      if (navButton) {
+        navButton.className = selected
+          ? 'w-9 h-9 rounded-lg border border-green-200 bg-green-100 text-green-800 text-sm font-semibold transition-colors'
+          : 'w-9 h-9 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors';
+      }
+    });
+
+    if (progressText) progressText.textContent = `Answered ${answered} / ${total}`;
   }
   
   // --- 4. START TIMER ---
@@ -138,6 +188,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- 5. SECURITY LISTENERS ---
   function addSecurityListeners() {
+    window.addEventListener('beforeunload', (event) => {
+      if (!testIsSubmitted && testContainer.style.display !== 'none') {
+        event.preventDefault();
+        event.returnValue = '';
+      }
+    });
+
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && !testIsSubmitted) {
         handleWarning();

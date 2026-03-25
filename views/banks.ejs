@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Question Banks | Admin Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&family=Noto+Sans:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Albert Sans", "Noto Sans", "sans-serif"],
+              display: ["Montserrat", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+        font-size: 20px;
+      }
+      .tab-btn.active { color: #4f46e5 !important; border-color: #4f46e5 !important; background-color: #eef2ff !important; }
+    </style>
+  </head>
+  <body
+    class="bg-[radial-gradient(circle_at_top_left,_#dbeafe,_#f8fafc_35%,_#f8fafc)] font-sans text-gray-900"
+  >
+    <!-- ===== NAVBAR ===== -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+      <div
+        class="container max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center"
+      >
+        <h1 class="text-xl sm:text-2xl font-bold font-display text-indigo-600">
+          Admin Dashboard
+        </h1>
+        <button
+          id="logout-btn"
+          class="bg-red-600 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-red-700 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm sm:text-base"
+        >
+          Logout
+        </button>
+      </div>
+    </nav>
+
+    <div class="container max-w-7xl mx-auto p-4 md:p-8">
+
+      <!-- ===== TAB NAVIGATION ===== -->
+      <div class="flex space-x-1 mb-6 bg-white rounded-xl border border-gray-200 p-1 shadow-sm overflow-x-auto">
+        <a href="/admin" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
+          <span class="material-symbols-outlined" style="font-size:18px">dashboard</span>
+          Overview
+        </a>
+        <a href="/admin/banks" class="tab-btn active flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
+          <span class="material-symbols-outlined" style="font-size:18px">quiz</span>
+          Question Banks
+        </a>
+        <a href="/admin/tests" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
+          <span class="material-symbols-outlined" style="font-size:18px">assignment</span>
+          Tests
+        </a>
+      </div>
+
+      <!-- ===== CONTENT ===== -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Create Bank Form -->
+        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+          <h2 class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200">
+            Create Question Bank
+          </h2>
+          <form id="create-bank-form" class="space-y-4">
+            <div>
+              <label
+                for="bank-title"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >New Bank Title:</label
+              >
+              <input
+                type="text"
+                id="bank-title"
+                required
+                class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500"
+                placeholder="e.g., 'JavaScript Basics'"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Create and Add Questions
+            </button>
+          </form>
+          <div id="bank-result-message" class="mt-4 text-sm font-medium"></div>
+        </div>
+
+        <!-- Existing Banks List -->
+        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
+          <h2 class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200">
+            Existing Question Banks
+            <span class="text-sm font-normal text-gray-400 ml-2">(<%= banks.length %>)</span>
+          </h2>
+          <div
+            id="bank-list-container"
+            class="space-y-3 max-h-[32rem] overflow-y-auto"
+          >
+            <% if (banks.length === 0) { %>
+            <p class="text-gray-500 p-3">No question banks created yet.</p>
+            <% } else { %> <% banks.forEach(bank => { %>
+            <div
+              id="bank-<%= bank._id %>"
+              class="flex justify-between items-center border border-gray-200 p-3 sm:p-4 rounded-lg hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="font-medium text-gray-800 break-all pr-2"
+                ><%= bank.title %></span
+              >
+              <div
+                class="flex-shrink-0 flex items-center space-x-2 sm:space-x-3"
+              >
+                <a
+                  href="/admin/bank/<%= bank._id %>"
+                  class="text-gray-500 hover:text-indigo-600 transition-colors"
+                  title="Edit Questions"
+                >
+                  <span class="material-symbols-outlined">edit</span>
+                </a>
+                <button
+                  data-action="delete-bank"
+                  data-id="<%= bank._id %>"
+                  class="text-gray-500 hover:text-red-600 transition-colors"
+                  title="Delete Bank"
+                >
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </div>
+            </div>
+            <% }); %> <% } %>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="/js/admin.js"></script>
+  </body>
+</html>

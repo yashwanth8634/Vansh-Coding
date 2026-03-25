@@ -1,5 +1,47 @@
 // public/js/admin.js
 document.addEventListener('DOMContentLoaded', () => {
+
+  // --- Tab Switching Logic ---
+  const tabButtons = document.querySelectorAll('[data-tab]');
+  const tabPanels = document.querySelectorAll('.tab-panel');
+
+  function switchTab(tabName) {
+    // Update nav buttons (only those inside the tab bar)
+    document.querySelectorAll('.flex.space-x-1 > [data-tab]').forEach(btn => {
+      if (btn.dataset.tab === tabName) {
+        btn.classList.add('active');
+        btn.classList.remove('text-gray-500');
+      } else {
+        btn.classList.remove('active');
+        btn.classList.add('text-gray-500');
+      }
+    });
+    // Show/hide panels via inline style (immune to CSS overrides)
+    tabPanels.forEach(panel => {
+      if (panel.id === `tab-${tabName}`) {
+        panel.style.display = 'block';
+        panel.style.animation = 'fadeIn 0.25s ease-out';
+      } else {
+        panel.style.display = 'none';
+      }
+    });
+    // Update URL hash (without scrolling)
+    history.replaceState(null, '', `#${tabName}`);
+  }
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // Don't prevent default for anchor tags but handle tab switching
+      switchTab(btn.dataset.tab);
+    });
+  });
+
+  // Restore tab from URL hash on load
+  const hash = window.location.hash.replace('#', '');
+  if (hash && document.getElementById(`tab-${hash}`)) {
+    switchTab(hash);
+  }
+
   // --- Get All Elements ---
   const testForm = document.getElementById('create-test-form');
   const testResultDiv = document.getElementById('test-link-result');
@@ -19,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       bankResultDiv.textContent = ''; 
       const title = bankTitleInput.value.trim();
+      const submitBtn = bankForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
       // ... (rest of this function is the same) ...
       
       try {
@@ -35,6 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } catch (error) {
         bankResultDiv.innerHTML = `<strong class="text-red-600">Network error: ${error.message}</strong>`;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create and Add Questions';
       }
     });
   }
@@ -46,6 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       testResultDiv.style.display = 'none';
       testResultDiv.textContent = '';
+      const submitBtn = testForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
       const data = {
         questionBankId: document.getElementById('bank-select').value,
         numQuestions: document.getElementById('num-questions').value,
@@ -55,6 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!data.questionBankId) {
           testResultDiv.innerHTML = `<strong class="text-red-600">Error: Please select a question bank.</strong>`;
           testResultDiv.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create Test Link';
           return;
       }
       try {
@@ -70,14 +123,34 @@ document.addEventListener('DOMContentLoaded', () => {
           testResultDiv.innerHTML = `
             <strong class="text-green-600">Test Created!</strong>
             <p class="mt-2">Share this link:</p>
-            <input type="text" value="${fullLink}" readonly class="w-full p-2 border border-gray-300 rounded-md bg-gray-100 mt-1">
+            <input id="latest-test-link" type="text" value="${fullLink}" readonly class="w-full p-2 border border-gray-300 rounded-md bg-gray-100 mt-1">
+            <button id="copy-latest-link" type="button" class="mt-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800">Copy Link</button>
           `;
+          const copyBtn = document.getElementById('copy-latest-link');
+          if (copyBtn) {
+            copyBtn.addEventListener('click', async () => {
+              const input = document.getElementById('latest-test-link');
+              try {
+                await navigator.clipboard.writeText(input.value);
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                  copyBtn.textContent = 'Copy Link';
+                }, 1200);
+              } catch {
+                input.select();
+                document.execCommand('copy');
+              }
+            });
+          }
         } else {
           testResultDiv.innerHTML = `<strong class="text-red-600">Error: ${result.message}</strong>`;
         }
       } catch (error) {
         testResultDiv.style.display = 'block';
         testResultDiv.innerHTML = `<strong class="text-red-600">Network error: ${error.message}</strong>`;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Test Link';
       }
     });
   }
@@ -100,10 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- NEW: Handle Delete Bank Clicks ---
   if (bankListContainer) {
     bankListContainer.addEventListener('click', async (e) => {
-      // Check if the clicked element is a delete button
-      if (e.target.dataset.action === 'delete-bank') {
-        const bankId = e.target.dataset.id;
-        const bankTitle = e.target.closest('.flex').querySelector('span').textContent;
+      const deleteBtn = e.target.closest('[data-action="delete-bank"]');
+      if (deleteBtn) {
+        const bankId = deleteBtn.dataset.id;
+        const bankRow = deleteBtn.closest(`[id="bank-${bankId}"]`);
+        const bankTitle = bankRow ? bankRow.querySelector('span').textContent : 'this bank';
 
         // 1. Show confirmation dialog
         if (!confirm(`Are you sure you want to delete the bank "${bankTitle}"?\n\nThis will delete all questions inside it and cannot be undone.`)) {
@@ -142,5 +216,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  document.addEventListener('click', async (e) => {
+    const copyBtn = e.target.closest('[data-action="copy-link"]');
+    if (!copyBtn) return;
+
+    const card = copyBtn.closest('.border');
+    const input = card ? card.querySelector('[data-role="test-link"]') : null;
+    if (!input) return;
+
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}${input.value}`);
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy Link';
+      }, 1200);
+    } catch {
+      input.select();
+      document.execCommand('copy');
+    }
+  });
 
 });

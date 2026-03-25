@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const attemptCount = document.getElementById('attempt-count');
     const testId = document.getElementById('test-id').value;
     const noResultsRow = document.getElementById('no-results-row');
+    const exportCsvBtn = document.getElementById('export-csv');
 
     // --- Modal Elements ---
     const modal = document.getElementById('analysis-modal');
@@ -59,6 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
+    if (searchInput) {
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          clearBtn.click();
+        }
+      });
+    }
 
     // --- Render Table ---
     function renderTable(attempts, isInitial = false) {
@@ -212,6 +221,43 @@ document.addEventListener('DOMContentLoaded', () => {
     modalCloseBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
     });
+
+    if (exportCsvBtn) {
+      exportCsvBtn.addEventListener('click', () => {
+        let rows = [];
+        if (typeof initialAttemptsData !== 'undefined' && initialAttemptsData.length) {
+          rows = initialAttemptsData;
+        } else {
+          rows = Object.values(searchResultsData);
+        }
+
+        if (!rows.length) {
+          alert('No attempts available to export.');
+          return;
+        }
+
+        const header = ['roll_no', 'score', 'submitted_at'];
+        const csvRows = rows.map((row) => [
+          row.studentRollNo || '',
+          row.score ?? '',
+          row.submittedAt ? new Date(row.submittedAt).toISOString() : ''
+        ]);
+
+        const csv = [header, ...csvRows]
+          .map((line) => line.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+          .join('\n');
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `test-${testId}-attempts.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      });
+    }
 
     // --- Initialize the "search cache" with data from the server ---
     if (typeof initialAttemptsData !== 'undefined') {

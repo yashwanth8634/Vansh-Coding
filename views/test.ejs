@@ -41,7 +41,9 @@
       }
     </style>
   </head>
-  <body class="bg-gray-50 font-sans text-gray-900">
+  <body
+    class="bg-[radial-gradient(circle_at_top_left,_#dcfce7,_#f8fafc_35%,_#f8fafc)] font-sans text-gray-900"
+  >
     <div
       id="login-container"
       class="min-h-screen flex items-center justify-center p-4"
@@ -89,11 +91,14 @@
     <div id="test-container" class="hidden">
       <div
         id="header"
-        class="bg-white shadow-md p-4 flex justify-between items-center fixed w-full top-0 left-0 z-10 px-4 sm:px-6"
+        class="bg-white shadow-md p-4 flex justify-between items-center fixed w-full top-0 left-0 z-10 px-4 sm:px-6 gap-3"
       >
-        <h2 id="test-title" class="text-lg sm:text-xl font-bold font-display">
-          Test in Progress...
-        </h2>
+        <div>
+          <h2 id="test-title" class="text-lg sm:text-xl font-bold font-display">
+            Test in Progress...
+          </h2>
+          <p id="progress-text" class="text-sm text-gray-600">Answered 0 / 0</p>
+        </div>
         <div
           id="timer"
           class="text-base sm:text-lg font-semibold bg-red-600 text-white px-3 py-2 rounded-lg"
@@ -107,6 +112,17 @@
           id="question-area"
           class="container max-w-3xl mx-auto p-4 md:p-8"
         ></div>
+        <div
+          id="question-nav"
+          class="container max-w-3xl mx-auto px-4 md:px-8 pb-4 hidden"
+        >
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <p class="text-sm text-gray-600 mb-3">
+              Quick Jump
+            </p>
+            <div id="question-nav-buttons" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
       </div>
 
       <div

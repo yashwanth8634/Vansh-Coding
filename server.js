@@ -1,9 +1,12 @@
 // server.js
+require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
-const connectDB = require('./config/db'); // Import DB connection
-const ipAddress = '192.168.4.123';
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
+const connectDB = require('./config/db');
 
 // Import route files
 const pageRoutes = require('./routes/pages');
@@ -13,35 +16,65 @@ const apiRoutes = require('./routes/api');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// --- Connect to Database ---
-connectDB();
+// --- Security & Performance Middleware ---
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP for EJS inline scripts
+}));
+app.use(compression()); // Gzip all responses (~70% smaller)
+app.use(morgan('short')); // HTTP request logging
 
-// --- Middleware ---
-app.use(express.json()); // To parse JSON bodies
-app.use(express.urlencoded({ extended: false })); // To parse URL-encoded forms
-app.use(cookieParser()); // To parse cookies
+// --- Parsing Middleware ---
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // --- View Engine Setup (EJS) ---
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// --- Static Folder Setup (public) ---
-app.use(express.static(path.join(__dirname, 'public')));
+// --- Static Folder Setup (with caching headers) ---
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '7d',
+  etag: true,
+  lastModified: true,
+}));
 
 // ===================================
 // --- ROUTES ---
 // ===================================
-
-// Use the imported route files
-// All EJS page-rendering routes will be handled by 'pageRoutes'
 app.use('/', pageRoutes); 
-
-// All API routes will be prefixed with '/api'
 app.use('/api', apiRoutes);
 
-// ===================================
-
-// --- Start the Server ---
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// --- Centralized Error Handler ---
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  const statusCode = err.status || 500;
+  res.status(statusCode).json({
+    message: process.env.NODE_ENV === 'production'
+      ? 'Internal Server Error'
+      : err.message,
+  });
 });
+
+// --- Graceful Shutdown ---
+const gracefulShutdown = (signal) => {
+  console.log(`\n${signal} received. Shutting down gracefully...`);
+  const mongoose = require('mongoose');
+  mongoose.connection.close(false).then(() => {
+    console.log('MongoDB connection closed.');
+    process.exit(0);
+  });
+};
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// --- Start the Server only after DB connection ---
+const startServer = async () => {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+};
+
+startServer();
+

@@ -1,32 +1,37 @@
 // middleware/auth.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { caches } = require('../utils/cache');
 
-// In a real app, this should be in a .env file
-const JWT_SECRET = process.env.JWT_SECRET // Must be the same secret
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const protect = async (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    // If it's an API request, send JSON
     if (req.originalUrl.startsWith('/api')) {
       return res.status(401).json({ message: 'Not authorized, no token.' });
     }
-    // If it's a page request, redirect to a login page
     return res.redirect('/login'); 
   }
 
   try {
-    // Verify token
     const decoded = jwt.verify(token, JWT_SECRET);
     
-    // Get user from the token and attach to request
-    req.user = await User.findById(decoded.userId).select('-password');
+    // Check user cache first, then DB
+    const cacheKey = `user-${decoded.userId}`;
+    let user = caches.user.get(cacheKey);
+    
+    if (!user) {
+      user = await User.findById(decoded.userId).select('-password');
+      if (user) {
+        caches.user.set(cacheKey, user);
+      }
+    }
+    
+    req.user = user;
     
     if (!req.user) {
-        // User not found in DB
-        // Clear the bad cookie
         res.cookie('token', '', { httpOnly: true, expires: new Date(0) });
         if (req.originalUrl.startsWith('/api')) {
             return res.status(401).json({ message: 'Not authorized.' });
@@ -34,9 +39,8 @@ const protect = async (req, res, next) => {
         return res.redirect('/login');
     }
     
-    next(); // Proceed to the protected route
+    next();
   } catch (error) {
-    // Token is invalid
     res.cookie('token', '', { httpOnly: true, expires: new Date(0) });
     if (req.originalUrl.startsWith('/api')) {
         return res.status(401).json({ message: 'Not authorized, token failed.' });

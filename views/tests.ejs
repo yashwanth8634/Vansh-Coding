@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard</title>
+    <title>Tests | Admin Dashboard</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,11 +35,15 @@
     <style>
       .material-symbols-outlined {
         font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-        font-size: 20px; /* Base size */
+        font-size: 20px;
       }
+      .tab-btn.active { color: #4f46e5 !important; border-color: #4f46e5 !important; background-color: #eef2ff !important; }
     </style>
   </head>
-  <body class="bg-gray-50 font-sans text-gray-900">
+  <body
+    class="bg-[radial-gradient(circle_at_top_left,_#dbeafe,_#f8fafc_35%,_#f8fafc)] font-sans text-gray-900"
+  >
+    <!-- ===== NAVBAR ===== -->
     <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
       <div
         class="container max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center"
@@ -57,45 +61,31 @@
     </nav>
 
     <div class="container max-w-7xl mx-auto p-4 md:p-8">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-          <h2
-            class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200"
-          >
-            1. Create Question Bank
-          </h2>
-          <form id="create-bank-form" class="space-y-4 pt-6">
-            <div>
-              <label
-                for="bank-title"
-                class="block text-sm font-medium text-gray-700 mb-1"
-                >New Bank Title:</label
-              >
-              <input
-                type="text"
-                id="bank-title"
-                required
-                class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500"
-                placeholder="e.g., 'JavaScript Basics'"
-              />
-            </div>
-            <button
-              type="submit"
-              class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Create and Add Questions
-            </button>
-          </form>
-          <div id="bank-result-message" class="mt-4 text-sm font-medium"></div>
-        </div>
 
-        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-          <h2
-            class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200"
-          >
-            2. Create New Test
+      <!-- ===== TAB NAVIGATION ===== -->
+      <div class="flex space-x-1 mb-6 bg-white rounded-xl border border-gray-200 p-1 shadow-sm overflow-x-auto">
+        <a href="/admin" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
+          <span class="material-symbols-outlined" style="font-size:18px">dashboard</span>
+          Overview
+        </a>
+        <a href="/admin/banks" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
+          <span class="material-symbols-outlined" style="font-size:18px">quiz</span>
+          Question Banks
+        </a>
+        <a href="/admin/tests" class="tab-btn active flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
+          <span class="material-symbols-outlined" style="font-size:18px">assignment</span>
+          Tests
+        </a>
+      </div>
+
+      <!-- ===== CONTENT ===== -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Create Test Form -->
+        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100 mb-6 lg:mb-0">
+          <h2 class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200">
+            Create New Test
           </h2>
-          <form id="create-test-form" class="space-y-4 pt-6">
+          <form id="create-test-form" class="space-y-4">
             <div>
               <label
                 for="bank-select"
@@ -120,7 +110,7 @@
                 <label
                   for="num-questions"
                   class="block text-sm font-medium text-gray-700 mb-1"
-                  ># of Qs:</label
+                  ># of Questions:</label
                 >
                 <input
                   type="number"
@@ -134,7 +124,7 @@
                 <label
                   for="duration"
                   class="block text-sm font-medium text-gray-700 mb-1"
-                  >Mins:</label
+                  >Duration (mins):</label
                 >
                 <input
                   type="number"
@@ -148,7 +138,7 @@
                 <label
                   for="expiry"
                   class="block text-sm font-medium text-gray-700 mb-1"
-                  >Hours:</label
+                  >Link Expiry (hours):</label
                 >
                 <input
                   type="number"
@@ -172,63 +162,14 @@
             style="display: none"
           ></div>
         </div>
-      </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Active & Expired Tests List -->
         <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-          <h2
-            class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200"
-          >
-            Existing Question Banks
-          </h2>
-
-          <div
-            id="bank-list-container"
-            class="space-y-3 max-h-96 overflow-y-auto pt-6"
-          >
-            <% if (banks.length === 0) { %>
-            <p class="text-gray-500 p-3">No question banks created yet.</p>
-            <% } else { %> <% banks.forEach(bank => { %>
-
-            <div
-              id="bank-<%= bank._id %>"
-              class="flex justify-between items-center border border-gray-200 p-3 sm:p-4 rounded-lg hover:bg-gray-100 transition-colors duration-150"
-            >
-              <span class="font-medium text-gray-800 break-all pr-2"
-                ><%= bank.title %></span
-              >
-
-              <div
-                class="flex-shrink-0 flex items-center space-x-2 sm:space-x-3"
-              >
-                <a
-                  href="/admin/bank/<%= bank._id %>"
-                  class="text-gray-500 hover:text-indigo-600 transition-colors"
-                  title="Edit Questions"
-                >
-                  <span class="material-symbols-outlined">edit</span>
-                </a>
-                <button
-                  data-action="delete-bank"
-                  data-id="<%= bank._id %>"
-                  class="text-gray-500 hover:text-red-600 transition-colors"
-                  title="Delete Bank"
-                >
-                  <span class="material-symbols-outlined">delete</span>
-                </button>
-              </div>
-            </div>
-            <% }); %> <% } %>
-          </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-          <h2
-            class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200"
-          >
+          <h2 class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200">
             Active & Expired Tests
+            <span class="text-sm font-normal text-gray-400 ml-2">(<%= tests.length %>)</span>
           </h2>
-          <div class="space-y-3 max-h-96 overflow-y-auto pt-6">
+          <div class="space-y-3 max-h-[32rem] overflow-y-auto">
             <% if (tests.length === 0) { %>
             <p class="text-gray-500 p-3">No tests created yet.</p>
             <% } else { %> <% tests.forEach(test => { %>
@@ -238,7 +179,7 @@
               <div class="flex flex-wrap justify-between items-start gap-3">
                 <div>
                   <strong class="font-semibold text-indigo-600">
-                    <%= test.questionBank ? test.questionBank.title : 'DeletedBank' %></strong
+                    <%= test.questionBank ? test.questionBank.title : 'Deleted Bank' %></strong
                   >
                   <p class="text-sm text-gray-600">
                     <%= test.numQuestions %> Questions, <%= test.duration %>
@@ -260,13 +201,22 @@
                 type="text"
                 value="<%= `/test/${test.uniqueLink}` %>"
                 readonly
+                data-role="test-link"
                 class="w-full p-2 border border-gray-200 rounded-md bg-gray-100 text-sm mt-3 font-mono"
               />
+              <button
+                type="button"
+                data-action="copy-link"
+                class="mt-2 text-sm text-indigo-600 font-semibold hover:text-indigo-800"
+              >
+                Copy Link
+              </button>
             </div>
             <% }); %> <% } %>
           </div>
         </div>
       </div>
+
     </div>
 
     <script src="/js/admin.js"></script>

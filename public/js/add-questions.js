@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const option3Input = document.getElementById('option3');
   const option4Input = document.getElementById('option4');
   const correctAnswerSelect = document.getElementById('correct-answer');
+  const imagePreviewWrap = document.getElementById('image-preview-wrap');
+  const imagePreview = document.getElementById('image-preview');
   
   // --- List Elements ---
   const questionList = document.getElementById('question-list');
@@ -31,15 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       messageDiv.textContent = '';
       messageDiv.className = 'mt-4 text-sm font-medium';
+      submitBtn.disabled = true;
 
       // 1. Get all values from the form
       const questionText = questionTextInput.value;
       const imageUrl = imageUrlInput.value.trim() || null; // Get image URL
       const options = [
-        option1Input.value,
-        option2Input.value,
-        option3Input.value,
-        option4Input.value,
+        option1Input.value.trim(),
+        option2Input.value.trim(),
+        option3Input.value.trim(),
+        option4Input.value.trim(),
       ];
       const correctIndex = correctAnswerSelect.value;
       
@@ -47,16 +50,25 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!questionText.trim()) {
         messageDiv.textContent = 'Please enter question text.';
         messageDiv.classList.add('text-red-600');
+        submitBtn.disabled = false;
         return;
       }
       if (options.some(opt => opt.trim() === '')) {
         messageDiv.textContent = 'All four options must be filled out.';
         messageDiv.classList.add('text-red-600');
+        submitBtn.disabled = false;
+        return;
+      }
+      if (new Set(options.map(opt => opt.toLowerCase())).size !== options.length) {
+        messageDiv.textContent = 'Options must be unique.';
+        messageDiv.classList.add('text-red-600');
+        submitBtn.disabled = false;
         return;
       }
       if (!correctIndex) {
         messageDiv.textContent = 'Please select a correct answer.';
         messageDiv.classList.add('text-red-600');
+        submitBtn.disabled = false;
         return;
       }
       
@@ -97,6 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         messageDiv.textContent = `Network error: ${err.message}`;
         messageDiv.classList.add('text-red-600');
+      } finally {
+        submitBtn.disabled = false;
       }
     });
   }
@@ -141,6 +155,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- CANCEL EDIT BUTTON CLICK ---
   if (cancelEditBtn) {
     cancelEditBtn.addEventListener('click', resetForm);
+  }
+
+  if (imageUrlInput) {
+    imageUrlInput.addEventListener('input', () => {
+      const value = imageUrlInput.value.trim();
+      if (!value) {
+        imagePreviewWrap.classList.add('hidden');
+        imagePreview.removeAttribute('src');
+        return;
+      }
+      imagePreview.src = value;
+      imagePreviewWrap.classList.remove('hidden');
+    });
+  }
+
+  if (imagePreview) {
+    imagePreview.addEventListener('error', () => {
+      imagePreviewWrap.classList.add('hidden');
+    });
   }
 
   if (questionList) {
@@ -207,6 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
     messageDiv.textContent = '';
     editQuestionIdInput.value = '';
     imageUrlInput.value = ''; // Reset image URL field
+    imagePreviewWrap.classList.add('hidden');
+    imagePreview.removeAttribute('src');
   }
 
   function addNewQuestionToList(question) {
