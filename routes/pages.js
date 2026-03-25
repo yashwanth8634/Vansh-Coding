@@ -6,9 +6,9 @@ const router = express.Router();
 const adminPages = require('./adminPages');
 const testPages = require('./testPages');
 
-// GET / - Homepage → redirect to login
+// GET / - Homepage Marketing Landing
 router.get('/', (req, res) => {
-  res.redirect('/login');
+  res.render('index');
 });
 
 // GET /login - Show the admin login page

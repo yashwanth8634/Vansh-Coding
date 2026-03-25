@@ -1,228 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tests | Admin Dashboard</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCQ Tests | Command Center</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&family=Noto+Sans:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+    
+    .glass-sidebar { background: rgba(10, 10, 10, 0.8); border-right: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
+    .glass-nav { background: rgba(0, 0, 0, 0.6); border-bottom: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
+    
+    .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.2s ease-out; }
+    .glass-card:hover { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.12); }
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-      rel="stylesheet"
-    />
+    .nav-item { color: #888; transition: all 0.2s; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-item.active { color: #fff; background: rgba(255,255,255,0.1); font-weight: 500; }
+    
+    .grid-bg {
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden antialiased selection:bg-white/30">
 
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ["Albert Sans", "Noto Sans", "sans-serif"],
-              display: ["Montserrat", "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
+  <aside class="w-20 md:w-64 glass-sidebar flex flex-col shrink-0 z-20">
+    <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-white/10 shrink-0">
+      <span class="material-symbols-outlined text-[24px] text-white">terminal</span>
+      <span class="ml-3 font-semibold tracking-tight text-white hidden md:block">VanshCoding</span>
+    </div>
+    
+    <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3 hidden md:block">Analytics</div>
+      <a href="/admin" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">space_dashboard</span>
+        <span class="text-sm hidden md:block">Overview</span>
+      </a>
 
-    <style>
-      .material-symbols-outlined {
-        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-        font-size: 20px;
-      }
-      .tab-btn.active { color: #4f46e5 !important; border-color: #4f46e5 !important; background-color: #eef2ff !important; }
-    </style>
-  </head>
-  <body
-    class="bg-[radial-gradient(circle_at_top_left,_#dbeafe,_#f8fafc_35%,_#f8fafc)] font-sans text-gray-900"
-  >
-    <!-- ===== NAVBAR ===== -->
-    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-      <div
-        class="container max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center"
-      >
-        <h1 class="text-xl sm:text-2xl font-bold font-display text-indigo-600">
-          Admin Dashboard
-        </h1>
-        <button
-          id="logout-btn"
-          class="bg-red-600 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-red-700 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm sm:text-base"
-        >
-          Logout
-        </button>
-      </div>
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Objective Tasks</div>
+      <a href="/admin/banks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">folder_open</span>
+        <span class="text-sm hidden md:block">MCQ Banks</span>
+      </a>
+      <a href="/admin/tests" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">link</span>
+        <span class="text-sm hidden md:block">MCQ Links</span>
+      </a>
+
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Engineering</div>
+      <a href="/admin/coding/banks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">data_object</span>
+        <span class="text-sm hidden md:block">Coding Banks</span>
+      </a>
+      <a href="/admin/coding/tests" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">api</span>
+        <span class="text-sm hidden md:block">Coding Links</span>
+      </a>
+      <a href="/admin/coding" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">code_blocks</span>
+        <span class="text-sm hidden md:block">Challenges</span>
+      </a>
     </nav>
+    
+    <div class="p-4 border-t border-white/10 shrink-0">
+      <form action="/api/auth/logout" method="POST">
+        <button type="submit" class="w-full flex items-center justify-center md:justify-start gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">logout</span>
+          <span class="text-sm font-medium hidden md:block">Sign Out</span>
+        </button>
+      </form>
+    </div>
+  </aside>
 
-    <div class="container max-w-7xl mx-auto p-4 md:p-8">
+  <main class="flex-1 flex flex-col relative overflow-hidden bg-[#000]">
+    <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
-      <!-- ===== TAB NAVIGATION ===== -->
-      <div class="flex space-x-1 mb-6 bg-white rounded-xl border border-gray-200 p-1 shadow-sm overflow-x-auto">
-        <a href="/admin" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">dashboard</span>
-          Overview
-        </a>
-        <a href="/admin/banks" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">quiz</span>
-          Question Banks
-        </a>
-        <a href="/admin/tests" class="tab-btn active flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">assignment</span>
-          Tests
-        </a>
-        <a href="/admin/coding" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">code</span>
-          Coding Platform
-        </a>
+    <header class="h-16 glass-nav flex items-center justify-between px-6 lg:px-10 shrink-0 z-10 relative">
+      <div class="flex items-center gap-2 text-sm text-gray-400">
+        <span class="text-gray-500 font-medium tracking-tight">Objective Tasks</span>
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span class="text-white font-medium">MCQ Link Generator</span>
       </div>
+      
+      <!-- Sub Tabs -->
+      <div class="hidden sm:flex items-center bg-white/5 border border-white/10 rounded-lg p-1 space-x-1">
+        <a href="/admin/banks" class="text-gray-400 hover:text-white hover:bg-white/5 px-4 py-1.5 rounded-md text-sm font-medium transition-colors">Question Banks</a>
+        <a href="/admin/tests" class="bg-white/10 text-white shadow-sm px-4 py-1.5 rounded-md text-sm font-medium transition-colors">Link Generator</a>
+      </div>
+    </header>
 
-      <!-- ===== CONTENT ===== -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Create Test Form -->
-        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100 mb-6 lg:mb-0">
-          <h2 class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200">
-            Create New Test
-          </h2>
-          <form id="create-test-form" class="space-y-4">
-            <div>
-              <label
-                for="bank-select"
-                class="block text-sm font-medium text-gray-700 mb-1"
-                >Question Bank:</label
-              >
-              <select
-                id="bank-select"
-                required
-                class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500"
-              >
-                <option value="">-- Select a Bank --</option>
-                <% if (banks.length > 0) { %> <% banks.forEach(bank => { %>
-                <option value="<%= bank._id %>"><%= bank.title %></option>
-                <% }); %> <% } else { %>
-                <option value="" disabled>No question banks found.</option>
-                <% } %>
-              </select>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="flex-1 overflow-y-auto p-6 lg:p-10 relative z-10">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8">
+        
+        <!-- Create Link Form (1/3 width) -->
+        <div class="xl:col-span-4 space-y-6">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Publish Session</h1>
+            <p class="text-gray-400 font-light text-sm">Generate temporary, tracking-enabled assessment links.</p>
+          </div>
+          
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <form id="createTestForm" class="space-y-5 relative z-10">
               <div>
-                <label
-                  for="num-questions"
-                  class="block text-sm font-medium text-gray-700 mb-1"
-                  ># of Questions:</label
-                >
-                <input
-                  type="number"
-                  id="num-questions"
-                  value="10"
-                  required
-                  class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500"
-                />
+                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Source Blueprint</label>
+                <select id="bankId" required class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white appearance-none focus:bg-[#111] focus:border-white/30 transition-all outline-none">
+                  <option value="" class="text-gray-500">-- Choose Bank --</option>
+                  <% banks.forEach(b => { %>
+                    <option value="<%= b._id %>"><%= b.name %> (<%= b.category %>)</option>
+                  <% }); %>
+                </select>
               </div>
-              <div>
-                <label
-                  for="duration"
-                  class="block text-sm font-medium text-gray-700 mb-1"
-                  >Duration (mins):</label
-                >
-                <input
-                  type="number"
-                  id="duration"
-                  value="30"
-                  required
-                  class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500"
-                />
-              </div>
-              <div>
-                <label
-                  for="expiry"
-                  class="block text-sm font-medium text-gray-700 mb-1"
-                  >Link Expiry (hours):</label
-                >
-                <input
-                  type="number"
-                  id="expiry"
-                  value="24"
-                  required
-                  class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500"
-                />
-              </div>
-            </div>
-            <button
-              type="submit"
-              class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Create Test Link
-            </button>
-          </form>
-          <div
-            id="test-link-result"
-            class="mt-4 p-4 bg-gray-50 rounded-lg"
-            style="display: none"
-          ></div>
-        </div>
-
-        <!-- Active & Expired Tests List -->
-        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-          <h2 class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200">
-            Active & Expired Tests
-            <span class="text-sm font-normal text-gray-400 ml-2">(<%= tests.length %>)</span>
-          </h2>
-          <div class="space-y-3 max-h-[32rem] overflow-y-auto">
-            <% if (tests.length === 0) { %>
-            <p class="text-gray-500 p-3">No tests created yet.</p>
-            <% } else { %> <% tests.forEach(test => { %>
-            <div
-              class="border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition-colors duration-150"
-            >
-              <div class="flex flex-wrap justify-between items-start gap-3">
+              
+              <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <strong class="font-semibold text-indigo-600">
-                    <%= test.questionBank ? test.questionBank.title : 'Deleted Bank' %></strong
-                  >
-                  <p class="text-sm text-gray-600">
-                    <%= test.numQuestions %> Questions, <%= test.duration %>
-                    Mins
-                  </p>
-                  <p class="text-sm text-gray-500">
-                    Expires: <%= new Date(test.linkExpiresAt).toLocaleString()
-                    %>
-                  </p>
+                  <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Volume</label>
+                  <input type="number" id="numQuestions" min="1" max="100" value="10" required 
+                    class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white focus:bg-[#111] focus:border-white/30 transition-all outline-none">
                 </div>
-                <a
-                  href="/admin/test/<%= test._id %>/results"
-                  class="text-sm bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                >
-                  View Results
-                </a>
+                <div>
+                  <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">TTL (Hours)</label>
+                  <input type="number" id="validityHours" min="1" max="720" value="24" required 
+                    class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white focus:bg-[#111] focus:border-white/30 transition-all outline-none">
+                </div>
               </div>
-              <input
-                type="text"
-                value="<%= `/test/${test.uniqueLink}` %>"
-                readonly
-                data-role="test-link"
-                class="w-full p-2 border border-gray-200 rounded-md bg-gray-100 text-sm mt-3 font-mono"
-              />
-              <button
-                type="button"
-                data-action="copy-link"
-                class="mt-2 text-sm text-indigo-600 font-semibold hover:text-indigo-800"
-              >
-                Copy Link
+
+              <button type="submit" class="w-full bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] flex justify-center items-center gap-2 mt-2">
+                <span class="material-symbols-outlined text-[18px]">add_link</span> Generate URL
               </button>
-            </div>
-            <% }); %> <% } %>
+            </form>
           </div>
         </div>
+
+        <!-- Links List (2/3 width) -->
+        <div class="xl:col-span-8 space-y-6">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Active Sessions</h1>
+            <p class="text-gray-400 font-light text-sm">Monitor live links and access candidate results.</p>
+          </div>
+          
+          <div class="glass-card rounded-2xl p-2 h-max max-h-[calc(100vh-250px)] overflow-y-auto">
+            <div class="space-y-2 p-2">
+              <% tests.forEach(t => { %>
+                <div class="bg-black/40 border border-white/5 hover:border-white/10 hover:bg-white/5 p-5 rounded-xl flex flex-col gap-4 transition-all group">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <strong class="text-base font-medium text-white block mb-1"><%= t.questionBank ? t.questionBank.name : 'Unknown Bank' %></strong>
+                      <div class="flex items-center gap-2 text-xs">
+                         <span class="inline-block w-2 h-2 rounded-full <%= new Date() > new Date(t.expiresAt) ? 'bg-red-500' : 'bg-green-500 animate-pulse' %>"></span>
+                         <span class="text-gray-400">Expires: <%= new Date(t.expiresAt).toLocaleString() %></span>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <a href="/admin/test/<%= t._id %>/results" class="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 hover:border-blue-500/40 px-4 py-2 rounded-lg text-xs font-medium transition-colors">View Results</a>
+                      <button onclick="deleteTest('<%= t._id %>')" class="bg-transparent text-gray-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 p-2 rounded-lg transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div class="bg-[#0a0a0a] border border-white/10 p-3 rounded-lg flex items-center justify-between">
+                    <a href="/test/<%= t.uniqueLink %>" target="_blank" class="text-gray-300 font-mono text-xs hover:text-white transition-colors truncate w-[80%]">/test/<%= t.uniqueLink %></a>
+                    <button onclick="navigator.clipboard.writeText(window.location.origin + '/test/<%= t.uniqueLink %>')" class="text-gray-500 hover:text-white transition-colors">
+                      <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                    </button>
+                  </div>
+                </div>
+              <% }); %>
+              <% if(tests.length === 0) { %>
+                <div class="text-gray-500 text-center py-16 text-sm font-medium bg-black/20 rounded-xl border border-dashed border-white/10 flex flex-col items-center">
+                  <span class="material-symbols-outlined text-4xl mb-3 opacity-50">link_off</span>
+                  No active assessment sessions.
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
       </div>
-
     </div>
+  </main>
 
-    <script src="/js/admin.js"></script>
-  </body>
+  <script>
+    document.getElementById('createTestForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Processing...';
+      btn.disabled = true;
+
+      const b = document.getElementById('bankId').value, n = document.getElementById('numQuestions').value, v = document.getElementById('validityHours').value;
+      const res = await fetch('/api/admin/tests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ questionBankId: b, numQuestions: n, validityHours: v }) });
+      if(res.ok) window.location.reload(); 
+      else { alert('Error generating session link.'); btn.innerHTML = originalText; btn.disabled = false; }
+    });
+
+    async function deleteTest(id) {
+      if(confirm('Terminate session? This deletes the link and all associated attempt results immediately.')) {
+        const res = await fetch(`/api/admin/tests/${id}`, { method: 'DELETE' });
+        if(res.ok) window.location.reload();
+      }
+    }
+  </script>
+</body>
 </html>

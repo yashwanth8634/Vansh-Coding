@@ -1,207 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assessment Protocol | VanshCoding</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-    <title>Attempt Test</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+    
+    .glass-header { background: rgba(0, 0, 0, 0.7); border-bottom: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(20px); }
+    .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-modal { background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(30px); }
+    
+    .grid-bg {
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+    }
+  </style>
+</head>
+<body class="min-h-screen relative selection:bg-white/30 selection:text-white pb-24 antialiased">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&family=Noto+Sans:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+  <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-      rel="stylesheet"
-    />
+  <!-- =============================== -->
+  <!-- 1. STUDENT LOGIN CONTAINER      -->
+  <!-- =============================== -->
+  <div id="login-container" class="min-h-screen flex items-center justify-center p-6 relative z-10">
+    <div class="glass-card rounded-2xl p-8 md:p-12 w-full max-w-md relative overflow-hidden">
+      <!-- Ambient Glow -->
+      <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ["Albert Sans", "Noto Sans", "sans-serif"],
-              display: ["Montserrat", "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
-
-    <style>
-      .material-symbols-outlined {
-        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-        font-size: 24px;
-      }
-    </style>
-  </head>
-  <body
-    class="bg-[radial-gradient(circle_at_top_left,_#dcfce7,_#f8fafc_35%,_#f8fafc)] font-sans text-gray-900"
-  >
-    <div
-      id="login-container"
-      class="min-h-screen flex items-center justify-center p-4"
-    >
-      <div
-        class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100 w-full max-w-md"
-      >
-        <h2
-          class="text-2xl sm:text-3xl font-bold text-center mb-6 font-display text-gray-800"
-        >
-          Test Portal
-        </h2>
-        <p class="text-center text-gray-600 mb-6">
-          Please enter your Roll Number to begin.
-        </p>
-        <form id="start-test-form" class="space-y-4">
-          <div>
-            <label for="roll-no" class="sr-only">Roll Number</label>
-            <input
-              type="text"
-              id="roll-no"
-              placeholder="Enter Your Roll Number"
-              required
-              class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500"
-            />
-          </div>
-
-          <input type="hidden" id="unique-link" value="<%= uniqueLink %>" />
-
-          <button
-            type="submit"
-            id="start-test-btn"
-            class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Start Test
-          </button>
-        </form>
-        <p
-          id="login-error"
-          class="text-red-600 mt-4 text-center font-medium"
-        ></p>
+      <div class="text-center mb-10 relative z-10">
+        <div class="mx-auto w-12 h-12 border border-white/20 bg-white/5 rounded-xl flex items-center justify-center mb-6 shadow-inner">
+          <span class="material-symbols-outlined text-white text-[24px]">vpn_key</span>
+        </div>
+        <h1 class="text-2xl font-semibold text-white tracking-tight mb-2">Secure Assessment</h1>
+        <p class="text-gray-400 font-light text-sm">Provide your candidate credential to initialize the session.</p>
       </div>
-    </div>
 
-    <div id="test-container" class="hidden">
-      <div
-        id="header"
-        class="bg-white shadow-md p-4 flex justify-between items-center fixed w-full top-0 left-0 z-10 px-4 sm:px-6 gap-3"
-      >
+      <form id="start-test-form" class="space-y-6 relative z-10">
         <div>
-          <h2 id="test-title" class="text-lg sm:text-xl font-bold font-display">
-            Test in Progress...
-          </h2>
-          <p id="progress-text" class="text-sm text-gray-600">Answered 0 / 0</p>
-        </div>
-        <div
-          id="timer"
-          class="text-base sm:text-lg font-semibold bg-red-600 text-white px-3 py-2 rounded-lg"
-        >
-          Time: <span>--:--</span>
-        </div>
-      </div>
-
-      <div class="pt-24 pb-28">
-        <div
-          id="question-area"
-          class="container max-w-3xl mx-auto p-4 md:p-8"
-        ></div>
-        <div
-          id="question-nav"
-          class="container max-w-3xl mx-auto px-4 md:px-8 pb-4 hidden"
-        >
-          <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-            <p class="text-sm text-gray-600 mb-3">
-              Quick Jump
-            </p>
-            <div id="question-nav-buttons" class="flex flex-wrap gap-2"></div>
+          <label class="sr-only">Candidate Roll Number</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span class="material-symbols-outlined text-gray-500 text-[18px]">badge</span>
+            </div>
+            <input type="text" id="roll-no" required 
+              class="w-full pl-12 pr-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white placeholder-gray-600 focus:bg-[#111] focus:border-white/30 transition-all outline-none uppercase tracking-widest text-center" 
+              placeholder="XX-XXXX-XX">
           </div>
         </div>
-      </div>
+        <input type="hidden" id="unique-link" value="<%= uniqueLink %>" />
 
-      <div
-        id="footer"
-        class="bg-white shadow-inner p-4 fixed w-full bottom-0 left-0 z-10 border-t border-gray-200"
-      >
-        <div class="container max-w-3xl mx-auto">
-          <button
-            id="submit-test-btn"
-            class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold text-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            Submit Test Now
-          </button>
+        <button type="submit" id="start-test-btn" class="w-full bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] flex justify-center items-center gap-2">
+          Initialize Environment <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </button>
+      </form>
+      <div id="login-error" class="hidden mt-6 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg flex items-start gap-3 text-sm font-medium relative z-10"></div>
+    </div>
+  </div>
+
+  <!-- =============================== -->
+  <!-- 2. ACTIVE TEST CONTAINER        -->
+  <!-- =============================== -->
+  <div id="test-container" class="hidden relative z-10 pb-32">
+    
+    <!-- Header -->
+    <div id="header" class="fixed top-0 left-0 w-full z-50 glass-header px-6 py-4 flex flex-col md:flex-row justify-between items-center transition-all gap-4">
+      <div class="flex flex-col md:flex-row items-center gap-4">
+        <h2 id="test-title" class="text-lg font-semibold text-white tracking-tight">Assessment Instance</h2>
+        <div class="hidden md:block w-px h-4 bg-white/20"></div>
+        <div class="flex items-center gap-2">
+           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+           <p id="progress-text" class="text-gray-400 font-mono text-xs uppercase tracking-widest hover:text-white transition-colors">0 / 0 Evaluated</p>
         </div>
       </div>
-    </div>
-
-    <div
-      id="results-container"
-      class="hidden min-h-screen flex items-center justify-center p-4 py-12"
-    >
-      <div
-        class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100 w-full max-w-2xl mx-auto"
-      >
-        <h2
-          class="text-2xl sm:text-3xl font-bold text-center mb-6 font-display"
-        >
-          Test Completed!
-        </h2>
-        <div
-          id="score"
-          class="text-4xl sm:text-5xl font-bold text-center text-indigo-600 mb-8"
-        ></div>
-        <h3 class="text-xl sm:text-2xl font-semibold mb-4">Your Results:</h3>
-        <div
-          id="results-breakdown"
-          class="space-y-6 max-h-[60vh] overflow-y-auto pr-2"
-        ></div>
+      <div id="timer" class="bg-white/5 border border-white/10 text-white px-5 py-2.5 rounded-full font-mono text-sm tracking-widest flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-gray-400">timer</span><span>--:--</span>
       </div>
     </div>
 
-    <div
-      id="warning-modal"
-      class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
-    >
-      <div
-        class="bg-white p-6 md:p-8 rounded-xl shadow-xl w-full max-w-lg text-center"
-      >
-        <span class="material-symbols-outlined text-red-500 text-6xl"
-          >warning</span
-        >
-        <h2
-          class="text-2xl sm:text-3xl font-bold text-gray-800 my-4 font-display"
-        >
-          Warning!
-        </h2>
-        <p class="text-base sm:text-lg text-gray-700 mb-6">
-          You have left the test window. This is not allowed.
-        </p>
-        <p class="text-gray-600 mb-8">
-          If you do this again, your test will be **automatically submitted**.
-        </p>
-        <div class="flex flex-col sm:flex-row-reverse gap-3">
-          <button
-            id="return-to-test"
-            class="w-full sm:w-auto bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Return to Test
-          </button>
-          <button
-            id="submit-anyway"
-            class="w-full sm:w-auto bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 font-medium transition-colors duration-150"
-          >
-            Submit Test Now
-          </button>
+    <!-- Main Content -->
+    <div class="pt-32 sm:pt-28 px-4 max-w-5xl mx-auto flex flex-col lg:flex-row gap-8 items-start relative">
+      
+      <!-- Questions Area -->
+      <div id="question-area" class="w-full flex-1">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Quick Nav -->
+      <div id="question-nav" class="hidden w-full lg:w-80 lg:sticky lg:top-28 glass-card rounded-2xl p-6 flex-shrink-0">
+        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4 border-b border-white/10 pb-3">Topology Map</h3>
+        <div id="question-nav-buttons" class="grid grid-cols-5 gap-2">
+          <!-- Rendered dynamically -->
         </div>
       </div>
+
     </div>
 
-    <script src="/js/test.js"></script>
-  </body>
+    <!-- Floating Footer -->
+    <div id="footer" class="fixed bottom-0 left-0 w-full z-40 bg-black/80 backdrop-blur-xl border-t border-white/10 p-4">
+      <div class="max-w-5xl mx-auto flex justify-end">
+        <button id="submit-test-btn" class="w-full md:w-auto bg-white text-black hover:bg-gray-200 py-3 px-8 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98]">
+          Commit Assessment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================== -->
+  <!-- 3. RESULTS CONTAINER            -->
+  <!-- =============================== -->
+  <div id="results-container" class="hidden min-h-screen items-start justify-center p-6 relative z-10 pt-20">
+    <div class="glass-card rounded-2xl p-8 md:p-12 w-full max-w-4xl relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-48 h-48 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="text-center mb-12 border-b border-white/10 pb-10 relative z-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-white/5 border border-white/10 rounded-xl mb-6 shadow-inner">
+          <span class="material-symbols-outlined text-white text-[32px]">task_alt</span>
+        </div>
+        <h2 class="text-3xl font-semibold text-white tracking-tight mb-2">Execution Terminated</h2>
+        <div id="score" class="text-sm font-mono text-green-400 mt-2 tracking-widest bg-green-500/10 border border-green-500/20 inline-block px-4 py-2 rounded-lg">Final Grade: - / -</div>
+      </div>
+
+      <div class="flex items-center justify-between mb-6 relative z-10">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-widest">Telemetry Log</h3>
+      </div>
+      
+      <div id="results-breakdown" class="space-y-4 relative z-10">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================== -->
+  <!-- 4. WARNING MODAL                -->
+  <!-- =============================== -->
+  <div id="warning-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] p-6">
+    <div class="glass-modal rounded-2xl shadow-2xl p-8 md:p-10 w-full max-w-md text-center transform transition-all border border-red-500/30">
+      
+      <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto mb-6">
+        <span class="material-symbols-outlined text-[32px]">security</span>
+      </div>
+      
+      <h2 class="text-2xl font-semibold text-white tracking-tight mb-2">Protocol Violation Detected</h2>
+      <p class="text-sm font-light text-gray-400 mb-6 leading-relaxed">Focus loss event registered on the primary execution window.</p>
+      
+      <div class="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mb-8">
+        <p class="text-[11px] font-mono text-red-400 uppercase tracking-widest leading-relaxed">Warning: Subsequent un-focus events will trigger an immediate, non-reversible force-commit of your current session state.</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button id="return-to-test" class="flex-1 bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors">
+          Acknowledge & Return
+        </button>
+        <button id="submit-anyway" class="w-full sm:w-max bg-transparent text-gray-500 hover:text-white border border-transparent hover:border-white/10 py-3 px-4 rounded-xl text-sm transition-colors">
+          Abort Session
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/test.js"></script>
+</body>
 </html>

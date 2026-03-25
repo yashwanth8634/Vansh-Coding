@@ -1,293 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Coding Platform | Admin Dashboard</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coding Challenges | Command Center</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+    
+    .glass-sidebar { background: rgba(10, 10, 10, 0.8); border-right: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
+    .glass-nav { background: rgba(0, 0, 0, 0.6); border-bottom: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
+    
+    .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.2s ease-out; }
+    .glass-card:hover { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.12); }
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    .nav-item { color: #888; transition: all 0.2s; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-item.active { color: #fff; background: rgba(255,255,255,0.1); font-weight: 500; }
+    
+    .grid-bg {
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    }
 
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ["Albert Sans", "Noto Sans", "sans-serif"],
-              display: ["Montserrat", "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden antialiased selection:bg-white/30">
 
-    <style>
-      .material-symbols-outlined {
-        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-        font-size: 20px;
-      }
-      .tab-btn.active { color: #4f46e5 !important; border-color: #4f46e5 !important; background-color: #eef2ff !important; }
-    </style>
-  </head>
-  <body class="bg-[radial-gradient(circle_at_top_left,_#dbeafe,_#f8fafc_35%,_#f8fafc)] font-sans text-gray-900">
-    <!-- ===== NAVBAR ===== -->
-    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-      <div class="container max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-        <h1 class="text-xl sm:text-2xl font-bold font-display text-indigo-600">Admin Dashboard</h1>
-        <button id="logout-btn" class="bg-red-600 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-red-700 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm sm:text-base">Logout</button>
-      </div>
+  <aside class="w-20 md:w-64 glass-sidebar flex flex-col shrink-0 z-20">
+    <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-white/10 shrink-0">
+      <span class="material-symbols-outlined text-[24px] text-white">terminal</span>
+      <span class="ml-3 font-semibold tracking-tight text-white hidden md:block">VanshCoding</span>
+    </div>
+    
+    <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3 hidden md:block">Analytics</div>
+      <a href="/admin" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">space_dashboard</span>
+        <span class="text-sm hidden md:block">Overview</span>
+      </a>
+
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Objective Tasks</div>
+      <a href="/admin/banks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">folder_open</span>
+        <span class="text-sm hidden md:block">MCQ Banks</span>
+      </a>
+      <a href="/admin/tests" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">link</span>
+        <span class="text-sm hidden md:block">MCQ Links</span>
+      </a>
+
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Engineering</div>
+      <a href="/admin/coding/banks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">data_object</span>
+        <span class="text-sm hidden md:block">Coding Banks</span>
+      </a>
+      <a href="/admin/coding/tests" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">api</span>
+        <span class="text-sm hidden md:block">Coding Links</span>
+      </a>
+      <a href="/admin/coding" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">code_blocks</span>
+        <span class="text-sm hidden md:block">Challenges</span>
+      </a>
     </nav>
+    
+    <div class="p-4 border-t border-white/10 shrink-0">
+      <form action="/api/auth/logout" method="POST">
+        <button type="submit" class="w-full flex items-center justify-center md:justify-start gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">logout</span>
+          <span class="text-sm font-medium hidden md:block">Sign Out</span>
+        </button>
+      </form>
+    </div>
+  </aside>
 
-    <div class="container max-w-7xl mx-auto p-4 md:p-8">
+  <main class="flex-1 flex flex-col relative overflow-hidden bg-[#000]">
+    <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
-      <!-- ===== TAB NAVIGATION ===== -->
-      <div class="flex space-x-1 mb-6 bg-white rounded-xl border border-gray-200 p-1 shadow-sm overflow-x-auto">
-        <a href="/admin" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">dashboard</span> Overview
-        </a>
-        <a href="/admin/banks" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">quiz</span> Question Banks
-        </a>
-        <a href="/admin/tests" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">assignment</span> Tests
-        </a>
-        <a href="/admin/coding" class="tab-btn active flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">code</span> Coding Platform
-        </a>
+    <header class="h-16 glass-nav flex items-center justify-between px-6 lg:px-10 shrink-0 z-10 relative">
+      <div class="flex items-center gap-2 text-sm text-gray-400">
+        <span class="text-gray-500 font-medium tracking-tight">Engineering</span>
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span class="text-white font-medium">Algorithmic Challenges</span>
       </div>
+    </header>
 
-      <!-- Sub Tabs for Coding -->
-      <div class="flex space-x-1 mb-6 bg-white rounded-xl border border-gray-200 p-1 shadow-sm w-max">
-        <a href="/admin/coding" class="px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-50 text-indigo-700">Challenges</a>
-        <a href="/admin/coding/banks" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50">Question Banks</a>
-        <a href="/admin/coding/tests" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50">Test Links</a>
-      </div>
-
-      <!-- ===== CONTENT ===== -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="flex-1 overflow-y-auto p-6 lg:p-10 relative z-10">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-8">
         
-        <!-- Create Challenge Form -->
-        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100 mb-6 lg:mb-0">
-          <h2 class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200">Create Coding Challenge</h2>
-          <form id="create-challenge-form" class="space-y-4">
-            <div>
-              <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title:</label>
-              <input type="text" id="title" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500" placeholder="e.g., Two Sum" />
-            </div>
-            <div>
-              <label for="difficulty" class="block text-sm font-medium text-gray-700 mb-1">Difficulty:</label>
-              <select id="difficulty" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500">
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Hard">Hard</option>
-              </select>
-            </div>
-            <div>
-              <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description (Text/Markdown):</label>
-              <textarea id="description" rows="4" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500" placeholder="Describe the problem, input format, and output format."></textarea>
-            </div>
-
-            <!-- Dynamic Test Cases -->
-            <div>
-              <div class="flex justify-between items-center mb-2">
-                <label class="block text-sm font-medium text-gray-700">Test Cases:</label>
-                <button type="button" id="add-testcase-btn" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 py-1 px-2 rounded font-medium transition-colors">
-                  + Add Test Case
-                </button>
+        <!-- Creator Form -->
+        <div class="space-y-6">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Build Challenge</h1>
+            <p class="text-gray-400 font-light text-sm">Design coding problems with strict I/O validation circuits.</p>
+          </div>
+          
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <form id="challengeForm" class="space-y-5 relative z-10">
+              <div>
+                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Challenge Title</label>
+                <input type="text" id="title" required 
+                  class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white focus:bg-[#111] focus:border-white/30 transition-all outline-none" 
+                  placeholder="e.g., Two Sum">
               </div>
-              <div id="testcases-container" class="space-y-3">
-                <!-- Initially 1 visible test case -->
-                <div class="testcase-block border border-gray-200 p-3 rounded-lg bg-gray-50 relative">
-                  <div class="grid grid-cols-2 gap-2 mb-2">
-                    <div>
-                      <label class="block text-xs text-gray-500">Input (stdin):</label>
-                      <textarea class="tc-input w-full p-2 border border-gray-300 rounded text-sm font-mono" rows="2"></textarea>
+              <div>
+                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Complexity Rating</label>
+                <select id="difficulty" class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white appearance-none focus:bg-[#111] focus:border-white/30 transition-all outline-none cursor-pointer">
+                  <option value="Easy" class="bg-[#111]">Easy</option>
+                  <option value="Medium" class="bg-[#111]">Medium</option>
+                  <option value="Hard" class="bg-[#111]">Hard</option>
+                </select>
+              </div>
+              <div>
+                <label class="flex justify-between items-center text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+                  <span>Problem Statement</span>
+                  <span class="bg-white/10 text-white border border-white/10 px-2 py-0.5 rounded text-[10px] tracking-widest normal-case">Markdown</span>
+                </label>
+                <textarea id="description" rows="5" required 
+                  class="w-full p-4 bg-[#0a0a0a] border border-white/10 rounded-xl font-mono text-sm text-gray-300 focus:bg-[#111] focus:border-white/30 transition-all outline-none resize-y"
+                  placeholder="Given an array of integers nums and an integer target..."></textarea>
+              </div>
+
+              <!-- Test Cases -->
+              <div class="border-t border-white/10 pt-5 mt-2">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-sm font-medium text-white">Validation I/O Circuits</h3>
+                  <button type="button" onclick="addTestCase()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border border-white/10 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">add</span> Add Case
+                  </button>
+                </div>
+                
+                <div id="testCasesContainer" class="space-y-4 max-h-[30rem] overflow-y-auto pr-2">
+                  <div class="test-case-card relative bg-[#0a0a0a] border border-white/10 p-4 rounded-xl group focus-within:border-white/30">
+                    <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-gray-500 hover:text-red-400 transition-colors">
+                      <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                    <div class="grid grid-cols-2 gap-3 mt-1">
+                      <div>
+                        <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">STDIN Data</label>
+                        <textarea class="tc-input w-full p-2.5 bg-black border border-white/5 rounded-lg font-mono text-xs text-gray-300 focus:border-white/20 outline-none resize-y" rows="2" placeholder="[2,7,11,15]\n9"></textarea>
+                      </div>
+                      <div>
+                        <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">STDOUT Expected</label>
+                        <textarea class="tc-output w-full p-2.5 bg-black border border-white/5 rounded-lg font-mono text-xs text-gray-300 focus:border-white/20 outline-none resize-y" rows="2" required placeholder="[0,1]"></textarea>
+                      </div>
                     </div>
-                    <div>
-                      <label class="block text-xs text-gray-500">Expected Output (stdout):</label>
-                      <textarea class="tc-output w-full p-2 border border-gray-300 rounded text-sm font-mono" rows="2" required></textarea>
-                    </div>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <label class="flex items-center text-sm text-gray-700 cursor-pointer">
-                      <input type="checkbox" class="tc-hidden mr-2 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                      Hidden Test Case
+                    <label class="flex items-center mt-3 cursor-pointer group/toggle w-max">
+                      <input type="checkbox" class="tc-hidden sr-only">
+                      <div class="w-4 h-4 rounded border border-white/20 flex items-center justify-center mr-2 bg-black group-hover/toggle:border-white/40 peer-checked:bg-white transition-all">
+                        <span class="material-symbols-outlined text-black text-[12px] opacity-0 peer-checked:opacity-100 hidden">check</span>
+                      </div>
+                      <span class="text-xs text-gray-400 select-none group-hover/toggle:text-gray-300">Conceal from candidate (Final verification only)</span>
                     </label>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              Create Challenge
-            </button>
-          </form>
-          <div id="challenge-result" class="mt-4 p-4 rounded-lg hidden text-sm font-medium border"></div>
+              <button type="submit" class="w-full bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] mt-4 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">publish</span> Publish Challenge
+              </button>
+            </form>
+          </div>
         </div>
 
-        <!-- Existing Challenges List -->
-        <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-          <h2 class="text-lg sm:text-xl font-semibold mb-4 pb-4 border-b border-gray-200">
-            Existing Challenges <span class="text-sm font-normal text-gray-400 ml-2">(<%= challenges.length %>)</span>
-          </h2>
-          <div class="space-y-3 max-h-[40rem] overflow-y-auto">
-            <% if (challenges.length === 0) { %>
-              <p class="text-gray-500 p-3">No coding challenges created yet.</p>
-            <% } else { %>
+        <!-- Existing List -->
+        <div class="space-y-6">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Algorithm Registry</h1>
+            <p class="text-gray-400 font-light text-sm">Review published code challenges available for environments.</p>
+          </div>
+          
+          <div class="glass-card rounded-2xl p-2 h-max max-h-[calc(100vh-150px)] overflow-y-auto">
+            <div class="space-y-2 p-2">
               <% challenges.forEach(c => { %>
-                <div class="flex justify-between items-center border border-gray-200 p-4 rounded-lg hover:bg-gray-50 transition-colors duration-150">
-                  <div>
-                    <strong class="font-semibold text-gray-800 block"><%= c.title %></strong>
-                    <div class="flex items-center gap-2 mt-1">
-                      <span class="text-xs px-2 py-0.5 rounded-full font-medium 
-                        <%= c.difficulty === 'Easy' ? 'bg-green-100 text-green-700' : (c.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') %>">
-                        <%= c.difficulty %>
-                      </span>
-                      <span class="text-xs text-gray-500"><%= c.testCases.length %> Test Cases</span>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <a href="/coding/workspace/<%= c._id %>" target="_blank" class="text-sm bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md hover:bg-blue-200 transition-colors font-medium">Verify</a>
-                    <button data-action="delete-challenge" data-id="<%= c._id %>" class="text-gray-400 hover:text-red-600 transition-colors bg-gray-100 p-1.5 rounded-md" title="Delete">
-                      <span class="material-symbols-outlined" style="font-size:18px">delete</span>
+                <div class="bg-black/40 border border-white/5 hover:border-white/10 hover:bg-white/5 p-5 rounded-xl transition-all group">
+                  <div class="flex justify-between items-start mb-2">
+                    <strong class="text-base font-medium text-white leading-tight"><%= c.title %></strong>
+                    <button onclick="deleteChallenge('<%= c._id %>')" class="text-gray-500 hover:text-red-400 bg-transparent hover:bg-red-500/10 border border-transparent hover:border-red-500/20 p-1.5 rounded-lg transition-colors ml-2 shrink-0">
+                      <span class="material-symbols-outlined text-[16px]">delete</span>
                     </button>
+                  </div>
+                  
+                  <div class="flex items-center gap-2 mt-1">
+                    <% 
+                       let badgeClass = 'bg-green-500/10 text-green-400 border-green-500/20';
+                       if(c.difficulty === 'Medium') badgeClass = 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+                       if(c.difficulty === 'Hard') badgeClass = 'bg-red-500/10 text-red-400 border-red-500/20';
+                    %>
+                    <span class="inline-flex items-center border px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider <%= badgeClass %>">
+                      <%= c.difficulty %>
+                    </span>
+                    <span class="inline-flex items-center text-[10px] font-semibold text-gray-400 tracking-wider uppercase border border-white/10 bg-white/5 px-2 py-0.5 rounded">
+                      <%= c.testCases.length %> Circuits
+                    </span>
                   </div>
                 </div>
               <% }); %>
-            <% } %>
+              <% if(challenges.length === 0) { %>
+                <div class="text-gray-500 text-center py-16 text-sm font-medium bg-black/20 rounded-xl border border-dashed border-white/10 flex flex-col items-center">
+                  <span class="material-symbols-outlined text-4xl mb-3 opacity-50">data_array</span>
+                  Registry is empty. Draft an algorithm.
+                </div>
+              <% } %>
+            </div>
           </div>
         </div>
+
       </div>
-
     </div>
+  </main>
 
-    <script src="/js/admin.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        // --- Dynamic Test Cases Logic ---
-        const addBtn = document.getElementById('add-testcase-btn');
-        const container = document.getElementById('testcases-container');
-
-        addBtn.addEventListener('click', () => {
-          const div = document.createElement('div');
-          div.className = 'testcase-block border border-gray-200 p-3 rounded-lg bg-gray-50 relative mt-3';
-          div.innerHTML = `
-            <button type="button" class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors remove-tc-btn" title="Remove">
-              <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+  <script>
+    function addTestCase() {
+        const container = document.getElementById('testCasesContainer');
+        const div = document.createElement('div');
+        div.className = "test-case-card relative bg-[#0a0a0a] border border-white/10 p-4 rounded-xl group focus-within:border-white/30";
+        div.innerHTML = `
+            <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-gray-500 hover:text-red-400 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">close</span>
             </button>
-            <div class="grid grid-cols-2 gap-2 mb-2 pr-6">
-              <div>
-                <label class="block text-xs text-gray-500">Input (stdin):</label>
-                <textarea class="tc-input w-full p-2 border border-gray-300 rounded text-sm font-mono" rows="2"></textarea>
-              </div>
-              <div>
-                <label class="block text-xs text-gray-500">Expected Output (stdout):</label>
-                <textarea class="tc-output w-full p-2 border border-gray-300 rounded text-sm font-mono" rows="2" required></textarea>
-              </div>
+            <div class="grid grid-cols-2 gap-3 mt-1">
+                <div>
+                <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">STDIN Data</label>
+                <textarea class="tc-input w-full p-2.5 bg-black border border-white/5 rounded-lg font-mono text-xs text-gray-300 focus:border-white/20 outline-none resize-y" rows="2"></textarea>
+                </div>
+                <div>
+                <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">STDOUT Expected</label>
+                <textarea class="tc-output w-full p-2.5 bg-black border border-white/5 rounded-lg font-mono text-xs text-gray-300 focus:border-white/20 outline-none resize-y" rows="2" required></textarea>
+                </div>
             </div>
-            <div class="flex flex-wrap gap-4 items-center mt-2">
-              <label class="flex items-center text-sm text-gray-700 cursor-pointer">
-                <input type="checkbox" class="tc-hidden mr-2 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                Hidden Test Case
-              </label>
-            </div>
-          `;
-          container.appendChild(div);
+            <label class="flex items-center mt-3 cursor-pointer group/toggle w-max">
+                <input type="checkbox" class="tc-hidden sr-only">
+                <!-- Custom Checkbox hack using JS to toggle physical class -->
+                <div class="w-4 h-4 rounded border border-white/20 flex items-center justify-center mr-2 bg-black toggler-box transition-all">
+                   <div class="w-2 h-2 rounded-sm bg-white hidden toggler-inner"></div>
+                </div>
+                <span class="text-xs text-gray-400 select-none group-hover/toggle:text-gray-300">Conceal from candidate (Final verification only)</span>
+            </label>
+        `;
+        container.appendChild(div);
 
-          // Add remove logic
-          div.querySelector('.remove-tc-btn').addEventListener('click', () => {
-            div.remove();
-          });
+        // Bind custom checkbox since peer-checked doesn't always work dynamically without specific markup changes
+        const toggleLabel = div.querySelector('label');
+        const toggleInput = div.querySelector('.tc-hidden');
+        const toggleBox = div.querySelector('.toggler-box');
+        const toggleInner = div.querySelector('.toggler-inner');
+        
+        toggleInput.addEventListener('change', (e) => {
+            if(e.target.checked) {
+              toggleBox.classList.add('border-white', 'bg-white/10');
+              toggleInner.classList.remove('hidden');
+            } else {
+              toggleBox.classList.remove('border-white', 'bg-white/10');
+              toggleInner.classList.add('hidden');
+            }
+        });
+    }
+
+    // Attach to initial checkbox manually
+    document.querySelectorAll('.test-case-card').forEach(div => {
+       const toggleInput = div.querySelector('.tc-hidden');
+       toggleInput.addEventListener('change', (e) => {
+           const label = e.target.parentElement;
+           const box = label.querySelector('.bg-black');
+           if(e.target.checked) { box.style.background = 'white'; } 
+           else { box.style.background = 'black'; }
+       });
+    });
+
+    document.getElementById('challengeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Compiling...';
+        btn.disabled = true;
+
+        const title = document.getElementById('title').value;
+        const difficulty = document.getElementById('difficulty').value;
+        const description = document.getElementById('description').value;
+
+        const testCaseElements = document.querySelectorAll('.test-case-card');
+        const testCases = [];
+        testCaseElements.forEach(card => {
+            testCases.push({
+                input: card.querySelector('.tc-input').value,
+                expectedOutput: card.querySelector('.tc-output').value,
+                isHidden: card.querySelector('.tc-hidden').checked
+            });
         });
 
-        // --- Create Challenge Submission ---
-        const form = document.getElementById('create-challenge-form');
-        const resultDiv = document.getElementById('challenge-result');
+        if (testCases.length === 0) {
+          alert('At least 1 valid I/O circuit is required.');
+          btn.innerHTML = originalText; btn.disabled = false;
+          return;
+        }
 
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          resultDiv.className = 'mt-4 p-4 rounded-lg hidden text-sm font-medium border';
-          
-          const title = document.getElementById('title').value.trim();
-          const description = document.getElementById('description').value.trim();
-          const difficulty = document.getElementById('difficulty').value;
-
-          // Gather Test Cases
-          const testCaseBlocks = document.querySelectorAll('.testcase-block');
-          const testCases = [];
-          
-          testCaseBlocks.forEach(block => {
-            const input = block.querySelector('.tc-input').value;
-            const output = block.querySelector('.tc-output').value.trim();
-            const isHidden = block.querySelector('.tc-hidden').checked;
-            
-            if (output) { // only add if expected output exists
-              testCases.push({ input, expectedOutput: output, isHidden });
-            }
-          });
-
-          if (testCases.length === 0) {
-            resultDiv.textContent = 'Please provide at least 1 test case with expected output.';
-            resultDiv.classList.add('bg-red-50', 'text-red-700', 'border-red-200', 'block');
-            resultDiv.classList.remove('hidden');
-            return;
-          }
-
-          try {
-            const btn = form.querySelector('button[type="submit"]');
-            btn.disabled = true;
-            btn.innerHTML = 'Creating...';
-
-            const response = await fetch('/api/coding/admin/create', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ title, description, difficulty, testCases })
+        try {
+            const res = await fetch('/api/coding/admin/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, difficulty, description, testCases })
             });
 
-            const data = await response.json();
-            btn.disabled = false;
-            btn.innerHTML = 'Create Challenge';
+            if(res.ok) window.location.reload();
+            else { alert('Deployment failed.'); btn.innerHTML = originalText; btn.disabled = false; }
+        } catch(err) { alert('Error: ' + err.message); btn.innerHTML = originalText; btn.disabled = false; }
+    });
 
-            if (response.ok) {
-              window.location.reload();
-            } else {
-              resultDiv.textContent = data.message || 'Error creating challenge';
-              resultDiv.classList.add('bg-red-50', 'text-red-700', 'border-red-200', 'block');
-              resultDiv.classList.remove('hidden');
-            }
-          } catch (error) {
-            console.error(error);
-            resultDiv.textContent = 'A network error occurred.';
-            resultDiv.classList.add('bg-red-50', 'text-red-700', 'border-red-200', 'block');
-            resultDiv.classList.remove('hidden');
-          }
-        });
-
-        // --- Delete Challenge Logic ---
-        document.querySelectorAll('button[data-action="delete-challenge"]').forEach(button => {
-          button.addEventListener('click', async (e) => {
-            const challengeId = e.currentTarget.dataset.id;
-            if (confirm('Are you sure you want to delete this challenge? It will also wipe associated student attempts.')) {
-              try {
-                const res = await fetch(`/api/coding/admin/${challengeId}`, { method: 'DELETE' });
-                if (res.ok) {
-                  window.location.reload();
-                } else {
-                  alert('Refused to delete challenge.');
-                }
-              } catch (error) {
-                console.error(error);
-                alert('Network error.');
-              }
-            }
-          });
-        });
-
-      });
-    </script>
-  </body>
+    async function deleteChallenge(id) {
+        if(confirm('Wipe challenge from registry? This may break running sessions.')) {
+            const res = await fetch(`/api/coding/admin/${id}`, { method: 'DELETE' });
+            if(res.ok) window.location.reload();
+        }
+    }
+  </script>
+</body>
 </html>

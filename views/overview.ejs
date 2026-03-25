@@ -1,151 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Overview | Admin Dashboard</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overview | Command Center</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&family=Noto+Sans:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+    
+    .glass-sidebar {
+      background: rgba(10, 10, 10, 0.8);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+    }
+    
+    .glass-nav {
+      background: rgba(0, 0, 0, 0.6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease-out;
+    }
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-      rel="stylesheet"
-    />
+    .nav-item { color: #888; transition: all 0.2s; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-item.active { color: #fff; background: rgba(255,255,255,0.1); font-weight: 500; }
+    
+    .grid-bg {
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden antialiased selection:bg-white/30">
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ["Albert Sans", "Noto Sans", "sans-serif"],
-              display: ["Montserrat", "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
-
-    <style>
-      .material-symbols-outlined {
-        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-        font-size: 20px;
-      }
-      .tab-btn.active { color: #4f46e5 !important; border-color: #4f46e5 !important; background-color: #eef2ff !important; }
-    </style>
-  </head>
-  <body
-    class="bg-[radial-gradient(circle_at_top_left,_#dbeafe,_#f8fafc_35%,_#f8fafc)] font-sans text-gray-900"
-  >
-    <!-- ===== NAVBAR ===== -->
-    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-      <div
-        class="container max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center"
-      >
-        <h1 class="text-xl sm:text-2xl font-bold font-display text-indigo-600">
-          Admin Dashboard
-        </h1>
-        <button
-          id="logout-btn"
-          class="bg-red-600 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-red-700 font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm sm:text-base"
-        >
-          Logout
-        </button>
-      </div>
-    </nav>
-
-    <div class="container max-w-7xl mx-auto p-4 md:p-8">
-
-      <!-- ===== TAB NAVIGATION ===== -->
-      <div class="flex space-x-1 mb-6 bg-white rounded-xl border border-gray-200 p-1 shadow-sm overflow-x-auto">
-        <a href="/admin" class="tab-btn active flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">dashboard</span>
-          Overview
-        </a>
-        <a href="/admin/banks" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">quiz</span>
-          Question Banks
-        </a>
-        <a href="/admin/tests" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">assignment</span>
-          Tests
-        </a>
-        <a href="/admin/coding" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 transition-all duration-150 hover:bg-gray-50 whitespace-nowrap border border-transparent">
-          <span class="material-symbols-outlined" style="font-size:18px">code</span>
-          Coding Platform
-        </a>
-      </div>
-
-      <!-- ===== CONTENT ===== -->
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <span class="material-symbols-outlined text-blue-600">folder</span>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">Question Banks</p>
-              <p class="text-2xl font-bold text-gray-900"><%= banks.length %></p>
-            </div>
-          </div>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <span class="material-symbols-outlined text-indigo-600">description</span>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">Total Tests</p>
-              <p class="text-2xl font-bold text-gray-900"><%= tests.length %></p>
-            </div>
-          </div>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <span class="material-symbols-outlined text-green-600">check_circle</span>
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">Active Tests</p>
-              <p class="text-2xl font-bold text-gray-900">
-                <%= tests.filter(t => new Date(t.linkExpiresAt) > new Date()).length %>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <a href="/admin/banks" class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all text-left group block">
-          <div class="flex items-center gap-3 mb-2">
-            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-              <span class="material-symbols-outlined text-blue-600">add_circle</span>
-            </div>
-            <h3 class="font-semibold text-gray-900">Manage Question Banks</h3>
-          </div>
-          <p class="text-sm text-gray-500">Create new question banks and start adding questions to them.</p>
-        </a>
-        <a href="/admin/tests" class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all text-left group block">
-          <div class="flex items-center gap-3 mb-2">
-            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
-              <span class="material-symbols-outlined text-indigo-600">link</span>
-            </div>
-            <h3 class="font-semibold text-gray-900">Manage Tests</h3>
-          </div>
-          <p class="text-sm text-gray-500">Generate and manage shareable test links from existing question banks.</p>
-        </a>
-      </div>
-
+  <!-- Sidebar -->
+  <aside class="w-20 md:w-64 glass-sidebar flex flex-col shrink-0 z-20">
+    <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-white/10 shrink-0">
+      <span class="material-symbols-outlined text-[24px] text-white">terminal</span>
+      <span class="ml-3 font-semibold tracking-tight text-white hidden md:block">VanshCoding</span>
     </div>
+    
+    <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3 hidden md:block">Analytics</div>
+      <a href="/admin" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">space_dashboard</span>
+        <span class="text-sm hidden md:block">Overview</span>
+      </a>
 
-    <script src="/js/admin.js"></script>
-  </body>
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Objective Tasks</div>
+      <a href="/admin/banks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">folder_open</span>
+        <span class="text-sm hidden md:block">MCQ Banks</span>
+      </a>
+      <a href="/admin/tests" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">link</span>
+        <span class="text-sm hidden md:block">MCQ Links</span>
+      </a>
+
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Engineering</div>
+      <a href="/admin/coding/banks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">data_object</span>
+        <span class="text-sm hidden md:block">Coding Banks</span>
+      </a>
+      <a href="/admin/coding/tests" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">api</span>
+        <span class="text-sm hidden md:block">Coding Links</span>
+      </a>
+      <a href="/admin/coding" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">code_blocks</span>
+        <span class="text-sm hidden md:block">Challenges</span>
+      </a>
+    </nav>
+    
+    <div class="p-4 border-t border-white/10 shrink-0">
+      <form action="/api/auth/logout" method="POST">
+        <button type="submit" class="w-full flex items-center justify-center md:justify-start gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">logout</span>
+          <span class="text-sm font-medium hidden md:block">Sign Out</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col relative overflow-hidden bg-[#000]">
+    <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
+
+    <!-- Header -->
+    <header class="h-16 glass-nav flex items-center justify-between px-6 lg:px-10 shrink-0 z-10 relative">
+      <div class="flex items-center gap-2 text-sm text-gray-400">
+        <span class="text-white font-medium tracking-tight">Command Center</span>
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span>Overview</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="h-8 w-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[16px] text-white">person</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Scrollable content -->
+    <div class="flex-1 overflow-y-auto p-6 lg:p-10 relative z-10">
+      <div class="max-w-6xl mx-auto space-y-10">
+        
+        <div>
+          <h1 class="text-3xl font-semibold tracking-tight text-white mb-2">Metrics Overview</h1>
+          <p class="text-gray-400 font-light text-sm">Real-time health and usage statistics across all environments.</p>
+        </div>
+
+        <!-- Dashboard Widgets -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Widget 1 -->
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
+            <div class="flex items-center justify-between mb-4 relative z-10">
+              <span class="text-sm font-medium text-gray-400">Active Banks</span>
+              <span class="material-symbols-outlined text-gray-500">folder_open</span>
+            </div>
+            <div class="text-4xl font-semibold tracking-tighter text-white relative z-10">
+              <%= (stats.banks + stats.codingBanks) || 0 %>
+            </div>
+          </div>
+
+          <!-- Widget 2 -->
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all"></div>
+            <div class="flex items-center justify-between mb-4 relative z-10">
+              <span class="text-sm font-medium text-gray-400">Live Assessments</span>
+              <span class="material-symbols-outlined text-gray-500">sensors</span>
+            </div>
+            <div class="text-4xl font-semibold tracking-tighter text-white relative z-10">
+              <%= (stats.tests + stats.codingTests) || 0 %>
+            </div>
+          </div>
+
+          <!-- Widget 3 -->
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all"></div>
+            <div class="flex items-center justify-between mb-4 relative z-10">
+              <span class="text-sm font-medium text-gray-400">Coding Challenges</span>
+              <span class="material-symbols-outlined text-gray-500">code_blocks</span>
+            </div>
+            <div class="text-4xl font-semibold tracking-tighter text-white relative z-10">
+              <%= stats.codingChallenges || 0 %>
+            </div>
+          </div>
+
+          <!-- Widget 4 -->
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 rounded-full blur-2xl group-hover:bg-yellow-500/20 transition-all"></div>
+            <div class="flex items-center justify-between mb-4 relative z-10">
+              <span class="text-sm font-medium text-gray-400">System Health</span>
+              <span class="material-symbols-outlined text-gray-500">moving</span>
+            </div>
+            <div class="text-4xl font-semibold tracking-tighter text-green-400 flex items-baseline gap-1 relative z-10">
+              100 <span class="text-lg font-normal">%</span>
+            </div>
+          </div>
+
+        </div>
+
+        <hr class="border-white/10 my-8">
+        
+        <div class="glass-card rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+           <div>
+             <h3 class="text-lg font-medium text-white mb-1">Architecture Reference</h3>
+             <p class="text-sm text-gray-400 font-light max-w-xl leading-relaxed">Ensure minimal friction by utilizing the quick navigation links in the sidebar. Both MCQ and Engineering modules are isolated into independent cloud clusters.</p>
+           </div>
+           <a href="/admin/banks" class="shrink-0 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full text-sm font-semibold transition-colors">
+             Create Repository
+           </a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</body>
 </html>

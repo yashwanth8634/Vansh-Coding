@@ -3,112 +3,211 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coding Tests | Admin Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet" />
+  <title>Coding Sessions | Command Center</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
   <style>
-    .material-symbols-outlined { font-size: 20px; }
-    .tab-btn.active { color: #4f46e5 !important; border-color: #4f46e5 !important; background-color: #eef2ff !important; }
+    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+    
+    .glass-sidebar { background: rgba(10, 10, 10, 0.8); border-right: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
+    .glass-nav { background: rgba(0, 0, 0, 0.6); border-bottom: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
+    
+    .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.2s ease-out; }
+    .glass-card:hover { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.12); }
+
+    .nav-item { color: #888; transition: all 0.2s; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-item.active { color: #fff; background: rgba(255,255,255,0.1); font-weight: 500; }
+    
+    .grid-bg {
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
   </style>
 </head>
-<body class="bg-[radial-gradient(circle_at_top_left,_#dbeafe,_#f8fafc_35%,_#f8fafc)] font-sans text-gray-900">
-  <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-    <div class="container max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-      <h1 class="text-xl font-bold font-display text-indigo-600">Admin Dashboard</h1>
-    </div>
-  </nav>
+<body class="flex h-screen overflow-hidden antialiased selection:bg-white/30">
 
-  <div class="container max-w-7xl mx-auto p-4 md:p-8">
-    <div class="flex space-x-1 mb-4 bg-white rounded-xl border border-gray-200 p-1 shadow-sm overflow-x-auto">
-      <a href="/admin" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 hover:bg-gray-50 whitespace-nowrap"><span class="material-symbols-outlined" style="font-size:18px">dashboard</span> Overview</a>
-      <a href="/admin/banks" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 hover:bg-gray-50 whitespace-nowrap"><span class="material-symbols-outlined" style="font-size:18px">quiz</span> MCQ Banks</a>
-      <a href="/admin/tests" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-500 hover:bg-gray-50 whitespace-nowrap"><span class="material-symbols-outlined" style="font-size:18px">assignment</span> MCQ Tests</a>
-      <a href="/admin/coding" class="tab-btn active flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 whitespace-nowrap"><span class="material-symbols-outlined" style="font-size:18px">code</span> Coding Platform</a>
+  <aside class="w-20 md:w-64 glass-sidebar flex flex-col shrink-0 z-20">
+    <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-white/10 shrink-0">
+      <span class="material-symbols-outlined text-[24px] text-white">terminal</span>
+      <span class="ml-3 font-semibold tracking-tight text-white hidden md:block">VanshCoding</span>
     </div>
+    
+    <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-2">
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3 hidden md:block">Analytics</div>
+      <a href="/admin" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">space_dashboard</span>
+        <span class="text-sm hidden md:block">Overview</span>
+      </a>
 
-    <!-- Sub Tabs -->
-    <div class="flex space-x-1 mb-6 bg-white rounded-xl border border-gray-200 p-1 shadow-sm w-max">
-      <a href="/admin/coding" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50">Challenges</a>
-      <a href="/admin/coding/banks" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50">Question Banks</a>
-      <a href="/admin/coding/tests" class="px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-50 text-indigo-700">Test Links</a>
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Objective Tasks</div>
+      <a href="/admin/banks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">folder_open</span>
+        <span class="text-sm hidden md:block">MCQ Banks</span>
+      </a>
+      <a href="/admin/tests" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">link</span>
+        <span class="text-sm hidden md:block">MCQ Links</span>
+      </a>
+
+      <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3 px-3 hidden md:block">Engineering</div>
+      <a href="/admin/coding/banks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">data_object</span>
+        <span class="text-sm hidden md:block">Coding Banks</span>
+      </a>
+      <a href="/admin/coding/tests" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">api</span>
+        <span class="text-sm hidden md:block">Coding Links</span>
+      </a>
+      <a href="/admin/coding" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg">
+        <span class="material-symbols-outlined text-[20px]">code_blocks</span>
+        <span class="text-sm hidden md:block">Challenges</span>
+      </a>
+    </nav>
+    
+    <div class="p-4 border-t border-white/10 shrink-0">
+      <form action="/api/auth/logout" method="POST">
+        <button type="submit" class="w-full flex items-center justify-center md:justify-start gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">logout</span>
+          <span class="text-sm font-medium hidden md:block">Sign Out</span>
+        </button>
+      </form>
     </div>
+  </aside>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Generate Link Form -->
-      <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-        <h2 class="text-xl font-semibold mb-4 pb-4 border-b border-gray-200">Generate Test Link</h2>
-        <form id="create-test-form" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Select Bank:</label>
-            <select id="codingBankId" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-300" required>
-              <option value="">-- Choose a Bank --</option>
-              <% banks.forEach(b => { %>
-                <option value="<%= b._id %>"><%= b.title %> (<%= b.challenges.length %> Questions)</option>
-              <% }); %>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Link Validity (Hours):</label>
-            <input type="number" id="validityHours" min="1" max="720" value="24" required class="w-full p-3 border border-gray-300 rounded-lg">
-          </div>
-          <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 font-medium cursor-pointer text-center flex items-center justify-center gap-2">
-             <span class="material-symbols-outlined" style="font-size:18px">link</span> Generate Link
-          </button>
-        </form>
+  <main class="flex-1 flex flex-col relative overflow-hidden bg-[#000]">
+    <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
+
+    <header class="h-16 glass-nav flex items-center justify-between px-6 lg:px-10 shrink-0 z-10 relative">
+      <div class="flex items-center gap-2 text-sm text-gray-400">
+        <span class="text-gray-500 font-medium tracking-tight">Engineering</span>
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span class="text-white font-medium">Session Generation</span>
       </div>
+      
+      <div class="hidden sm:flex items-center bg-white/5 border border-white/10 rounded-lg p-1 space-x-1">
+        <a href="/admin/coding/banks" class="text-gray-400 hover:text-white hover:bg-white/5 px-4 py-1.5 rounded-md text-sm font-medium transition-colors">Environments</a>
+        <a href="/admin/coding/tests" class="bg-white/10 text-white shadow-sm px-4 py-1.5 rounded-md text-sm font-medium transition-colors">Session Links</a>
+      </div>
+    </header>
 
-      <!-- Existing Links -->
-      <div class="bg-white p-5 rounded-xl shadow-lg border border-gray-100">
-        <h2 class="text-xl font-semibold mb-4 pb-4 border-b border-gray-200">Active Test Links</h2>
-        <div class="space-y-3 max-h-[40rem] overflow-y-auto">
-          <% tests.forEach(t => { %>
-            <div class="border border-gray-200 p-4 rounded-lg bg-gray-50">
-              <div class="flex justify-between items-start mb-2">
-                <div>
-                  <strong class="font-semibold text-gray-800 text-lg"><%= t.codingBank.title %></strong>
-                  <div class="text-xs text-gray-500 mt-1">Expires: <%= new Date(t.linkExpiresAt).toLocaleString() %></div>
-                </div>
-                <div class="flex gap-2">
-                  <a href="/admin/coding/results/<%= t._id %>" class="text-sm bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md hover:bg-blue-200 font-medium">Results</a>
-                  <button onclick="deleteTest('<%= t._id %>')" class="text-gray-400 hover:text-red-600 bg-gray-200 p-1.5 rounded-md" title="Delete">
-                    <span class="material-symbols-outlined" style="font-size:18px">delete</span>
-                  </button>
-                </div>
+    <div class="flex-1 overflow-y-auto p-6 lg:p-10 relative z-10">
+      <div class="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8">
+        
+        <!-- Create Form (1/3) -->
+        <div class="xl:col-span-4 space-y-6">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Publish Session</h1>
+            <p class="text-gray-400 font-light text-sm">Deploy an engineered candidate environment via traceable token.</p>
+          </div>
+          
+          <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <form id="createTestForm" class="space-y-5 relative z-10">
+              <div>
+                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Target Environment</label>
+                <select id="bankId" required class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white appearance-none focus:bg-[#111] focus:border-white/30 transition-all outline-none">
+                  <option value="" class="text-gray-500">-- Select Configured Environment --</option>
+                  <% banks.forEach(b => { %>
+                    <option value="<%= b._id %>"><%= b.title %></option>
+                  <% }); %>
+                </select>
               </div>
-              <div class="mt-3 bg-white border border-gray-200 rounded p-2 flex items-center justify-between group">
-                <a href="/coding/test/<%= t.uniqueLink %>" target="_blank" class="text-indigo-600 font-mono text-sm group-hover:underline truncate">
-                  /coding/test/<%= t.uniqueLink %>
-                </a>
-                <button onclick="navigator.clipboard.writeText(window.location.origin + '/coding/test/<%= t.uniqueLink %>')" class="text-gray-400 hover:text-gray-700" title="Copy Link">
-                  <span class="material-symbols-outlined" style="font-size:16px">content_copy</span>
-                </button>
+              
+              <div>
+                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">TTL Validity (Hours)</label>
+                <input type="number" id="validityHours" min="1" max="720" value="24" required 
+                  class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white focus:bg-[#111] focus:border-white/30 transition-all outline-none">
               </div>
-            </div>
-          <% }); %>
+
+              <button type="submit" class="w-full bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] flex justify-center items-center gap-2 mt-2">
+                <span class="material-symbols-outlined text-[18px]">add_link</span> Generate Invitation Link
+              </button>
+            </form>
+          </div>
         </div>
+
+        <!-- Sessions List (2/3) -->
+        <div class="xl:col-span-8 space-y-6">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Live Invitations</h1>
+            <p class="text-gray-400 font-light text-sm">Monitor candidate execution telemetry and code output.</p>
+          </div>
+          
+          <div class="glass-card rounded-2xl p-2 h-max max-h-[calc(100vh-250px)] overflow-y-auto">
+            <div class="space-y-2 p-2">
+              <% tests.forEach(t => { %>
+                <div class="bg-black/40 border border-white/5 hover:border-white/10 hover:bg-white/5 p-5 rounded-xl flex flex-col gap-4 transition-all group">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <strong class="text-base font-medium text-white block mb-1"><%= t.codingBank ? t.codingBank.title : 'Deleted Environment' %></strong>
+                      <div class="flex items-center gap-2 text-xs">
+                         <span class="inline-block w-2 h-2 rounded-full <%= new Date() > new Date(t.expiresAt) ? 'bg-red-500' : 'bg-green-500 animate-pulse' %>"></span>
+                         <span class="text-gray-400">Expires: <%= new Date(t.expiresAt).toLocaleString() %></span>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <a href="/admin/coding/results/<%= t._id %>" class="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 hover:border-blue-500/40 px-4 py-2 rounded-lg text-xs font-medium transition-colors">Access Console</a>
+                      <button onclick="deleteTest('<%= t._id %>')" class="bg-transparent text-gray-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 p-2 rounded-lg transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div class="bg-[#0a0a0a] border border-white/10 p-3 rounded-lg flex items-center justify-between">
+                    <a href="/coding/<%= t.uniqueLink %>" target="_blank" class="text-gray-300 font-mono text-xs hover:text-white transition-colors truncate w-[80%]">/coding/<%= t.uniqueLink %></a>
+                    <button onclick="navigator.clipboard.writeText(window.location.origin + '/coding/<%= t.uniqueLink %>')" class="text-gray-500 hover:text-white transition-colors">
+                      <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                    </button>
+                  </div>
+                </div>
+              <% }); %>
+              <% if(tests.length === 0) { %>
+                <div class="text-gray-500 text-center py-16 text-sm font-medium bg-black/20 rounded-xl border border-dashed border-white/10 flex flex-col items-center">
+                  <span class="material-symbols-outlined text-4xl mb-3 opacity-50">link_off</span>
+                  No active engineering sessions.
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
-  </div>
+  </main>
 
   <script>
-    document.getElementById('create-test-form').addEventListener('submit', async (e) => {
+    document.getElementById('createTestForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const codingBankId = document.getElementById('codingBankId').value;
-      const validityHours = document.getElementById('validityHours').value;
+      const btn = e.target.querySelector('button[type="submit"]');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Processing...';
+      btn.disabled = true;
 
-      const res = await fetch('/api/coding/admin/test/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ codingBankId, validityHours })
-      });
-      if(res.ok) window.location.reload();
-      else alert('Failed to create test link');
+      const b = document.getElementById('bankId').value, v = document.getElementById('validityHours').value;
+      const res = await fetch('/api/coding/admin/tests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ codingBankId: b, validityHours: v }) });
+      if(res.ok) window.location.reload(); 
+      else { alert('Error generating session link.'); btn.innerHTML = originalText; btn.disabled = false; }
     });
 
     async function deleteTest(id) {
-      if(confirm('Delete this test link? All student submissions will be lost forever.')) {
-        const res = await fetch(`/api/coding/admin/test/${id}`, { method: 'DELETE' });
+      if(confirm('Terminate live coding session? This severs the link and eradicates candidate data.')) {
+        const res = await fetch(`/api/coding/admin/tests/${id}`, { method: 'DELETE' });
         if(res.ok) window.location.reload();
       }
     }

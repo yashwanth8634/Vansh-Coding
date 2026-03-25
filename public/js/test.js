@@ -93,25 +93,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (questionNavButtons) questionNavButtons.innerHTML = '';
     questions.forEach((q, index) => {
       // Create options HTML
-      const optionsHtml = q.options.map(option => `
-        <label class="block p-4 border border-gray-300 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors duration-150">
-          <input type="radio" name="question-${q._id}" value="${option}" class="mr-3 text-indigo-600 focus:ring-indigo-500">
-          <span class="font-medium text-gray-800">${option}</span>
+      const optionsHtml = q.options.map((option, optIdx) => `
+        <label class="block p-4 border border-white/10 bg-[#0a0a0a] rounded-xl hover:bg-[#111] hover:border-white/30 cursor-pointer transition-all duration-200 group">
+          <div class="flex items-center">
+            <input type="radio" name="question-${q._id}" value="${option}" class="w-5 h-5 bg-black border-white/20 text-white focus:ring-1 focus:ring-white/30 focus:ring-offset-0 focus:ring-offset-transparent">
+            <span class="ml-4 font-medium text-gray-300 text-sm group-hover:text-white">${option}</span>
+          </div>
         </label>
       `).join('');
 
       // Add image HTML if it exists
       const imageHTML = q.imageUrl
-        ? `<img src="${q.imageUrl}" alt="Question Content" class="w-full rounded-lg mb-4 max-h-72 object-contain">`
+        ? `<img src="${q.imageUrl}" alt="Question Content" class="w-full rounded-lg mb-6 max-h-72 object-contain border border-white/10">`
         : '';
 
       // Create question card
       const questionCard = document.createElement('div');
-      questionCard.className = 'bg-white p-5 sm:p-6 rounded-xl shadow-lg border border-gray-100 mb-6';
+      questionCard.className = 'bg-[#0a0a0a] p-6 md:p-10 rounded-2xl border border-white/10 mb-8 w-full';
       questionCard.id = `question-card-${q._id}`;
       questionCard.innerHTML = `
         ${imageHTML}
-        <h3 class="text-lg sm:text-xl font-semibold mb-5 text-gray-900">${index + 1}. ${q.questionText}</h3>
+        <h3 class="text-xl md:text-2xl font-semibold mb-8 text-white leading-relaxed tracking-tight">
+          <span class="text-gray-500 mr-2 font-mono text-sm">Q${index + 1}.</span> ${q.questionText}
+        </h3>
         <div class="space-y-3" data-question-id="${q._id}">
           ${optionsHtml}
         </div>
@@ -122,11 +126,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const navButton = document.createElement('button');
         navButton.type = 'button';
         navButton.dataset.questionId = q._id;
-        navButton.className = 'w-9 h-9 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors';
+        navButton.className = 'w-10 h-10 rounded-lg border border-white/10 text-sm font-medium text-gray-400 bg-white/5 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center';
         navButton.textContent = `${index + 1}`;
         navButton.addEventListener('click', () => {
           const target = document.getElementById(`question-card-${q._id}`);
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (target) {
+            const headerHeight = document.getElementById('header') ? document.getElementById('header').offsetHeight : 0;
+            const elementPosition = target.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerHeight - 20;
+            window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+          }
         });
         questionNavButtons.appendChild(navButton);
       }
@@ -156,8 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
         : null;
       if (navButton) {
         navButton.className = selected
-          ? 'w-9 h-9 rounded-lg border border-green-200 bg-green-100 text-green-800 text-sm font-semibold transition-colors'
-          : 'w-9 h-9 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors';
+          ? 'w-10 h-10 rounded-lg border border-white text-white text-sm font-medium bg-white/10 transition-all flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)] focus:outline-none'
+          : 'w-10 h-10 rounded-lg border border-white/10 text-sm font-medium text-gray-400 bg-white/5 hover:bg-white/10 hover:text-white transition-all flex items-center justify-center focus:outline-none';
       }
     });
 
@@ -266,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     alert(submitMessage);
 
-    testContainer.innerHTML = '<h1 class="text-3xl font-bold text-center mt-40 font-display">Submitting... Please wait.</h1>';
+    testContainer.innerHTML = '<h1 class="text-xl font-medium text-gray-400 text-center mt-40 animate-pulse tracking-widest uppercase">Transmitting Data...</h1>';
 
     try {
         const response = await fetch('/api/test/submit', {
@@ -286,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
         displayResults(results);
 
     } catch (err) {
-        testContainer.innerHTML = `<h1 class="text-3xl font-bold text-center mt-40 text-red-600 font-display">Error: ${err.message}</h1>`;
+        testContainer.innerHTML = `<h1 class="text-xl font-medium text-center mt-40 text-red-500 font-mono">Transmission Error: ${err.message}</h1>`;
     }
   }
 
@@ -296,40 +305,44 @@ document.addEventListener('DOMContentLoaded', () => {
     resultsContainer.style.display = 'flex';
     if(warningModal) warningModal.style.display = 'none';
 
-    scoreDisplay.textContent = `You Scored: ${results.score} / ${results.total}`;
+    scoreDisplay.textContent = `Grade: ${results.score} / ${results.total}`;
 
     resultsBreakdown.innerHTML = '';
     results.results.forEach((item, index) => {
         const isCorrect = item.isCorrect;
-        const bgColor = isCorrect ? 'bg-green-50' : 'bg-red-50';
-        const borderColor = isCorrect ? 'border-green-300' : 'border-red-300';
+        const bgColor = isCorrect ? 'bg-green-500/5' : 'bg-red-500/5';
+        const borderColor = isCorrect ? 'border-green-500/20' : 'border-red-500/20';
         
         let answerHtml;
         if (isCorrect) {
           answerHtml = `
-            <p class="mt-2 text-green-700 font-medium">
-              <strong>Your Answer:</strong> ${item.selectedOption || 'Not Answered'}
-            </p>`;
+            <div class="mt-4 p-4 bg-[#050505] rounded-xl border border-white/10">
+              <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Detected Match (Exact)</span>
+              <span class="text-white font-medium text-sm">${item.selectedOption || 'NULL_DATA'}</span>
+            </div>`;
         } else {
           answerHtml = `
-            <p class="mt-2 text-red-700 font-medium">
-              <strong>Your Answer:</strong> ${item.selectedOption || 'Not Answered'}
-            </p>
-            <p class="mt-1 text-green-700 font-medium">
-              <strong>Correct Answer:</strong> ${item.correctAnswer}
-            </p>`;
+            <div class="mt-4 flex flex-col md:flex-row gap-3">
+              <div class="flex-1 p-4 bg-[#050505] rounded-xl border border-red-500/20">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-red-400 block mb-1">Recorded Value</span>
+                <span class="text-gray-500 font-medium text-sm line-through">${item.selectedOption || 'NULL_DATA'}</span>
+              </div>
+              <div class="flex-1 p-4 bg-[#050505] rounded-xl border border-green-500/20">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Expected Control</span>
+                <span class="text-white font-medium text-sm">${item.correctAnswer}</span>
+              </div>
+            </div>`;
         }
         
-        // Add image HTML if it exists
         const imageHTML = item.imageUrl
-          ? `<img src="${item.imageUrl}" alt="Question Content" class="w-full rounded-lg mb-3 max-h-48 object-contain">`
+          ? `<img src="${item.imageUrl}" alt="Question Content" class="w-full rounded-lg mb-5 max-h-64 object-contain border border-white/10">`
           : '';
 
         const resultCard = document.createElement('div');
-        resultCard.className = `p-4 border ${borderColor} ${bgColor} rounded-lg`;
+        resultCard.className = `p-6 border ${borderColor} ${bgColor} rounded-xl bg-[#0a0a0a]`;
         resultCard.innerHTML = `
             ${imageHTML}
-            <p class="font-semibold text-lg text-gray-800">${index + 1}. ${item.questionText}</p>
+            <h4 class="font-medium text-sm text-gray-200 leading-relaxed"><span class="text-gray-500 mr-2 font-mono">Q${index + 1}.</span> ${item.questionText}</h4>
             ${answerHtml}
         `;
         resultsBreakdown.appendChild(resultCard);
