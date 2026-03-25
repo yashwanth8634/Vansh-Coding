@@ -7,7 +7,7 @@ const CodingBank = require('../models/CodingBank');
 const CodingTest = require('../models/CodingTest');
 const CodingAttempt = require('../models/CodingAttempt');
 const { caches } = require('../utils/cache');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 // Create Challenge
 router.post('/create', protect, async (req, res) => {
@@ -159,7 +159,7 @@ router.post('/tests', protect, async (req, res) => {
     }
 
     const expiresAt = new Date(Date.now() + parsedValidityHours * 60 * 60 * 1000);
-    const uniqueLink = uuidv4().slice(0, 8); 
+    const uniqueLink = crypto.randomUUID().slice(0, 8); 
 
     const newTest = new CodingTest({
       codingBank: codingBankId,

@@ -1,6 +1,6 @@
 // models/Test.js
+const crypto = require('crypto');
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
 
 const testSchema = new mongoose.Schema({
   questionBank: {
@@ -18,7 +18,7 @@ const testSchema = new mongoose.Schema({
   },
   uniqueLink: {
     type: String,
-    default: () => uuidv4(),
+    default: () => crypto.randomUUID(),
     unique: true, // <-- This line creates the index. It's all you need.
   },
   createdAt: {
