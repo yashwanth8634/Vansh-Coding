@@ -7,10 +7,72 @@ const Question = require('../models/Question');
 const QuestionBank = require('../models/QuestionBank');
 const Test = require('../models/Test');
 const Attempt = require('../models/Attempt');
+const CodingTest = require('../models/CodingTest');
+const CodingAttempt = require('../models/CodingAttempt');
 
 const { shuffleArray } = require('../utils/helpers');
 const { protect } = require('../middleware/auth');
-const { caches, invalidateQuestionData } = require('../utils/cache');
+const {
+  caches,
+  invalidateQuestionData,
+} = require('../utils/cache');
+
+const DEPARTMENTS = [
+  'CSE',
+  'CSE(AI&ML)',
+  'CSE(DS)',
+  'IT',
+  'ECE',
+  'EEE',
+  'CIVIL',
+  'MECH',
+  'EIE',
+  'AI&DS',
+  'AI&ML',
+];
+
+const YEARS = ['1', '2', '3', '4'];
+
+const getCachedQuizTest = async (uniqueLink) => {
+  const cacheKey = `test-${uniqueLink}`;
+  let test = caches.test.get(cacheKey);
+
+  if (!test) {
+    test = await Test.findOne({ uniqueLink })
+      .populate({
+        path: 'questionBank',
+        populate: { path: 'questions', model: 'Question' },
+      })
+      .lean();
+
+    if (!test) {
+      return null;
+    }
+
+    caches.test.set(cacheKey, test);
+  }
+
+  return test;
+};
+
+const getCachedCodingTest = async (uniqueLink) => {
+  const cacheKey = `coding-test-${uniqueLink}`;
+  let codingTest = caches.codingTest.get(cacheKey);
+
+  if (!codingTest) {
+    codingTest = await CodingTest.findOne({ uniqueLink })
+      .select('_id linkExpiresAt')
+      .lean();
+
+    if (!codingTest) {
+      return null;
+    }
+
+    caches.codingTest.set(cacheKey, codingTest);
+  }
+
+  return codingTest;
+};
 
 // ===================================
 // --- Question Bank Routes (Protected) ---
@@ -39,7 +101,25 @@ router.post('/banks', protect, async (req, res) => {
 // POST /api/banks/:bankId/questions
 router.post('/banks/:bankId/questions', protect, async (req, res) => {
   try {
-    const { questionText, options, correctAnswer, imageUrl } = req.body;
+    const questionText = (req.body.questionText || '').trim();
+    const imageUrl = (req.body.imageUrl || '').trim();
+    const options = Array.isArray(req.body.options)
+      ? req.body.options.map((option) => String(option || '').trim())
+      : [];
+    const correctAnswer = String(req.body.correctAnswer || '').trim();
+
+    if (!questionText) {
+      return res.status(400).json({ message: 'Question text is required.' });
+    }
+
+    if (options.length !== 4 || options.some((option) => !option)) {
+      return res.status(400).json({ message: 'Exactly four non-empty options are required.' });
+    }
+
+    if (!options.includes(correctAnswer)) {
+      return res.status(400).json({ message: 'Correct answer must match one of the options.' });
+    }
+
     const bank = await QuestionBank.findById(req.params.bankId);
     if (!bank) {
       return res.status(404).json({ message: 'Bank not found' });
@@ -48,7 +128,7 @@ router.post('/banks/:bankId/questions', protect, async (req, res) => {
       questionText, 
       options, 
       correctAnswer, 
-      imageUrl
+      imageUrl: imageUrl || null,
     });
     await newQuestion.save();
     bank.questions.push(newQuestion._id);
@@ -147,6 +227,18 @@ router.post('/tests', protect, async (req, res) => {
     await newTest.save();
 
     caches.pages.flushAll();
+    caches.test.set(`test-${newTest.uniqueLink}`, {
+      _id: newTest._id,
+      uniqueLink: newTest.uniqueLink,
+      linkExpiresAt: newTest.linkExpiresAt,
+      duration: newTest.duration,
+      numQuestions: newTest.numQuestions,
+      questionBank: {
+        _id: bank._id,
+        title: bank.title,
+        questions: bank.questions.map((question) => question.toObject()),
+      },
+    });
 
     const fullLink = `/test/${newTest.uniqueLink}`; 
     res.status(201).json({
@@ -166,23 +258,42 @@ router.post('/tests', protect, async (req, res) => {
 // POST /api/test/start (cached test lookup)
 router.post('/test/start', async (req, res) => {
   try {
-    let { uniqueLink, rollNo } = req.body;
-    if (!uniqueLink || !rollNo) {
-      return res.status(400).json({ message: 'Link and Roll No are required.' });
+    let {
+      uniqueLink,
+    name,
+    rollNo,
+    department,
+    year,
+    section,
+    collegeName,
+  } = req.body;
+
+    if (!uniqueLink || !name || !rollNo || !department || !year) {
+      return res.status(400).json({ message: 'Name, Roll No, Department, and Year are required.' });
     }
+
+    name = name.trim();
     rollNo = rollNo.trim().toUpperCase();
+    department = department.trim();
+    year = year.trim();
+    section = (section || '').trim();
+    collegeName = (collegeName || '').trim() || 'Vignan';
 
-    const cacheKey = `test-${uniqueLink}`;
-    let test = caches.test.get(cacheKey);
+    if (!DEPARTMENTS.includes(department)) {
+      return res.status(400).json({ message: 'Invalid department selected.' });
+    }
 
+    if (!YEARS.includes(year)) {
+      return res.status(400).json({ message: 'Invalid year selected.' });
+    }
+
+    const test = await getCachedQuizTest(uniqueLink);
     if (!test) {
-      test = await Test.findOne({ uniqueLink }).populate({
-        path: 'questionBank',
-        populate: { path: 'questions', model: 'Question' },
-      });
+      return res.status(404).json({ message: 'Test link is invalid.' });
+    }
 
-      if (!test) return res.status(404).json({ message: 'Test link is invalid.' });
-      caches.test.set(cacheKey, test);
+    if (!test.questionBank || !Array.isArray(test.questionBank.questions) || test.questionBank.questions.length === 0) {
+      return res.status(400).json({ message: 'This test has no questions configured.' });
     }
 
     if (new Date() > new Date(test.linkExpiresAt)) return res.status(400).json({ message: 'This test link has expired.' });
@@ -195,18 +306,28 @@ router.post('/test/start', async (req, res) => {
     let allQuestions = test.questionBank.questions;
     let randomizedQuestions = shuffleArray([...allQuestions]);
     let selectedQuestions = randomizedQuestions.slice(0, test.numQuestions);
+    if (selectedQuestions.length === 0) {
+      return res.status(400).json({ message: 'This test has no available questions.' });
+    }
 
     const questionsForStudent = selectedQuestions.map((q) => {
-      const questionData = q.toObject ? q.toObject() : q; 
       return {
-        _id: questionData._id,
-        questionText: questionData.questionText,
-        imageUrl: questionData.imageUrl,
-        options: shuffleArray([...questionData.options]),
+        _id: q._id,
+        questionText: q.questionText,
+        imageUrl: q.imageUrl,
+        options: shuffleArray([...q.options]),
       };
     });
 
-    const newAttempt = new Attempt({ test: test._id, studentRollNo: rollNo });
+    const newAttempt = new Attempt({
+      test: test._id,
+      studentName: name,
+      studentRollNo: rollNo,
+      studentDepartment: department,
+      studentYear: year,
+      studentSection: section,
+      studentCollege: collegeName,
+    });
     await newAttempt.save();
 
     res.json({
@@ -228,7 +349,7 @@ router.post('/test/start', async (req, res) => {
 router.post('/test/submit', async (req, res) => {
   try {
     const { attemptId, answers } = req.body; 
-    if (!attemptId || !answers) {
+    if (!attemptId || !Array.isArray(answers)) {
         return res.status(400).json({ message: 'Missing attempt ID or answers.' });
     }
     
@@ -276,6 +397,73 @@ router.post('/test/submit', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error submitting test.' });
+  }
+});
+
+router.post('/coding/student/start', async (req, res) => {
+  try {
+    let {
+      uniqueLink,
+      name,
+      rollNo,
+      department,
+      year,
+      section,
+      collegeName,
+    } = req.body;
+
+    if (!uniqueLink || !name || !rollNo || !department || !year) {
+      return res.status(400).json({ message: 'Name, Roll No, Department, and Year are required.' });
+    }
+
+    name = name.trim();
+    rollNo = rollNo.trim().toUpperCase();
+    department = department.trim();
+    year = year.trim();
+    section = (section || '').trim();
+    collegeName = (collegeName || '').trim() || 'Vignan';
+
+    if (!DEPARTMENTS.includes(department)) {
+      return res.status(400).json({ message: 'Invalid department selected.' });
+    }
+
+    if (!YEARS.includes(year)) {
+      return res.status(400).json({ message: 'Invalid year selected.' });
+    }
+
+    const codingTest = await getCachedCodingTest(uniqueLink);
+
+    if (!codingTest) {
+      return res.status(404).json({ message: 'Coding test link is invalid.' });
+    }
+
+    if (new Date() > new Date(codingTest.linkExpiresAt)) {
+      return res.status(400).json({ message: 'This coding test link has expired.' });
+    }
+
+    const existingAttempt = await CodingAttempt.findOne({
+      codingTest: codingTest._id,
+      studentRollNo: rollNo,
+    }).select('_id');
+
+    if (existingAttempt) {
+      return res.status(403).json({ message: 'You have already attempted this coding test.' });
+    }
+
+    res.json({
+      message: 'Student details accepted.',
+      student: {
+        name,
+        rollNo,
+        department,
+        year,
+        section,
+        collegeName,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error starting coding test.' });
   }
 });
 

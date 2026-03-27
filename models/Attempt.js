@@ -1,17 +1,60 @@
 // models/Attempt.js
 const mongoose = require('mongoose');
 
+const DEPARTMENTS = [
+  'CSE',
+  'CSE(AI&ML)',
+  'CSE(DS)',
+  'IT',
+  'ECE',
+  'EEE',
+  'CIVIL',
+  'MECH',
+  'EIE',
+  'AI&DS',
+  'AI&ML',
+];
+
+const YEARS = ['1', '2', '3', '4'];
+
 const attemptSchema = new mongoose.Schema({
   test: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Test',
     required: true,
   },
+  studentName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   studentRollNo: {
     type: String,
     required: true,
     trim: true,
-    lowercase: true
+    lowercase: true,
+  },
+  studentDepartment: {
+    type: String,
+    required: true,
+    trim: true,
+    enum: DEPARTMENTS,
+  },
+  studentYear: {
+    type: String,
+    required: true,
+    trim: true,
+    enum: YEARS,
+  },
+  studentSection: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  studentCollege: {
+    type: String,
+    trim: true,
+    default: 'Vignan',
   },
   score: {
     type: Number,

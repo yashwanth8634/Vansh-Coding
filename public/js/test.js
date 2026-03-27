@@ -7,12 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Login form
   const startTestForm = document.getElementById('start-test-form');
+  const studentNameInput = document.getElementById('student-name');
   const rollNoInput = document.getElementById('roll-no');
+  const departmentInput = document.getElementById('department');
+  const yearInput = document.getElementById('year');
+  const sectionInput = document.getElementById('section');
+  const collegeNameInput = document.getElementById('college-name');
   const uniqueLinkInput = document.getElementById('unique-link');
   const loginError = document.getElementById('login-error');
+  const startTestBtn = document.getElementById('start-test-btn');
 
   // Test elements
-  const timerDisplay = document.querySelector('#timer span');
+  const timerDisplay = document.getElementById('timer-value');
   const questionArea = document.getElementById('question-area');
   const submitTestBtn = document.getElementById('submit-test-btn');
   const progressText = document.getElementById('progress-text');
@@ -33,31 +39,57 @@ document.addEventListener('DOMContentLoaded', () => {
   let timerInterval;
   let warningCount = 0;
   let testIsSubmitted = false;
+  let isStartingTest = false;
+  let isSubmittingTest = false;
+
+  function setButtonLoading(button, isLoading, idleHtml, loadingHtml) {
+    if (!button) return;
+    button.disabled = isLoading;
+    button.classList.toggle('opacity-70', isLoading);
+    button.classList.toggle('cursor-not-allowed', isLoading);
+    button.innerHTML = isLoading ? loadingHtml : idleHtml;
+  }
   
   // --- 1. START TEST ---
   if(startTestForm) {
     startTestForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (isStartingTest) return;
       loginError.textContent = '';
+      loginError.classList.add('hidden');
+      const name = studentNameInput.value;
       const rollNo = rollNoInput.value;
+      const department = departmentInput.value;
+      const year = yearInput.value;
+      const section = sectionInput.value;
+      const collegeName = collegeNameInput.value;
       const uniqueLink = uniqueLinkInput.value;
 
-      if (!rollNo.trim()) {
-        loginError.textContent = 'Please enter your Roll Number.';
+      if (!name.trim() || !rollNo.trim() || !department.trim() || !year.trim()) {
+        loginError.textContent = 'Please enter your name, roll number, department, and year.';
+        loginError.classList.remove('hidden');
         return;
       }
 
       try {
+        isStartingTest = true;
+        setButtonLoading(
+          startTestBtn,
+          true,
+          startTestBtn.innerHTML,
+          '<span class="material-symbols-outlined animate-spin text-[18px]" style="color: #ffffff;">sync</span><span class="tracking-wide" style="color: #ffffff;">Please wait...</span>',
+        );
         const response = await fetch('/api/test/start', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uniqueLink, rollNo }),
+          body: JSON.stringify({ uniqueLink, name, rollNo, department, year, section, collegeName }),
         });
 
         const data = await response.json();
 
         if (!response.ok) {
           loginError.textContent = data.message || 'Failed to start test.';
+          loginError.classList.remove('hidden');
           return;
         }
 
@@ -66,6 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
       } catch (err) {
         loginError.textContent = 'A network error occurred.';
+        loginError.classList.remove('hidden');
+      } finally {
+        isStartingTest = false;
+        setButtonLoading(
+          startTestBtn,
+          false,
+          '<span class="tracking-wide" style="color: #ffffff;">Start Test</span><span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:translate-x-0.5" style="color: #ffffff;">arrow_forward</span>',
+          '',
+        );
       }
     });
   }
@@ -247,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- 7. SUBMIT TEST LOGIC ---
   if(submitTestBtn) {
     submitTestBtn.addEventListener('click', () => {
+      if (isSubmittingTest) return;
       if (confirm('Are you sure you want to submit your test?')) {
         forceSubmitTest('You have submitted the test.');
       }
@@ -254,8 +296,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function forceSubmitTest(submitMessage) {
-    if (testIsSubmitted) return;
+    if (testIsSubmitted || isSubmittingTest) return;
     testIsSubmitted = true;
+    isSubmittingTest = true;
     clearInterval(timerInterval);
 
     const answers = [];
@@ -273,9 +316,11 @@ document.addEventListener('DOMContentLoaded', () => {
       document.exitFullscreen();
     }
     
-    alert(submitMessage);
-
-    testContainer.innerHTML = '<h1 class="text-xl font-medium text-gray-400 text-center mt-40 animate-pulse tracking-widest uppercase">Submitting... Please wait.</h1>';
+    testContainer.innerHTML = `<div class="mt-32 flex flex-col items-center justify-center gap-4 text-center">
+      <span class="material-symbols-outlined animate-spin text-white text-3xl">sync</span>
+      <h1 class="text-xl font-medium text-gray-400 animate-pulse tracking-widest uppercase">Submitting... Please wait.</h1>
+      <p class="text-xs text-gray-500 uppercase tracking-[0.2em]">${submitMessage}</p>
+    </div>`;
 
     try {
         const response = await fetch('/api/test/submit', {
@@ -295,6 +340,8 @@ document.addEventListener('DOMContentLoaded', () => {
         displayResults(results);
 
     } catch (err) {
+        isSubmittingTest = false;
+        testIsSubmitted = false;
         testContainer.innerHTML = `<h1 class="text-xl font-medium text-center mt-40 text-red-500 font-mono">Error: ${err.message}</h1>`;
     }
   }

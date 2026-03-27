@@ -6,11 +6,27 @@ const CodingChallenge = require('../models/CodingChallenge');
 const CodingAttempt = require('../models/CodingAttempt');
 const CodingTest = require('../models/CodingTest');
 
+const DEPARTMENTS = [
+  'CSE',
+  'CSE(AI&ML)',
+  'CSE(DS)',
+  'IT',
+  'ECE',
+  'EEE',
+  'CIVIL',
+  'MECH',
+  'EIE',
+  'AI&DS',
+  'AI&ML',
+];
+
+const YEARS = ['1', '2', '3', '4'];
+
 // Rate limiting specifically to prevent DDoS on execution APIs
 const executionLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 15, // limit each IP to 15 executions per minute
-  message: { message: 'Too many run attempts. Please wait a minute.' },
+  max: 8, // limit each IP to 8 executions per minute
+  message: { message: 'Too many code runs right now. Please wait a minute before trying again.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -88,11 +104,35 @@ router.post('/execute', executionLimiter, async (req, res) => {
 
 // POST /api/coding/submit - Run against multiple challenges and save unified test attempt
 router.post('/submit', executionLimiter, async (req, res) => {
-  const { studentRollNo, testId, submissions } = req.body;
+  let {
+    studentName,
+    studentRollNo,
+    studentDepartment,
+    studentYear,
+    studentSection,
+    studentCollege,
+    testId,
+    submissions,
+  } = req.body;
   // submissions: [ { challengeId, code, language } ]
   
-  if (!studentRollNo || !testId || !Array.isArray(submissions)) {
+  if (!studentName || !studentRollNo || !studentDepartment || !studentYear || !testId || !Array.isArray(submissions)) {
     return res.status(400).json({ message: 'Missing fields' });
+  }
+
+  studentName = studentName.trim();
+  studentRollNo = studentRollNo.trim().toUpperCase();
+  studentDepartment = studentDepartment.trim();
+  studentYear = studentYear.trim();
+  studentSection = (studentSection || '').trim();
+  studentCollege = (studentCollege || '').trim() || 'Vignan';
+
+  if (!DEPARTMENTS.includes(studentDepartment)) {
+    return res.status(400).json({ message: 'Invalid department selected.' });
+  }
+
+  if (!YEARS.includes(studentYear)) {
+    return res.status(400).json({ message: 'Invalid year selected.' });
   }
 
   if (submissions.length === 0) {
@@ -174,7 +214,12 @@ router.post('/submit', executionLimiter, async (req, res) => {
 
     // Save Unified Attempt to DB
     const attempt = new CodingAttempt({
+      studentName,
       studentRollNo,
+      studentDepartment,
+      studentYear,
+      studentSection,
+      studentCollege,
       codingTest: testId,
       answers: finalAnswers
     });

@@ -9,25 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" href="/css/vansh2k26-theme.css">
-
-  <style>
-    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
-    .glass-nav { background: rgba(0, 0, 0, 0.6); border-bottom: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
-    .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); }
-    .grid-bg {
-      background-size: 40px 40px;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-    }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
-  </style>
+  <%- include('partials/tailwind-setup') %>
 </head>
 <body class="vc-admin min-h-screen relative overflow-x-hidden antialiased selection:bg-white/30">
 
@@ -53,13 +35,21 @@
           <h1 class="text-3xl font-semibold tracking-tight text-white mb-2"><%= test.questionBank ? test.questionBank.title : 'Deleted Bank' %></h1>
           <p class="text-xs font-mono uppercase tracking-wider text-gray-500"><%= test.numQuestions %> Questions · <%= test.duration %> Minutes · Created <%= new Date(test.createdAt).toLocaleDateString() %></p>
         </div>
-        <button
-          type="button"
-          id="export-csv"
-          class="bg-white text-black hover:bg-gray-200 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors"
-        >
-          Export Attempts CSV
-        </button>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a
+            href="/admin/test/<%= test._id %>/results/pdf"
+            class="bg-white text-black hover:bg-gray-200 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors"
+          >
+            Export Rank PDF
+          </a>
+          <button
+            type="button"
+            id="export-csv"
+            class="bg-white/10 border border-white/10 text-white hover:bg-white/15 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors"
+          >
+            Export Attempts CSV
+          </button>
+        </div>
       </div>
 
       <div class="mb-6">

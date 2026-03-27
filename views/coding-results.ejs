@@ -9,29 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" href="/css/vansh2k26-theme.css">
-  <style>
-    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
-    
-    .glass-nav { background: rgba(0, 0, 0, 0.6); border-bottom: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
-    .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); }
-    
-    .grid-bg {
-      background-size: 40px 40px;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-    }
-
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
-    
-    .code-block { font-family: 'Fira Code', monospace; font-size: 13px; line-height: 1.6; }
-  </style>
+  <%- include('partials/tailwind-setup') %>
 </head>
 <body class="vc-admin flex flex-col min-h-screen relative overflow-x-hidden antialiased selection:bg-white/30">
 
@@ -63,6 +41,12 @@
             <span class="text-gray-500 font-mono">ID: <%= test._id %></span>
           </div>
         </div>
+        <a
+          href="/admin/coding/results/<%= test._id %>/pdf"
+          class="bg-white text-black hover:bg-gray-200 py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors"
+        >
+          Export Rank PDF
+        </a>
       </div>
 
       <div class="overflow-x-auto border border-white/10 rounded-xl bg-black/40">
@@ -164,7 +148,7 @@
               </div>
             </div>
             <div class="bg-[#000] p-4 overflow-x-auto">
-              <pre class="code-block text-gray-300 m-0"><code class="language-${ans.language.toLowerCase()}">${escapeHtml(ans.code || '// Blank File')}</code></pre>
+              <pre class="font-code text-[13px] leading-relaxed text-gray-300 m-0"><code class="language-${ans.language.toLowerCase()}">${escapeHtml(ans.code || '// Blank File')}</code></pre>
             </div>
           </div>
         `;

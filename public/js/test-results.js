@@ -236,11 +236,23 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        const header = ['roll_no', 'score', 'submitted_at'];
-        const csvRows = rows.map((row) => [
+        const header = ['rank', 'name', 'roll_no', 'year', 'department', 'section', 'college', 'score', 'submitted_at'];
+        const rankedRows = [...rows].sort((a, b) => {
+          if ((b.score ?? 0) !== (a.score ?? 0)) {
+            return (b.score ?? 0) - (a.score ?? 0);
+          }
+          return new Date(a.submittedAt) - new Date(b.submittedAt);
+        });
+        const csvRows = rankedRows.map((row, index) => [
+          index + 1,
+          row.studentName || '',
           row.studentRollNo || '',
+          row.studentYear || '',
+          row.studentDepartment || '',
+          row.studentSection || '',
+          row.studentCollege || 'Vignan',
           row.score ?? '',
-          row.submittedAt ? new Date(row.submittedAt).toISOString() : ''
+          row.submittedAt ? new Date(row.submittedAt).toISOString() : '',
         ]);
 
         const csv = [header, ...csvRows]
