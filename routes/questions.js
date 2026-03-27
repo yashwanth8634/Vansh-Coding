@@ -13,7 +13,20 @@ const { invalidateQuestionData } = require('../utils/cache');
 router.put('/:questionId', protect, async (req, res) => {
     try {
         const { questionId } = req.params;
-        const { questionText, options, correctAnswer, imageUrl } = req.body;
+        const questionText = (req.body.questionText || '').trim();
+        const imageUrl = (req.body.imageUrl || '').trim();
+        const options = Array.isArray(req.body.options)
+          ? req.body.options.map((option) => String(option || '').trim())
+          : [];
+        const correctAnswer = String(req.body.correctAnswer || '').trim();
+
+        if (!questionText) {
+            return res.status(400).json({ message: 'Question text is required.' });
+        }
+
+        if (options.length !== 4 || options.some((option) => !option)) {
+            return res.status(400).json({ message: 'Exactly four non-empty options are required.' });
+        }
 
         if (!options || !options.includes(correctAnswer)) {
             return res.status(400).json({ message: 'The correct answer must be one of the provided options.' });
@@ -21,7 +34,7 @@ router.put('/:questionId', protect, async (req, res) => {
 
         const updatedQuestion = await Question.findByIdAndUpdate(
             questionId,
-            { questionText, options, correctAnswer, imageUrl },
+            { questionText, options, correctAnswer, imageUrl: imageUrl || null },
             { new: true } 
         );
 

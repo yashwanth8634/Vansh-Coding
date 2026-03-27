@@ -9,24 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" href="/css/vansh2k26-theme.css">
-
-  <style>
-    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
-    
-    .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); }
-    
-    .grid-bg {
-      background-size: 40px 40px;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-    }
-  </style>
+  <%- include('partials/tailwind-setup') %>
 </head>
-<body class="min-h-screen relative selection:bg-white/30 selection:text-white pb-24 flex items-start justify-center p-6 pt-20 antialiased overflow-x-hidden">
+<body class="vc-app min-h-screen relative selection:bg-white/30 selection:text-white pb-24 flex items-start justify-center p-6 pt-20 antialiased overflow-x-hidden">
 
   <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
@@ -38,7 +23,7 @@
         <span class="material-symbols-outlined text-white text-[32px]">task_alt</span>
       </div>
       <h1 class="text-3xl font-semibold text-white tracking-tight mb-2">Mr & Ms Coder Quiz Submitted</h1>
-      <p class="text-gray-400 font-medium uppercase tracking-widest text-xs mb-6"><%= attempt.questionBank.name %></p>
+      <p class="text-gray-400 font-medium uppercase tracking-widest text-xs mb-6"><%= attempt.questionBank ? attempt.questionBank.title : 'Question Bank' %></p>
       
       <div class="inline-block bg-[#0a0a0a] border border-white/10 px-8 py-5 rounded-xl">
         <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-2">Score</p>

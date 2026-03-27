@@ -21,6 +21,11 @@ const authLimiter = rateLimit({
 // POST /api/admin/register
 router.post('/register', authLimiter, async (req, res) => {
   try {
+    if (!JWT_SECRET) {
+      console.error('JWT_SECRET is not configured.');
+      return res.status(500).json({ message: 'Authentication is not configured.' });
+    }
+
     const existingUser = await User.findOne();
     if (existingUser) {
         return res.status(403).json({ 
@@ -28,7 +33,8 @@ router.post('/register', authLimiter, async (req, res) => {
         });
     }
 
-    const { username, password } = req.body;
+    const username = (req.body.username || '').trim();
+    const password = req.body.password || '';
     if (!username || !password) {
         return res.status(400).json({ message: 'Please enter all fields.' });
     }
@@ -37,14 +43,25 @@ router.post('/register', authLimiter, async (req, res) => {
     await user.save();
     res.status(201).json({ message: 'Admin registered successfully. Registration is now closed.' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Unable to register admin.' });
   }
 });
 
 // POST /api/admin/login
 router.post('/login', authLimiter, async (req, res) => {
   try {
-    const { username, password } = req.body;
+    if (!JWT_SECRET) {
+      console.error('JWT_SECRET is not configured.');
+      return res.status(500).json({ message: 'Authentication is not configured.' });
+    }
+
+    const username = (req.body.username || '').trim();
+    const password = req.body.password || '';
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required.' });
+    }
+
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials.' });
@@ -70,7 +87,8 @@ router.post('/login', authLimiter, async (req, res) => {
 
     res.json({ message: 'Logged in successfully.' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Unable to log in right now.' });
   }
 });
 
@@ -78,6 +96,8 @@ router.post('/login', authLimiter, async (req, res) => {
 router.post('/logout', (req, res) => {
   res.cookie('token', '', {
     httpOnly: true,
+    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production',
     expires: new Date(0),
   });
 

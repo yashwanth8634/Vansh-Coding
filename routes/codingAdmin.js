@@ -6,13 +6,32 @@ const CodingChallenge = require('../models/CodingChallenge');
 const CodingBank = require('../models/CodingBank');
 const CodingTest = require('../models/CodingTest');
 const CodingAttempt = require('../models/CodingAttempt');
-const { caches } = require('../utils/cache');
+const { caches, invalidateAllCodingTests } = require('../utils/cache');
 const crypto = require('crypto');
 
 // Create Challenge
 router.post('/create', protect, async (req, res) => {
   try {
-    const { title, description, difficulty, testCases } = req.body;
+    const title = (req.body.title || '').trim();
+    const description = (req.body.description || '').trim();
+    const difficulty = (req.body.difficulty || '').trim();
+    const rawCases = Array.isArray(req.body.testCases) ? req.body.testCases : [];
+    const testCases = rawCases
+      .map((testCase) => ({
+        input: String(testCase.input || '').trim(),
+        expectedOutput: String(testCase.expectedOutput || '').trim(),
+        isHidden: Boolean(testCase.isHidden),
+      }))
+      .filter((testCase) => testCase.expectedOutput);
+
+    if (!title || !description || !difficulty) {
+      return res.status(400).json({ message: 'Title, description, and difficulty are required.' });
+    }
+
+    if (testCases.length === 0) {
+      return res.status(400).json({ message: 'At least one valid test case is required.' });
+    }
+
     const newChallenge = new CodingChallenge({
       title,
       description,
@@ -20,7 +39,7 @@ router.post('/create', protect, async (req, res) => {
       testCases,
     });
     await newChallenge.save();
-    caches.pages.del('admin-coding'); // clear admin page cache
+    caches.pages.flushAll();
     res.status(201).json({ message: 'Challenge created successfully', challenge: newChallenge });
   } catch (error) {
     console.error(error);
@@ -42,7 +61,7 @@ router.delete('/:id', protect, async (req, res) => {
       { challenges: req.params.id },
       { $pull: { challenges: req.params.id } },
     );
-    caches.pages.del('admin-coding');
+    caches.pages.flushAll();
     res.json({ message: 'Challenge deleted successfully' });
   } catch (error) {
     console.error(error);
@@ -64,6 +83,7 @@ router.post('/banks', protect, async (req, res) => {
 
     const newBank = new CodingBank({ title, description: description || undefined, challenges: [] });
     await newBank.save();
+    caches.pages.flushAll();
     res.status(201).json({ message: 'Bank created successfully', bank: newBank });
   } catch (error) {
     console.error(error);
@@ -86,6 +106,7 @@ router.delete('/banks/:id', protect, async (req, res) => {
     }
 
     await CodingBank.findByIdAndDelete(req.params.id);
+    caches.pages.flushAll();
     res.json({ message: 'Bank deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting coding bank' });
@@ -113,6 +134,7 @@ router.post('/banks/:bankId/challenges', protect, async (req, res) => {
       bank.challenges.push(challengeId);
       await bank.save();
     }
+    caches.pages.flushAll();
     res.json({ message: 'Challenge added to bank', bank });
   } catch (error) {
     res.status(500).json({ message: 'Error adding challenge to bank' });
@@ -127,6 +149,7 @@ router.delete('/banks/:bankId/challenges/:challengeId', protect, async (req, res
     
     bank.challenges = bank.challenges.filter(id => id.toString() !== req.params.challengeId);
     await bank.save();
+    caches.pages.flushAll();
     res.json({ message: 'Challenge removed from bank', bank });
   } catch (error) {
     res.status(500).json({ message: 'Error removing challenge from bank' });
@@ -168,6 +191,8 @@ router.post('/tests', protect, async (req, res) => {
       durationMinutes: parsedDurationMinutes,
     });
     await newTest.save();
+    caches.pages.flushAll();
+    invalidateAllCodingTests();
     res.status(201).json({ message: 'Test link generated', test: newTest });
   } catch (error) {
     console.error(error);
@@ -178,8 +203,13 @@ router.post('/tests', protect, async (req, res) => {
 // Delete Test
 router.delete('/tests/:id', protect, async (req, res) => {
   try {
-    await CodingTest.findByIdAndDelete(req.params.id);
+    const deletedTest = await CodingTest.findByIdAndDelete(req.params.id);
+    if (!deletedTest) {
+      return res.status(404).json({ message: 'Coding test not found.' });
+    }
     await CodingAttempt.deleteMany({ codingTest: req.params.id }); 
+    caches.pages.flushAll();
+    invalidateAllCodingTests();
     res.json({ message: 'Test and attempts deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting test' });

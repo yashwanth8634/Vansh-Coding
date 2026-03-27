@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Added the delete button here
     questionDiv.innerHTML = `
       ${imageHTML}
-      <p class="font-medium text-gray-800 break-words">${q.questionText}</p>
+      <p class="font-medium text-gray-200 break-words">${q.questionText}</p>
       <ul class="list-disc list-inside text-sm text-gray-600 my-2 space-y-1">
         ${optionsHTML}
       </ul>

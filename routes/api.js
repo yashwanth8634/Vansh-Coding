@@ -2,6 +2,8 @@
 // Thin aggregator — mounts all API sub-routers
 const express = require('express');
 const router = express.Router();
+const connectDB = require('../config/db');
+const { caches } = require('../utils/cache');
 
 const adminRoutes = require('./admin');
 const testRoutes = require('./test');
@@ -15,5 +17,23 @@ router.use('/', testRoutes);             // /api/banks/*, /api/tests/*, /api/tes
 router.use('/questions', questionRoutes); // /api/questions/*
 router.use('/coding/admin', codingAdminRoutes); // /api/coding/admin/*
 router.use('/coding/student', codingStudentRoutes); // /api/coding/student/*
+
+router.get('/warmup', async (req, res) => {
+  try {
+    await connectDB();
+    res.json({
+      message: 'Warmup complete.',
+      cacheKeys: {
+        test: caches.test.keys().length,
+        codingTest: caches.codingTest.keys().length,
+        pages: caches.pages.keys().length,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Warmup failed:', error);
+    res.status(500).json({ message: 'Warmup failed.' });
+  }
+});
 
 module.exports = router;

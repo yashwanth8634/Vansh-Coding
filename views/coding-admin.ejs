@@ -10,35 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" href="/css/vansh2k26-theme.css">
-  
-  <style>
-    body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
-    
-    .glass-sidebar { background: rgba(10, 10, 10, 0.8); border-right: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
-    .glass-nav { background: rgba(0, 0, 0, 0.6); border-bottom: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); }
-    
-    .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.2s ease-out; }
-    .glass-card:hover { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.12); }
-
-    .nav-item { color: #888; transition: all 0.2s; }
-    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
-    .nav-item.active { color: #fff; background: rgba(255,255,255,0.1); font-weight: 500; }
-    
-    .grid-bg {
-      background-size: 40px 40px;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-    }
-
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
-  </style>
+  <%- include('partials/tailwind-setup') %>
 </head>
 <body class="vc-admin flex h-screen overflow-hidden antialiased selection:bg-white/30">
 
@@ -194,7 +166,7 @@
                 <div class="bg-black/40 border border-white/5 hover:border-white/10 hover:bg-white/5 p-5 rounded-xl transition-all group">
                   <div class="flex justify-between items-start mb-2">
                     <strong class="text-base font-medium text-white leading-tight"><%= c.title %></strong>
-                    <button onclick="deleteChallenge('<%= c._id %>')" class="text-gray-500 hover:text-red-400 bg-transparent hover:bg-red-500/10 border border-transparent hover:border-red-500/20 p-1.5 rounded-lg transition-colors ml-2 shrink-0">
+                    <button onclick="deleteChallenge('<%= c._id %>', this)" class="text-gray-500 hover:text-red-400 bg-transparent hover:bg-red-500/10 border border-transparent hover:border-red-500/20 p-1.5 rounded-lg transition-colors ml-2 shrink-0">
                       <span class="material-symbols-outlined text-[16px]">delete</span>
                     </button>
                   </div>
@@ -229,6 +201,15 @@
   </main>
 
   <script>
+    async function getErrorMessage(res, fallback) {
+        try {
+            const data = await res.json();
+            return data.message || fallback;
+        } catch (error) {
+            return fallback;
+        }
+    }
+
     function addTestCase() {
         const container = document.getElementById('testCasesContainer');
         const div = document.createElement('div');
@@ -321,14 +302,19 @@
             });
 
             if(res.ok) window.location.reload();
-            else { alert('Deployment failed.'); btn.innerHTML = originalText; btn.disabled = false; }
+            else { alert(await getErrorMessage(res, 'Deployment failed.')); btn.innerHTML = originalText; btn.disabled = false; }
         } catch(err) { alert('Error: ' + err.message); btn.innerHTML = originalText; btn.disabled = false; }
     });
 
-    async function deleteChallenge(id) {
+    async function deleteChallenge(id, button) {
         if(confirm('Wipe challenge from registry? This may break running sessions.')) {
+            if (button) button.disabled = true;
             const res = await fetch(`/api/coding/admin/${id}`, { method: 'DELETE' });
             if(res.ok) window.location.reload();
+            else {
+              if (button) button.disabled = false;
+              alert(await getErrorMessage(res, 'Failed to delete challenge.'));
+            }
         }
     }
   </script>

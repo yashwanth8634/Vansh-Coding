@@ -16,6 +16,9 @@ const apiRoutes = require('./routes/api');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.disable('x-powered-by');
+app.set('trust proxy', 1);
+
 // --- Security & Performance Middleware ---
 app.use(helmet({
   contentSecurityPolicy: false, // Disable CSP for EJS inline scripts
@@ -70,11 +73,15 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // --- Start the Server only after DB connection ---
 const startServer = async () => {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error.message);
+    process.exit(1);
+  }
 };
 
 startServer();
-
