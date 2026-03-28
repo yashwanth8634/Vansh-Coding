@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const uniqueLinkInput = document.getElementById('unique-link');
   const loginError = document.getElementById('login-error');
   const startTestBtn = document.getElementById('start-test-btn');
+  const rulesScreen = document.getElementById('rules-screen');
+  const editDetailsBtn = document.getElementById('edit-details-btn');
+  const confirmRulesBtn = document.getElementById('confirm-rules-btn');
 
   // Test elements
   const timerDisplay = document.getElementById('timer-value');
@@ -41,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let testIsSubmitted = false;
   let isStartingTest = false;
   let isSubmittingTest = false;
+  let pendingStudentDetails = null;
 
   function setButtonLoading(button, isLoading, idleHtml, loadingHtml) {
     if (!button) return;
@@ -54,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if(startTestForm) {
     startTestForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (isStartingTest) return;
       loginError.textContent = '';
       loginError.classList.add('hidden');
       const name = studentNameInput.value;
@@ -71,18 +74,35 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      pendingStudentDetails = { uniqueLink, name, rollNo, department, year, section, collegeName };
+      startTestForm.classList.add('hidden');
+      rulesScreen.classList.remove('hidden');
+    });
+  }
+
+  if (editDetailsBtn) {
+    editDetailsBtn.addEventListener('click', () => {
+      rulesScreen.classList.add('hidden');
+      startTestForm.classList.remove('hidden');
+    });
+  }
+
+  if (confirmRulesBtn) {
+    confirmRulesBtn.addEventListener('click', async () => {
+      if (isStartingTest || !pendingStudentDetails) return;
+
       try {
         isStartingTest = true;
         setButtonLoading(
-          startTestBtn,
+          confirmRulesBtn,
           true,
-          startTestBtn.innerHTML,
-          '<span class="material-symbols-outlined animate-spin text-[18px]" style="color: #ffffff;">sync</span><span class="tracking-wide" style="color: #ffffff;">Please wait...</span>',
+          confirmRulesBtn.innerHTML,
+          '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span><span class="tracking-wide">Please wait...</span>',
         );
         const response = await fetch('/api/test/start', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uniqueLink, name, rollNo, department, year, section, collegeName }),
+          body: JSON.stringify(pendingStudentDetails),
         });
 
         const data = await response.json();
@@ -90,21 +110,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!response.ok) {
           loginError.textContent = data.message || 'Failed to start test.';
           loginError.classList.remove('hidden');
+          rulesScreen.classList.add('hidden');
+          startTestForm.classList.remove('hidden');
           return;
         }
 
         testData = data;
         startTest();
-        
       } catch (err) {
         loginError.textContent = 'A network error occurred.';
         loginError.classList.remove('hidden');
+        rulesScreen.classList.add('hidden');
+        startTestForm.classList.remove('hidden');
       } finally {
         isStartingTest = false;
         setButtonLoading(
-          startTestBtn,
+          confirmRulesBtn,
           false,
-          '<span class="tracking-wide" style="color: #ffffff;">Start Test</span><span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:translate-x-0.5" style="color: #ffffff;">arrow_forward</span>',
+          'I Agree, Start Test<span class="material-symbols-outlined text-[18px]">arrow_forward</span>',
           '',
         );
       }

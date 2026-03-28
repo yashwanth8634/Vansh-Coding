@@ -128,6 +128,50 @@
           <span class="material-symbols-outlined text-[18px] transition-transform duration-200 group-hover:translate-x-0.5" style="color: #ffffff;">arrow_forward</span>
         </button>
       </form>
+
+      <div id="rules-screen" class="hidden relative z-10">
+        <div class="rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 md:p-6 shadow-inner">
+          <div class="flex items-start gap-3">
+            <div class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-400">
+              <span class="material-symbols-outlined text-[20px]">gavel</span>
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Rules & Instructions</p>
+              <h2 class="mt-2 text-xl font-semibold text-white tracking-tight">Read carefully before you begin</h2>
+              <p class="mt-2 text-sm text-gray-400 leading-relaxed">Your quiz will start only after you accept these instructions.</p>
+            </div>
+          </div>
+
+          <div class="mt-5 rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-red-400 text-[20px]">warning</span>
+              <div>
+                <p class="text-sm font-semibold text-red-300">Important fullscreen warning</p>
+                <p class="mt-1 text-sm leading-relaxed text-red-200/90">
+                  If you press <strong>Esc</strong>, leave fullscreen, switch tabs, or come back from fullscreen during the test, your test may be automatically submitted. Please be careful.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <ul class="mt-5 space-y-3 text-sm text-gray-300 leading-relaxed">
+            <li class="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">Enter only your correct details. You will have only one valid attempt.</li>
+            <li class="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">The timer starts only after you agree and begin the test.</li>
+            <li class="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">Do not switch tabs, leave fullscreen, or minimize the window during the test.</li>
+            <li class="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">Any malpractice or external help can lead to immediate disqualification.</li>
+            <li class="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">Once the test is submitted, answers cannot be changed.</li>
+          </ul>
+        </div>
+        <div class="mt-5 flex flex-col sm:flex-row gap-3">
+          <button type="button" id="edit-details-btn" class="w-full sm:w-auto border border-white/10 text-gray-300 hover:bg-white/5 hover:text-white py-3 px-4 rounded-xl text-sm font-medium transition-colors">
+            Edit Details
+          </button>
+          <button type="button" id="confirm-rules-btn" class="w-full bg-white text-black hover:bg-gray-200 py-3.5 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] flex justify-center items-center gap-2">
+            I Agree, Start Test
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+        </div>
+      </div>
       <div id="login-error" class="hidden mt-6 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg flex items-start gap-3 text-sm font-medium relative z-10"></div>
     </div>
   </div>
