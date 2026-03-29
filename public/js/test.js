@@ -411,7 +411,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- 8. DISPLAY RESULTS (UPDATED) ---
   function displayResults(results) {
+    testContainer.style.display = 'none';
     testContainer.classList.add('hidden');
+    resultsContainer.style.display = 'flex';
     resultsContainer.classList.remove('hidden');
     resultsContainer.classList.add('flex');
     if(warningModal) warningModal.style.display = 'none';
