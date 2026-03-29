@@ -39,7 +39,7 @@ router.post('/create', protect, async (req, res) => {
       testCases,
     });
     await newChallenge.save();
-    caches.pages.flushAll();
+    await caches.pages.flushAll();
     res.status(201).json({ message: 'Challenge created successfully', challenge: newChallenge });
   } catch (error) {
     console.error(error);
@@ -81,7 +81,7 @@ router.put('/:id', protect, async (req, res) => {
     challenge.difficulty = difficulty;
     challenge.testCases = testCases;
     await challenge.save();
-    caches.pages.flushAll();
+    await caches.pages.flushAll();
     res.json({ message: 'Challenge updated successfully', challenge });
   } catch (error) {
     console.error(error);
@@ -103,7 +103,7 @@ router.delete('/:id', protect, async (req, res) => {
       { challenges: req.params.id },
       { $pull: { challenges: req.params.id } },
     );
-    caches.pages.flushAll();
+    await caches.pages.flushAll();
     res.json({ message: 'Challenge deleted successfully' });
   } catch (error) {
     console.error(error);
@@ -125,7 +125,7 @@ router.post('/banks', protect, async (req, res) => {
 
     const newBank = new CodingBank({ title, description: description || undefined, challenges: [] });
     await newBank.save();
-    caches.pages.flushAll();
+    await caches.pages.flushAll();
     res.status(201).json({ message: 'Bank created successfully', bank: newBank });
   } catch (error) {
     console.error(error);
@@ -148,7 +148,7 @@ router.delete('/banks/:id', protect, async (req, res) => {
     }
 
     await CodingBank.findByIdAndDelete(req.params.id);
-    caches.pages.flushAll();
+    await caches.pages.flushAll();
     res.json({ message: 'Bank deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting coding bank' });
@@ -176,7 +176,7 @@ router.post('/banks/:bankId/challenges', protect, async (req, res) => {
       bank.challenges.push(challengeId);
       await bank.save();
     }
-    caches.pages.flushAll();
+    await caches.pages.flushAll();
     res.json({ message: 'Challenge added to bank', bank });
   } catch (error) {
     res.status(500).json({ message: 'Error adding challenge to bank' });
@@ -191,7 +191,7 @@ router.delete('/banks/:bankId/challenges/:challengeId', protect, async (req, res
     
     bank.challenges = bank.challenges.filter(id => id.toString() !== req.params.challengeId);
     await bank.save();
-    caches.pages.flushAll();
+    await caches.pages.flushAll();
     res.json({ message: 'Challenge removed from bank', bank });
   } catch (error) {
     res.status(500).json({ message: 'Error removing challenge from bank' });
@@ -233,8 +233,8 @@ router.post('/tests', protect, async (req, res) => {
       durationMinutes: parsedDurationMinutes,
     });
     await newTest.save();
-    caches.pages.flushAll();
-    invalidateAllCodingTests();
+    await caches.pages.flushAll();
+    await invalidateAllCodingTests();
     res.status(201).json({ message: 'Test link generated', test: newTest });
   } catch (error) {
     console.error(error);
@@ -250,7 +250,7 @@ router.delete('/tests/:id', protect, async (req, res) => {
       return res.status(404).json({ message: 'Coding test not found.' });
     }
     await CodingAttempt.deleteMany({ codingTest: req.params.id }); 
-    caches.pages.flushAll();
+    await caches.pages.flushAll();
     invalidateAllCodingTests();
     res.json({ message: 'Test and attempts deleted successfully' });
   } catch (error) {

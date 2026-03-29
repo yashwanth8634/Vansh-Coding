@@ -20,12 +20,12 @@ const protect = async (req, res, next) => {
     
     // Check user cache first, then DB
     const cacheKey = `user-${decoded.userId}`;
-    let user = caches.user.get(cacheKey);
+    let user = await caches.user.get(cacheKey);
     
     if (!user) {
       user = await User.findById(decoded.userId).select('-password');
       if (user) {
-        caches.user.set(cacheKey, user);
+        await caches.user.set(cacheKey, user);
       }
     }
     

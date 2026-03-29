@@ -109,7 +109,7 @@ function drawRankingPdf({ res, title, subtitle, rows }) {
 router.get('/', protect, async (req, res) => {
   try {
     const cacheKey = 'admin-overview';
-    let data = caches.pages.get(cacheKey);
+    let data = await caches.pages.get(cacheKey);
     
     if (!data) {
       const banks = await QuestionBank.find().sort({ title: 1 }).lean();
@@ -132,7 +132,7 @@ router.get('/', protect, async (req, res) => {
       };
 
       data = { banks, tests, stats };
-      caches.pages.set(cacheKey, data);
+      await caches.pages.set(cacheKey, data);
     }
     
     // Pass the activeTab variable so the sidebar highlights correctly (if we add sidebar later)
@@ -147,12 +147,12 @@ router.get('/', protect, async (req, res) => {
 router.get('/banks', protect, async (req, res) => {
   try {
     const cacheKey = 'admin-banks';
-    let data = caches.pages.get(cacheKey);
+    let data = await caches.pages.get(cacheKey);
     
     if (!data) {
       const banks = await QuestionBank.find().sort({ title: 1 }).lean();
       data = { banks };
-      caches.pages.set(cacheKey, data);
+      await caches.pages.set(cacheKey, data);
     }
     
     res.render('banks', { ...data, activeTab: 'banks' }); 
@@ -166,7 +166,7 @@ router.get('/banks', protect, async (req, res) => {
 router.get('/tests', protect, async (req, res) => {
   try {
     const cacheKey = 'admin-tests';
-    let data = caches.pages.get(cacheKey);
+    let data = await caches.pages.get(cacheKey);
     
     if (!data) {
       const banks = await QuestionBank.find().sort({ title: 1 }).lean();
@@ -175,7 +175,7 @@ router.get('/tests', protect, async (req, res) => {
         .sort({ createdAt: -1 })
         .lean();
       data = { banks, tests };
-      caches.pages.set(cacheKey, data);
+      await caches.pages.set(cacheKey, data);
     }
     
     res.render('tests', { ...data, activeTab: 'tests' }); 
@@ -202,7 +202,7 @@ router.get('/tests/links', protect, async (req, res) => {
 router.get('/bank/:bankId', protect, async (req, res) => {
   try {
     const cacheKey = `bank-page-${req.params.bankId}`;
-    let data = caches.pages.get(cacheKey);
+    let data = await caches.pages.get(cacheKey);
     
     if (!data) {
       const bank = await QuestionBank.findById(req.params.bankId).populate('questions').lean();
@@ -210,7 +210,7 @@ router.get('/bank/:bankId', protect, async (req, res) => {
         return res.status(404).send('Question bank not found');
       }
       data = { bank, questions: bank.questions };
-      caches.pages.set(cacheKey, data);
+      await caches.pages.set(cacheKey, data);
     }
     
     res.render('add-questions', { ...data, activeTab: 'banks' });
@@ -224,12 +224,12 @@ router.get('/bank/:bankId', protect, async (req, res) => {
 router.get('/coding', protect, async (req, res) => {
   try {
     const cacheKey = 'admin-coding';
-    let data = caches.pages.get(cacheKey);
+    let data = await caches.pages.get(cacheKey);
     
     if (!data) {
       const challenges = await CodingChallenge.find().sort({ createdAt: -1 }).lean();
       data = { challenges };
-      caches.pages.set(cacheKey, data);
+      await caches.pages.set(cacheKey, data);
     }
     
     res.render('coding-admin', { ...data, activeTab: 'coding' }); 

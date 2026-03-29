@@ -106,7 +106,7 @@ function drawRankingPdf({ res, title, subtitle, rows }) {
 router.get('/admin/test/:testId/results', protect, async (req, res) => {
     try {
         const cacheKey = `test-results-${req.params.testId}`;
-        let data = caches.pages.get(cacheKey);
+        let data = await caches.pages.get(cacheKey);
         
         if (!data) {
           const test = await Test.findById(req.params.testId).populate('questionBank', 'title');
@@ -117,7 +117,7 @@ router.get('/admin/test/:testId/results', protect, async (req, res) => {
               .select('studentName studentRollNo studentDepartment studentYear studentSection studentCollege score submittedAt answers')
               .sort({ score: -1, submittedAt: 1 });
           data = { test, attempts };
-          caches.pages.set(cacheKey, data);
+          await caches.pages.set(cacheKey, data);
         }
         
         res.render('test-results', data);

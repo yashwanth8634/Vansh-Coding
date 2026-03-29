@@ -35,7 +35,7 @@ const YEARS = ['1', '2', '3', '4'];
 
 const getCachedQuizTest = async (uniqueLink) => {
   const cacheKey = `test-${uniqueLink}`;
-  let test = caches.test.get(cacheKey);
+  let test = await caches.test.get(cacheKey);
 
   if (!test) {
     test = await Test.findOne({ uniqueLink })
@@ -49,7 +49,7 @@ const getCachedQuizTest = async (uniqueLink) => {
       return null;
     }
 
-    caches.test.set(cacheKey, test);
+    await caches.test.set(cacheKey, test);
   }
 
   return test;
@@ -57,7 +57,7 @@ const getCachedQuizTest = async (uniqueLink) => {
 
 const getCachedCodingTest = async (uniqueLink) => {
   const cacheKey = `coding-test-${uniqueLink}`;
-  let codingTest = caches.codingTest.get(cacheKey);
+  let codingTest = await caches.codingTest.get(cacheKey);
 
   if (!codingTest) {
     codingTest = await CodingTest.findOne({ uniqueLink })
@@ -68,7 +68,7 @@ const getCachedCodingTest = async (uniqueLink) => {
       return null;
     }
 
-    caches.codingTest.set(cacheKey, codingTest);
+    await caches.codingTest.set(cacheKey, codingTest);
   }
 
   return codingTest;
@@ -89,8 +89,8 @@ router.post('/banks', protect, async (req, res) => {
     const newBank = new QuestionBank({ title });
     await newBank.save();
     
-    caches.banks.flushAll();
-    caches.pages.flushAll();
+    await caches.banks.flushAll();
+    await caches.pages.flushAll();
     
     res.status(201).json(newBank);
   } catch (error) {
@@ -134,7 +134,7 @@ router.post('/banks/:bankId/questions', protect, async (req, res) => {
     bank.questions.push(newQuestion._id);
     await bank.save();
     
-    invalidateQuestionData();
+    await invalidateQuestionData();
     
     res.status(201).json(newQuestion);
   } catch (error) {
@@ -146,11 +146,11 @@ router.post('/banks/:bankId/questions', protect, async (req, res) => {
 router.get('/banks', protect, async (req, res) => {
   try {
     const cacheKey = 'all-banks';
-    let banks = caches.banks.get(cacheKey);
+    let banks = await caches.banks.get(cacheKey);
     
     if (!banks) {
       banks = await QuestionBank.find().select('title _id');
-      caches.banks.set(cacheKey, banks);
+      await caches.banks.set(cacheKey, banks);
     }
     
     res.json(banks);
@@ -178,7 +178,7 @@ router.delete('/banks/:bankId', protect, async (req, res) => {
         }
         await QuestionBank.findByIdAndDelete(bankId);
         
-        invalidateQuestionData();
+        await invalidateQuestionData();
         
         res.json({ message: 'Bank and all its questions were deleted.' });
     } catch (error) {
@@ -226,8 +226,8 @@ router.post('/tests', protect, async (req, res) => {
     });
     await newTest.save();
 
-    caches.pages.flushAll();
-    caches.test.set(`test-${newTest.uniqueLink}`, {
+    await caches.pages.flushAll();
+    await caches.test.set(`test-${newTest.uniqueLink}`, {
       _id: newTest._id,
       uniqueLink: newTest.uniqueLink,
       linkExpiresAt: newTest.linkExpiresAt,
@@ -516,7 +516,7 @@ router.delete('/tests/:testId', protect, async (req, res) => {
     }
 
     await Attempt.deleteMany({ test: testId });
-    invalidateQuestionData();
+    await invalidateQuestionData();
 
     res.json({ message: 'Test and related attempts deleted successfully.' });
   } catch (error) {

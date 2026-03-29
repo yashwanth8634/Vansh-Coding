@@ -24,9 +24,9 @@ router.get('/warmup', async (req, res) => {
     res.json({
       message: 'Warmup complete.',
       cacheKeys: {
-        test: caches.test.keys().length,
-        codingTest: caches.codingTest.keys().length,
-        pages: caches.pages.keys().length,
+        test: (await caches.test.keys()).length,
+        codingTest: (await caches.codingTest.keys()).length,
+        pages: (await caches.pages.keys()).length,
       },
       timestamp: new Date().toISOString(),
     });
