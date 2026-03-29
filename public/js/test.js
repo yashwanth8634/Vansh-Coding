@@ -382,6 +382,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <p class="text-xs text-gray-500 uppercase tracking-[0.2em]">${submitMessage}</p>
     </div>`;
 
+    // ADD JITTER: Random delay (0-3s) to spread server load during spikes
+    await new Promise(r => setTimeout(r, Math.random() * 3000));
+
     try {
         const response = await fetch('/api/test/submit', {
             method: 'POST',

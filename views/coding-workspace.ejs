@@ -872,6 +872,9 @@ int main() {
         );
         runBtn.disabled = true;
 
+        // ADD JITTER: Random delay (0-3s) to spread server load during spikes
+        await new Promise(r => setTimeout(r, Math.random() * 3000));
+
         const payload = Object.keys(submissions).map(id => ({
           challengeId: id, code: submissions[id].code, language: submissions[id].language
         }));
