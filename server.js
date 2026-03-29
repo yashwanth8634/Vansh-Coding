@@ -42,6 +42,17 @@ app.use(express.static(path.join(__dirname, 'public'), {
   lastModified: true,
 }));
 
+// --- Database Connection Middleware (Standard for Serverless) ---
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection error:', err.message);
+    res.status(500).json({ message: 'Database connection failed' });
+  }
+});
+
 // ===================================
 // --- ROUTES ---
 // ===================================
@@ -75,7 +86,6 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 if (!process.env.VERCEL) {
   const startServer = async () => {
     try {
-      await connectDB();
       app.listen(PORT, () => {
         console.log(`Server running on http://localhost:${PORT}`);
       });
