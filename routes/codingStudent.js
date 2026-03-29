@@ -34,11 +34,11 @@ const executionLimiter = rateLimit({
 // Wandbox API mapping for languages
 const WANDBOX_API_URL = 'https://wandbox.org/api/compile.json';
 const LANGUAGE_MAP = {
-  javascript: 'nodejs-16.14.0',
-  python: 'cpython-3.10.2',
-  java: 'openjdk-jdk-15.0.3+2',
-  cpp: 'gcc-12.1.0',
-  c: 'gcc-12.1.0-c',
+  javascript: 'nodejs-20.17.0',
+  python: 'cpython-3.12.7',
+  java: 'openjdk-jdk-22+36',
+  cpp: 'gcc-13.2.0',
+  c: 'gcc-13.2.0-c',
 };
 
 // Helper function to call Wandbox API with strict timeout
@@ -76,9 +76,14 @@ async function executeCode(code, language, input = "") {
     const data = await response.json();
     
     if (data.status !== '0') {
-      return { status: 'Compilation Error', output: data.compiler_error || data.program_error || 'Execution Error' };
+      return {
+        status: 'Compilation Error',
+        output: data.compiler_error || data.program_error || data.compiler_message || 'Execution Error',
+      };
     }
-    return { status: 'Success', output: (data.program_message || '').trim() };
+
+    const stdout = data.program_output || data.program_message || '';
+    return { status: 'Success', output: String(stdout).trim() };
   } catch (err) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
@@ -192,10 +197,13 @@ router.post('/submit', executionLimiter, async (req, res) => {
           if (result.status === 'Compilation Error') {
             finalStatus = 'Compilation Error'; break;
           }
+          if (result.status === 'Time Limit Exceeded') {
+            finalStatus = 'Time Limit Exceeded'; break;
+          }
           if (result.output === testCase.expectedOutput.trim()) {
             passedCases++;
           } else {
-            finalStatus = 'Wrong Answer'; break; 
+            finalStatus = 'Wrong Answer';
           }
         } catch(e) {
           finalStatus = 'Runtime Error'; break;
@@ -224,6 +232,10 @@ router.post('/submit', executionLimiter, async (req, res) => {
       answers: finalAnswers
     });
     await attempt.save();
+
+    // Invalidate cached pages so admin results page shows new submission
+    const { invalidatePages } = require('../utils/cache');
+    invalidatePages();
 
     res.json({ message: 'Test submitted successfully', result: finalAnswers });
 

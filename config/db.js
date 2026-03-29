@@ -17,9 +17,12 @@ const connectDB = async () => {
 
   try {
     if (!globalMongo.promise) {
+      // For Serverless, we want a very small pool size (1) because scaling opens many instances.
+      // This prevents hitting the 500 connection limit on MongoDB Free Tier.
       globalMongo.promise = mongoose.connect(MONGO_URI, {
-        maxPoolSize: 10,
+        maxPoolSize: 1, 
         serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
       });
     }
 

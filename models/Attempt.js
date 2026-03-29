@@ -32,7 +32,7 @@ const attemptSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    lowercase: true,
+    uppercase: true,
   },
   studentDepartment: {
     type: String,

@@ -12,11 +12,11 @@
 
   <%- include('partials/tailwind-setup') %>
 </head>
-<body class="vc-admin flex h-screen overflow-hidden antialiased selection:bg-white/30">
+<body class="vc-admin flex min-h-screen flex-col md:h-screen md:flex-row overflow-x-hidden md:overflow-hidden antialiased selection:bg-white/30">
 
   <%- include('partials/admin-sidebar', { activePage: 'coding-admin' }) %>
 
-  <main class="flex-1 flex flex-col relative overflow-hidden bg-[#000]">
+  <main class="flex-1 flex min-h-0 flex-col relative overflow-hidden bg-[#000]">
     <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
     <header class="h-16 glass-nav flex items-center justify-between px-6 lg:px-10 shrink-0 z-10 relative">
@@ -33,8 +33,8 @@
         <!-- Creator Form -->
         <div class="space-y-6">
           <div>
-            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Create New Challenge</h1>
-            <p class="text-gray-400 font-light text-sm">Define a new coding problem.</p>
+            <h1 id="form-heading" class="text-2xl font-semibold tracking-tight text-white mb-2">Create New Challenge</h1>
+            <p id="form-subheading" class="text-gray-400 font-light text-sm">Define a new coding problem.</p>
           </div>
           
           <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
@@ -79,7 +79,7 @@
                     <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-gray-500 hover:text-red-400 transition-colors">
                       <span class="material-symbols-outlined text-[18px]">close</span>
                     </button>
-                    <div class="grid grid-cols-2 gap-3 mt-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                       <div>
                         <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">STDIN Data</label>
                         <textarea class="tc-input w-full p-2.5 bg-black border border-white/5 rounded-lg font-mono text-xs text-gray-300 focus:border-white/20 outline-none resize-y" rows="2" placeholder="[2,7,11,15]\n9"></textarea>
@@ -89,40 +89,48 @@
                         <textarea class="tc-output w-full p-2.5 bg-black border border-white/5 rounded-lg font-mono text-xs text-gray-300 focus:border-white/20 outline-none resize-y" rows="2" required placeholder="[0,1]"></textarea>
                       </div>
                     </div>
-                    <label class="flex items-center mt-3 cursor-pointer group/toggle w-max">
-                      <input type="checkbox" class="tc-hidden sr-only">
-                      <div class="w-4 h-4 rounded border border-white/20 flex items-center justify-center mr-2 bg-black group-hover/toggle:border-white/40 peer-checked:bg-white transition-all">
-                        <span class="material-symbols-outlined text-black text-[12px] opacity-0 peer-checked:opacity-100 hidden">check</span>
-                      </div>
-                      <span class="text-xs text-gray-400 select-none group-hover/toggle:text-gray-300">Hidden from student</span>
+                    <label class="flex items-center mt-3 cursor-pointer w-max gap-2">
+                      <input type="checkbox" class="tc-hidden w-4 h-4 rounded border-white/20 accent-white cursor-pointer">
+                      <span class="text-xs text-gray-400 select-none hover:text-gray-300">Hidden from student</span>
                     </label>
                   </div>
                 </div>
+                </div>
               </div>
 
-              <button type="submit" class="w-full bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] mt-4 flex items-center justify-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">add_circle</span> Create Challenge
-              </button>
+              <div class="flex gap-3 mt-4">
+                <button type="submit" id="submitBtn" class="flex-1 bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] flex items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-[18px]">add_circle</span> Create Challenge
+                </button>
+                <button type="button" id="cancelEditBtn" onclick="cancelEdit()" class="hidden bg-transparent border border-white/10 text-gray-400 hover:text-white hover:border-white/30 py-3 px-4 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-[18px]">close</span> Cancel
+                </button>
+              </div>
             </form>
           </div>
         </div>
 
         <!-- Existing List -->
-        <div class="space-y-6">
+        <div class="space-y-6" id="challenges-list">
           <div>
             <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Existing Challenges</h1>
             <p class="text-gray-400 font-light text-sm">List of available challenges.</p>
           </div>
           
-          <div class="glass-card rounded-2xl p-2 h-max max-h-[calc(100vh-150px)] overflow-y-auto">
+          <div class="glass-card rounded-2xl p-2 h-max md:max-h-[calc(100vh-150px)] overflow-y-auto">
             <div class="space-y-2 p-2">
               <% challenges.forEach(c => { %>
                 <div class="bg-black/40 border border-white/5 hover:border-white/10 hover:bg-white/5 p-5 rounded-xl transition-all group">
                   <div class="flex justify-between items-start mb-2">
                     <strong class="text-base font-medium text-white leading-tight"><%= c.title %></strong>
-                    <button onclick="deleteChallenge('<%= c._id %>', this)" class="text-gray-500 hover:text-red-400 bg-transparent hover:bg-red-500/10 border border-transparent hover:border-red-500/20 p-1.5 rounded-lg transition-colors ml-2 shrink-0">
-                      <span class="material-symbols-outlined text-[16px]">delete</span>
-                    </button>
+                    <div class="flex items-center gap-1 ml-2 shrink-0">
+                      <button data-challenge="<%= JSON.stringify(c) %>" class="edit-btn text-gray-500 hover:text-blue-400 bg-transparent hover:bg-blue-500/10 border border-transparent hover:border-blue-500/20 p-1.5 rounded-lg transition-colors" title="Edit">
+                        <span class="material-symbols-outlined text-[16px]">edit</span>
+                      </button>
+                      <button data-delete-id="<%= c._id %>" class="delete-btn text-gray-500 hover:text-red-400 bg-transparent hover:bg-red-500/10 border border-transparent hover:border-red-500/20 p-1.5 rounded-lg transition-colors" title="Delete">
+                        <span class="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    </div>
                   </div>
                   
                   <div class="flex items-center gap-2 mt-1">
@@ -155,6 +163,19 @@
   </main>
 
   <script>
+    function showToast(message, type = 'error') {
+      const existing = document.getElementById('vc-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'vc-toast';
+      const color = type === 'error' ? 'border-red-500/30 text-red-500 bg-red-500/10' : 'border-green-500/30 text-green-500 bg-green-500/10';
+      toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] px-5 py-3 rounded-xl glass-card border ${color} text-sm font-medium shadow-xl transition-all duration-300`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => { if (document.getElementById('vc-toast')) toast.remove() }, 4000);
+    }
+
     async function getErrorMessage(res, fallback) {
         try {
             const data = await res.json();
@@ -172,7 +193,7 @@
             <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-gray-500 hover:text-red-400 transition-colors">
                 <span class="material-symbols-outlined text-[18px]">close</span>
             </button>
-            <div class="grid grid-cols-2 gap-3 mt-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                 <div>
                 <label class="block text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-1">STDIN Data</label>
                 <textarea class="tc-input w-full p-2.5 bg-black border border-white/5 rounded-lg font-mono text-xs text-gray-300 focus:border-white/20 outline-none resize-y" rows="2"></textarea>
@@ -182,51 +203,66 @@
                 <textarea class="tc-output w-full p-2.5 bg-black border border-white/5 rounded-lg font-mono text-xs text-gray-300 focus:border-white/20 outline-none resize-y" rows="2" required></textarea>
                 </div>
             </div>
-            <label class="flex items-center mt-3 cursor-pointer group/toggle w-max">
-                <input type="checkbox" class="tc-hidden sr-only">
-                <!-- Custom Checkbox hack using JS to toggle physical class -->
-                <div class="w-4 h-4 rounded border border-white/20 flex items-center justify-center mr-2 bg-black toggler-box transition-all">
-                   <div class="w-2 h-2 rounded-sm bg-white hidden toggler-inner"></div>
-                </div>
-                <span class="text-xs text-gray-400 select-none group-hover/toggle:text-gray-300">Hidden from student</span>
+            <label class="flex items-center mt-3 cursor-pointer w-max gap-2">
+                <input type="checkbox" class="tc-hidden w-4 h-4 rounded border-white/20 accent-white cursor-pointer">
+                <span class="text-xs text-gray-400 select-none hover:text-gray-300">Hidden from student</span>
             </label>
         `;
         container.appendChild(div);
-
-        // Bind custom checkbox since peer-checked doesn't always work dynamically without specific markup changes
-        const toggleLabel = div.querySelector('label');
-        const toggleInput = div.querySelector('.tc-hidden');
-        const toggleBox = div.querySelector('.toggler-box');
-        const toggleInner = div.querySelector('.toggler-inner');
-        
-        toggleInput.addEventListener('change', (e) => {
-            if(e.target.checked) {
-              toggleBox.classList.add('border-white', 'bg-white/10');
-              toggleInner.classList.remove('hidden');
-            } else {
-              toggleBox.classList.remove('border-white', 'bg-white/10');
-              toggleInner.classList.add('hidden');
-            }
-        });
     }
 
-    // Attach to initial checkbox manually
-    document.querySelectorAll('.test-case-card').forEach(div => {
-       const toggleInput = div.querySelector('.tc-hidden');
-       toggleInput.addEventListener('change', (e) => {
-           const label = e.target.parentElement;
-           const box = label.querySelector('.bg-black');
-           if(e.target.checked) { box.style.background = 'white'; } 
-           else { box.style.background = 'black'; }
-       });
-    });
+
+
+    let editingId = null;
+
+    function editChallenge(c) {
+      editingId = c._id;
+      document.getElementById('title').value = c.title;
+      document.getElementById('difficulty').value = c.difficulty;
+      document.getElementById('description').value = c.description;
+
+      // Rebuild test cases
+      const container = document.getElementById('testCasesContainer');
+      container.innerHTML = '';
+      (c.testCases || []).forEach(tc => {
+        addTestCase();
+        const cards = container.querySelectorAll('.test-case-card');
+        const last = cards[cards.length - 1];
+        last.querySelector('.tc-input').value = tc.input || '';
+        last.querySelector('.tc-output').value = tc.expectedOutput || '';
+        const hidden = last.querySelector('.tc-hidden');
+        hidden.checked = tc.isHidden || false;
+      });
+
+      // Update UI
+      document.getElementById('form-heading').textContent = 'Edit Challenge';
+      document.getElementById('form-subheading').textContent = 'Modify "' + c.title + '"';
+      document.getElementById('submitBtn').innerHTML = '<span class="material-symbols-outlined text-[18px]">save</span> Update Challenge';
+      document.getElementById('cancelEditBtn').classList.remove('hidden');
+      document.getElementById('form-heading').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cancelEdit() {
+      editingId = null;
+      document.getElementById('challengeForm').reset();
+      document.getElementById('form-heading').textContent = 'Create New Challenge';
+      document.getElementById('form-subheading').textContent = 'Define a new coding problem.';
+      document.getElementById('submitBtn').innerHTML = '<span class="material-symbols-outlined text-[18px]">add_circle</span> Create Challenge';
+      document.getElementById('cancelEditBtn').classList.add('hidden');
+
+      // Reset test cases to one blank card
+      const container = document.getElementById('testCasesContainer');
+      container.innerHTML = '';
+      addTestCase();
+    }
 
     document.getElementById('challengeForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Compiling...';
+        const btn = document.getElementById('submitBtn');
         btn.disabled = true;
+        
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Saving...';
 
         const title = document.getElementById('title').value;
         const difficulty = document.getElementById('difficulty').value;
@@ -234,43 +270,103 @@
 
         const testCaseElements = document.querySelectorAll('.test-case-card');
         const testCases = [];
+        let hasInvalidCase = false;
+        
         testCaseElements.forEach(card => {
+            const output = card.querySelector('.tc-output').value.trim();
+            if (!output) {
+                hasInvalidCase = true;
+                card.querySelector('.tc-output').classList.add('border-red-500/50');
+            } else {
+                card.querySelector('.tc-output').classList.remove('border-red-500/50');
+            }
+            
             testCases.push({
                 input: card.querySelector('.tc-input').value,
-                expectedOutput: card.querySelector('.tc-output').value,
+                expectedOutput: output,
                 isHidden: card.querySelector('.tc-hidden').checked
             });
         });
 
         if (testCases.length === 0) {
-          alert('At least 1 valid I/O circuit is required.');
+          showToast('At least 1 valid I/O circuit is required.');
+          btn.innerHTML = originalText; btn.disabled = false;
+          return;
+        }
+        
+        if (hasInvalidCase) {
+          showToast('All test cases must have an expected output.');
           btn.innerHTML = originalText; btn.disabled = false;
           return;
         }
 
+        const isEditing = !!editingId;
+        const url = isEditing ? `/api/coding/admin/${editingId}` : '/api/coding/admin/create';
+        const method = isEditing ? 'PUT' : 'POST';
+
         try {
-            const res = await fetch('/api/coding/admin/create', {
-                method: 'POST',
+            const res = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title, difficulty, description, testCases })
             });
 
-            if(res.ok) window.location.reload();
-            else { alert(await getErrorMessage(res, 'Deployment failed.')); btn.innerHTML = originalText; btn.disabled = false; }
-        } catch(err) { alert('Error: ' + err.message); btn.innerHTML = originalText; btn.disabled = false; }
+            if(res.ok) {
+              window.location.href = window.location.pathname + '#challenges-list';
+              window.location.reload();
+            }
+            else { showToast(await getErrorMessage(res, 'Operation failed.')); btn.innerHTML = originalText; btn.disabled = false; }
+        } catch(err) { showToast('Error: ' + err.message); btn.innerHTML = originalText; btn.disabled = false; }
     });
 
-    async function deleteChallenge(id, button) {
-        if(confirm('Wipe challenge from registry? This may break running sessions.')) {
-            if (button) button.disabled = true;
-            const res = await fetch(`/api/coding/admin/${id}`, { method: 'DELETE' });
-            if(res.ok) window.location.reload();
-            else {
-              if (button) button.disabled = false;
-              alert(await getErrorMessage(res, 'Failed to delete challenge.'));
+    document.addEventListener('click', async (e) => {
+      const editBtn = e.target.closest('.edit-btn');
+      if (editBtn) {
+        const c = JSON.parse(editBtn.dataset.challenge);
+        editChallenge(c);
+        return;
+      }
+
+      const deleteBtn = e.target.closest('.delete-btn');
+      if (deleteBtn && !deleteBtn.dataset.confirmPending) {
+        deleteBtn.dataset.confirmPending = 'true';
+        deleteBtn.innerHTML = '<span class="material-symbols-outlined text-[14px]">check</span>';
+        deleteBtn.title = 'Click again to confirm delete';
+        deleteBtn.classList.add('text-red-400', 'border-red-500/20', 'bg-red-500/10');
+        setTimeout(() => {
+            if (deleteBtn.dataset.confirmPending) {
+                delete deleteBtn.dataset.confirmPending;
+                deleteBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">delete</span>';
+                deleteBtn.title = 'Delete';
+                deleteBtn.classList.remove('text-red-400', 'border-red-500/20', 'bg-red-500/10');
             }
-        }
-    }
+        }, 3000);
+        return;
+      }
+
+      const confirmBtn = e.target.closest('[data-confirm-pending]');
+      if (confirmBtn) {
+          const id = confirmBtn.dataset.deleteId;
+          delete confirmBtn.dataset.confirmPending;
+          confirmBtn.disabled = true;
+          confirmBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[16px]">sync</span>';
+          try {
+              const res = await fetch(`/api/coding/admin/${id}`, { method: 'DELETE' });
+              if(res.ok) window.location.reload();
+              else {
+                confirmBtn.disabled = false;
+                showToast(await getErrorMessage(res, 'Failed to delete challenge.'));
+                confirmBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">delete</span>';
+                confirmBtn.classList.remove('text-red-400', 'border-red-500/20', 'bg-red-500/10');
+              }
+          } catch(err) {
+              confirmBtn.disabled = false;
+              showToast('Error: ' + err.message);
+              confirmBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">delete</span>';
+              confirmBtn.classList.remove('text-red-400', 'border-red-500/20', 'bg-red-500/10');
+          }
+      }
+    });
   </script>
 </body>
 </html>

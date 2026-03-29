@@ -33,7 +33,7 @@
       <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 border-b border-white/10 pb-6 mb-6">
         <div>
           <h1 class="text-3xl font-semibold tracking-tight text-white mb-2"><%= test.questionBank ? test.questionBank.title : 'Deleted Bank' %></h1>
-          <p class="text-xs font-mono uppercase tracking-wider text-gray-500"><%= test.numQuestions %> Questions · <%= test.duration %> Minutes · Created <%= new Date(test.createdAt).toLocaleDateString() %></p>
+          <p class="text-xs font-mono uppercase tracking-wider text-gray-500"><%= test.numQuestions %> Questions · <%= test.duration %> Minutes · Created <% const created = test.createdAt ? new Date(test.createdAt) : null; %><%= created && !isNaN(created) ? created.toLocaleDateString('en-IN') : '—' %></p>
         </div>
         <div class="flex flex-col sm:flex-row gap-3">
           <a
@@ -102,7 +102,7 @@
                 <tr class="hover:bg-white/[0.02] transition-colors">
                   <td class="p-4 font-medium text-white"><%= attempt.studentRollNo %></td>
                   <td class="p-4 text-gray-300"><%= attempt.score %> / <%= test.numQuestions %></td>
-                  <td class="p-4 text-gray-400 text-sm"><%= new Date(attempt.submittedAt).toLocaleString() %></td>
+                  <td class="p-4 text-gray-400 text-sm"><% const sub = attempt.submittedAt ? new Date(attempt.submittedAt) : null; %><%= sub && !isNaN(sub) ? sub.toLocaleString('en-IN') : '—' %></td>
                   <td class="p-4 text-right">
                     <button
                       data-action="view-details"
@@ -140,8 +140,10 @@
     </div>
   </div>
 
+  <script type="application/json" id="attempts-data"><%- JSON.stringify(attempts) %></script>
   <script>
-    const initialAttemptsData = <%- JSON.stringify(attempts) %>;
+    const attemptsNode = document.getElementById('attempts-data');
+    const initialAttemptsData = attemptsNode && attemptsNode.textContent ? JSON.parse(attemptsNode.textContent) : [];
     const testTotalQuestions = <%= test.numQuestions %>;
   </script>
   <script src="/js/test-results.js"></script>

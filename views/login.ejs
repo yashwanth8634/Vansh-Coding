@@ -26,7 +26,7 @@
           <div class="mx-auto w-12 h-12 border border-white/20 bg-white/5 rounded-xl flex items-center justify-center mb-4">
             <span class="material-symbols-outlined text-gray-500 text-[22px]">admin_panel_settings</span>
           </div>
-          <h2 class="text-2xl font-semibold tracking-tight text-gray-500">Mr & Ms Coder Control Room</h2>
+          <h1 class="text-2xl font-semibold tracking-tight text-gray-500">Mr & Ms Coder Control Room</h1>
           <p class="text-sm text-gray-400 mt-2">Vansh2k26 admin sign-in for quiz and coding rounds.</p>
         </div>
 
@@ -36,6 +36,7 @@
             <input
               type="text"
               id="username"
+              autocomplete="username"
               placeholder="Username"
               required
               class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white placeholder-gray-600 focus:bg-[#111] focus:border-white/30 outline-none transition-all"
@@ -47,6 +48,7 @@
               <input
                 type="password"
                 id="password"
+                autocomplete="current-password"
                 placeholder="Password"
                 required
                 class="w-full px-4 py-3 pr-24 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white placeholder-gray-600 focus:bg-[#111] focus:border-white/30 outline-none transition-all"
@@ -64,7 +66,7 @@
           <button
             type="submit"
             id="login-btn"
-            class="w-full bg-white text-black hover:bg-gray-200 py-3 rounded-xl text-sm font-semibold transition-colors"
+            class="btn-secondary w-full py-3"
           >
             Login
           </button>
@@ -89,14 +91,19 @@
         .getElementById("login-form")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
+          passwordInput.type = "password";
+          togglePasswordBtn.textContent = "Show";
+
           const username = document.getElementById("username").value;
           const password = document.getElementById("password").value;
           const errorP = document.getElementById("login-error");
           errorP.textContent = "";
 
+          const originalHTML = loginBtn.innerHTML;
+
           try {
             loginBtn.disabled = true;
-            loginBtn.textContent = "Logging in...";
+            loginBtn.innerHTML = "Logging in...";
             const res = await fetch("/api/admin/login", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -114,7 +121,7 @@
             errorP.textContent = "An error occurred. Please try again.";
           } finally {
             loginBtn.disabled = false;
-            loginBtn.textContent = "Login";
+            loginBtn.innerHTML = originalHTML;
           }
         });
     </script>

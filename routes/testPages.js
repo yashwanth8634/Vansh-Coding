@@ -115,7 +115,7 @@ router.get('/admin/test/:testId/results', protect, async (req, res) => {
           }
           const attempts = await Attempt.find({ test: test._id })
               .select('studentName studentRollNo studentDepartment studentYear studentSection studentCollege score submittedAt answers')
-              .sort({ score: -1 });
+              .sort({ score: -1, submittedAt: 1 });
           data = { test, attempts };
           caches.pages.set(cacheKey, data);
         }

@@ -16,7 +16,7 @@
   <div class="fixed inset-0 soft-grid pointer-events-none z-0"></div>
 
   <nav class="sticky top-0 z-40 border-b border-black/5 bg-white/50 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-5 md:px-8 py-4 md:py-0 min-h-20 flex flex-wrap items-center justify-between gap-3">
       <a href="/" class="flex items-center w-20 md:w-52">
         <img src="/images/1.png" alt="Vansh2k26 Logo" class="h-12 md:h-16 w-auto object-contain">
       </a>
@@ -26,10 +26,14 @@
         <a href="/active-tests" class="hover:text-stone-900 transition-colors">Active Tests</a>
       </div>
 
-      <div class="w-20 md:w-52 lg:w-56 flex justify-end">
+      <div class="w-auto md:w-52 lg:w-56 flex justify-end">
         <p class="hidden md:block text-xs font-semibold uppercase tracking-[0.15em] text-stone-500 text-right">
           Organized by Computer Science Department
         </p>
+      </div>
+      <div class="flex w-full items-center justify-end gap-2 md:hidden">
+        <a href="/" class="btn-pill">Home</a>
+        <a href="/active-tests" class="btn-pill">Active Tests</a>
       </div>
     </div>
   </nav>
@@ -46,9 +50,18 @@
     </section>
 
     <section class="max-w-7xl mx-auto mt-8">
-      <% if (activeTests && activeTests.length) { %>
+      <% 
+        const now = new Date();
+        const validTests = (activeTests || []).filter(t => !t.expiresAt || new Date(t.expiresAt) > now);
+        if (validTests.length > 0) { 
+      %>
         <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
-          <% activeTests.forEach((test) => { %>
+          <% validTests.forEach((test) => { 
+               const LOCALE = 'en-IN';
+               const expiry = test.expiresAt ? new Date(test.expiresAt) : null;
+               const isValidLink = test.link && (test.link.startsWith('/') || test.link.startsWith('http'));
+               const safeLink = isValidLink ? test.link : '#';
+          %>
             <article class="glass rounded-2xl p-6">
               <div class="flex items-center justify-between gap-3">
                 <span class="inline-flex items-center rounded-full border border-stone-300 bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-600">
@@ -60,9 +73,13 @@
               </div>
               <h2 class="mt-5 text-xl font-extrabold text-stone-900"><%= test.title %></h2>
               <p class="mt-3 text-sm text-stone-600 leading-relaxed">
-                Expires on <%= new Date(test.expiresAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) %>
+                <% if (expiry && !isNaN(expiry.valueOf())) { %>
+                  Expires on <%= expiry.toLocaleString(LOCALE, { dateStyle: 'medium', timeStyle: 'short' }) %>
+                <% } else { %>
+                  No expiry set
+                <% } %>
               </p>
-              <a href="<%= test.link %>" class="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-stone-900 text-white px-5 py-3 text-sm font-semibold hover:bg-stone-800 transition-colors">
+              <a href="<%= safeLink %>" rel="noopener noreferrer" class="btn-primary mt-6 px-5 py-3">
                 Open Test
                 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
               </a>
@@ -76,7 +93,7 @@
           <p class="mt-3 max-w-2xl text-stone-600 leading-relaxed">
             Once an admin creates an unexpired quiz or coding link, it will automatically appear here.
           </p>
-          <a href="/" class="mt-6 inline-flex items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white/70 text-stone-700 px-5 py-3 text-sm font-semibold hover:bg-white transition-colors">
+          <a href="/" class="btn-secondary mt-6 px-5 py-3">
             Back to Home
             <span class="material-symbols-outlined text-[18px]">west</span>
           </a>

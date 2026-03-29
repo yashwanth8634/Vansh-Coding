@@ -476,7 +476,7 @@ router.get('/tests/:testId/attempts', protect, async (req, res) => {
   try {
     const attempts = await Attempt.find({ test: req.params.testId })
         .select('studentRollNo score submittedAt')
-        .sort({ score: -1 });
+        .sort({ score: -1, submittedAt: 1 });
     res.json(attempts);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching attempts.' });
@@ -490,12 +490,12 @@ router.get('/tests/:testId/search', protect, async (req, res) => {
     if (!rollNo) {
         return res.status(400).json({ message: 'Roll No is required.' });
     }
-    rollNo = rollNo.trim().toLowerCase();
+    rollNo = rollNo.trim().toUpperCase();
 
     const attempts = await Attempt.find({
         test: req.params.testId,
         studentRollNo: { $regex: rollNo, $options: 'i' }
-    });
+    }).sort({ score: -1, submittedAt: 1 });
 
     if (!attempts.length) {
         return res.status(404).json({ message: 'No attempts found for this Roll No.' });

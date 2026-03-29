@@ -16,7 +16,7 @@
   <div class="fixed inset-0 soft-grid pointer-events-none z-0"></div>
 
   <nav class="sticky top-0 z-40 border-b border-black/5 bg-white/50 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-5 md:px-8 h-22 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-5 md:px-8 py-4 md:py-0 min-h-24 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center w-20 md:w-52">
         <img src="/images/1.png" alt="Vansh2k26 Logo" class="h-12 md:h-20 w-auto object-contain">
       </div>
@@ -28,10 +28,18 @@
         <a href="#highlights" class="hover:text-stone-900 transition-colors">Highlights</a>
       </div>
 
-      <div class="w-20 md:w-52 lg:w-56 flex justify-end">
+      <div class="w-auto md:w-52 lg:w-56 flex justify-end">
         <a
           href="/active-tests"
-          class="hidden md:inline-flex items-center justify-center rounded-full border border-stone-300 bg-white/85 px-4 py-2 text-sm font-bold text-stone-800 transition-colors hover:bg-white hover:text-stone-900"
+          class="btn-pill hidden md:inline-flex"
+        >
+          Active Tests
+        </a>
+      </div>
+      <div class="flex w-full items-center justify-end md:hidden">
+        <a
+          href="/active-tests"
+          class="btn-pill"
         >
           Active Tests
         </a>
@@ -64,7 +72,7 @@
           </p>
 
           <div class="fade-up fade-up-delay-3 mt-10 flex flex-col sm:flex-row gap-3">
-            <a href="/active-tests" class="inline-flex items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white/70 text-stone-700 px-6 py-3.5 text-sm font-semibold hover:bg-white transition-colors">
+            <a href="/active-tests" class="btn-secondary px-6 py-3.5">
               View Active Tests
               <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
             </a>
@@ -97,7 +105,7 @@
       </div>
     </section>
 
-    <section id="about" class="px-5 md:px-8 pb-14">
+    <section id="about" class="scroll-mt-24 px-5 md:px-8 pb-14">
       <div class="max-w-7xl mx-auto mb-8">
         <div class="glass rounded-2xl p-6 md:p-8">
           <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
@@ -148,7 +156,7 @@
       </div>
     </section>
 
-    <section id="format" class="px-5 md:px-8 py-16">
+    <section id="format" class="scroll-mt-24 px-5 md:px-8 py-16">
       <div class="max-w-7xl mx-auto">
         <div class="mb-10">
           <p class="text-xs uppercase tracking-[0.2em] text-stone-500 font-semibold">Competition Structure</p>
@@ -173,25 +181,16 @@
           <p class="text-xs uppercase tracking-[0.2em] text-stone-500 font-semibold">About the Event</p>
           <h3 class="mt-3 text-2xl font-extrabold text-stone-900">Overview & details</h3>
           <p class="mt-3 text-stone-600 leading-relaxed">The official search for Mr. Coder and Miss Coder. A two-round technical challenge featuring a fast-paced MCQ sprint followed by intensive individual problem-solving to identify the most efficient and logical programmers.</p>
-          <div class="mt-5 grid gap-3 md:grid-cols-3">
-            <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3">
-              <p class="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">Organised By</p>
-              <p class="mt-1 text-sm font-bold text-stone-900">Computer Science Department</p>
-            </div>
-            <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3">
-              <p class="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">Event Head</p>
-              <p class="mt-1 text-sm font-bold text-stone-900">Mr. P. Balaji</p>
-            </div>
-            <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3">
-              <p class="text-[11px] uppercase tracking-wider text-stone-500 font-semibold">Technical Coordinators</p>
-              <p class="mt-1 text-sm font-bold text-stone-900">Yashwanth, Shashank</p>
-            </div>
+          <div class="mt-5">
+            <a href="#team" class="inline-flex items-center gap-2 text-sm font-bold text-[#ef4d8d] hover:text-[#d43773] transition-colors">
+              View Organizing Team <span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+            </a>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="rules" class="px-5 md:px-8 pt-2 pb-8">
+    <section id="rules" class="scroll-mt-24 px-5 md:px-8 pt-2 pb-8">
       <div class="max-w-7xl mx-auto grid lg:grid-cols-3 gap-5">
         <div class="lg:col-span-2 glass rounded-2xl p-7 md:p-8">
           <div class="flex items-center justify-between gap-4">
@@ -199,7 +198,6 @@
               <p class="text-xs uppercase tracking-[0.2em] text-stone-500 font-semibold">Rules & Guidelines</p>
               <h3 class="mt-2 text-2xl font-extrabold text-stone-900">9 rules</h3>
             </div>
-            <span class="text-xs uppercase tracking-[0.15em] text-stone-500 font-semibold">View Full Page</span>
           </div>
 
           <div class="mt-6 space-y-3">
@@ -207,7 +205,7 @@
             <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3 text-sm text-stone-700"><strong>02</strong> · Topics (R1): Programming Fundamentals, DBMS, Aptitude and Logical Reasoning.</div>
             <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3 text-sm text-stone-700"><strong>03</strong> · Advancement: Top performers (Top 5 or 10) will advance to Round 2.</div>
             <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3 text-sm text-stone-700"><strong>04</strong> · Round 2 (Coding): 2 Problems | 60 Minutes | Languages: C, C++, Java, Python, etc.</div>
-            <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3 text-sm text-stone-700"><strong>05</strong> · Malpractice: Mobile phones/external assistance resulting in immediate disqualification.</div>
+            <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3 text-sm text-stone-700"><strong>05</strong> · Malpractice: Mobile phones/external assistance will result in immediate disqualification.</div>
             <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3 text-sm text-stone-700"><strong>06</strong> · Time Regulations: Entry not permitted once a round has started. No additional time.</div>
             <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3 text-sm text-stone-700"><strong>07</strong> · Winner Selection: Based on combined performance in Round 1 and Round 2.</div>
             <div class="rounded-xl border border-stone-200 bg-white/70 px-4 py-3 text-sm text-stone-700"><strong>08</strong> · Tie-breaker: Submission time for R1; higher weightage to Coding Round for overall scores.</div>
@@ -228,7 +226,7 @@
       </div>
     </section>
 
-    <section id="highlights" class="px-5 md:px-8 pt-6 pb-20">
+    <section id="highlights" class="scroll-mt-24 px-5 md:px-8 pt-6 pb-20">
       <div class="max-w-7xl mx-auto glass rounded-3xl p-8 md:p-10">
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
@@ -238,12 +236,68 @@
         </div>
       </div>
     </section>
+    <section id="team" class="scroll-mt-24 px-5 md:px-8 pt-6 pb-20">
+      <div class="max-w-7xl mx-auto glass rounded-3xl p-8 md:p-12 flex flex-col items-center">
+        <!-- Organized By Badge -->
+        <div class="inline-flex items-center gap-2 rounded-full border border-stone-300/70 bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-stone-600">
+          <span class="w-2 h-2 rounded-full bg-[#7f6dff]"></span>
+          Organized by CSE Department
+        </div>
+
+        <!-- Event Head -->
+        <div class="mt-10 text-center">
+          <h3 class="text-xs uppercase tracking-[0.2em] text-stone-500 font-semibold">Event Head</h3>
+          <div class="mt-3 flex items-center justify-center gap-2 text-2xl md:text-3xl font-extrabold text-stone-900">
+            <span class="material-symbols-outlined text-[28px] text-[#ef4d8d]">groups</span>
+            Mr. Lanka. Balaji
+          </div>
+        </div>
+
+        <!-- Event Coordinators -->
+        <div class="mt-12 w-full max-w-4xl mx-auto text-center">
+          <h3 class="text-xs uppercase tracking-[0.2em] text-stone-500 font-semibold mb-6">Event Coordinators</h3>
+          
+          <div class="flex flex-wrap justify-center gap-3">
+            <!-- Coordinator 1 -->
+            <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-stone-200 bg-white/70 hover:bg-white/90 transition-colors">
+              <div class="w-7 h-7 rounded-full bg-[#7f6dff] text-white flex items-center justify-center text-[11px] font-bold">D</div>
+              <span class="text-sm md:text-base font-semibold text-stone-800">Deepthi | 3rd Year | CSE</span>
+            </div>
+            <!-- Coordinator 2 -->
+            <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-stone-200 bg-white/70 hover:bg-white/90 transition-colors">
+              <div class="w-7 h-7 rounded-full bg-[#21c5a5] text-white flex items-center justify-center text-[11px] font-bold">S</div>
+              <span class="text-sm md:text-base font-semibold text-stone-800">Saniya | 3rd Year | CSE</span>
+            </div>
+            <!-- Coordinator 3 -->
+            <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-stone-200 bg-white/70 hover:bg-white/90 transition-colors">
+              <div class="w-7 h-7 rounded-full bg-[#7f6dff] text-white flex items-center justify-center text-[11px] font-bold">K</div>
+              <span class="text-sm md:text-base font-semibold text-stone-800">K.Yashwanth reddy | 2nd Year | CSE</span>
+            </div>
+            <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-stone-200 bg-white/70 hover:bg-white/90 transition-colors">
+              <div class="w-7 h-7 rounded-full bg-[#ef4d8d] text-white flex items-center justify-center text-[11px] font-bold">K</div>
+              <span class="text-sm md:text-base font-semibold text-stone-800">Karthik Sai | 2nd Year | CSE</span>
+            </div>
+            <!-- Coordinator 4 -->
+            <!-- Coordinator 5 -->
+            <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-stone-200 bg-white/70 hover:bg-white/90 transition-colors">
+              <div class="w-7 h-7 rounded-full bg-[#21c5a5] text-white flex items-center justify-center text-[11px] font-bold">B</div>
+              <span class="text-sm md:text-base font-semibold text-stone-800">B.Yashwanth Reddy | 2nd Year | CSE</span>
+            </div>
+            <!-- Coordinator 6 -->
+            <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-stone-200 bg-white/70 hover:bg-white/90 transition-colors">
+              <div class="w-7 h-7 rounded-full bg-[#ef4d8d] text-white flex items-center justify-center text-[11px] font-bold">R</div>
+              <span class="text-sm md:text-base font-semibold text-stone-800">Raghupathi Shashank | 2nd Year | CSE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="border-t border-black/5 bg-white/50 backdrop-blur py-8">
     <div class="max-w-7xl mx-auto px-5 md:px-8 flex flex-col md:flex-row items-center justify-between gap-3">
       <p class="text-sm text-stone-600">© 2026 Vansh2k26 Fest · Mr & Ms Coder</p>
-      <p class="text-xs uppercase tracking-[0.2em] text-stone-500">Built by Yashwanth CSE</p>
+      <p class="text-xs uppercase tracking-[0.2em] text-stone-500">Built by K.Yashwanth Reddy | CSE</p>
     </div>
   </footer>
 

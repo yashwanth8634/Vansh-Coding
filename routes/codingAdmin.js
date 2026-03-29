@@ -48,6 +48,48 @@ router.post('/create', protect, async (req, res) => {
   }
 });
 
+// Update Challenge
+router.put('/:id', protect, async (req, res) => {
+  try {
+    const challenge = await CodingChallenge.findById(req.params.id);
+    if (!challenge) {
+      return res.status(404).json({ message: 'Challenge not found' });
+    }
+
+    const title = (req.body.title || '').trim();
+    const description = (req.body.description || '').trim();
+    const difficulty = (req.body.difficulty || '').trim();
+    const rawCases = Array.isArray(req.body.testCases) ? req.body.testCases : [];
+    const testCases = rawCases
+      .map((testCase) => ({
+        input: String(testCase.input || '').trim(),
+        expectedOutput: String(testCase.expectedOutput || '').trim(),
+        isHidden: Boolean(testCase.isHidden),
+      }))
+      .filter((testCase) => testCase.expectedOutput);
+
+    if (!title || !description || !difficulty) {
+      return res.status(400).json({ message: 'Title, description, and difficulty are required.' });
+    }
+
+    if (testCases.length === 0) {
+      return res.status(400).json({ message: 'At least one valid test case is required.' });
+    }
+
+    challenge.title = title;
+    challenge.description = description;
+    challenge.difficulty = difficulty;
+    challenge.testCases = testCases;
+    await challenge.save();
+    caches.pages.flushAll();
+    res.json({ message: 'Challenge updated successfully', challenge });
+  } catch (error) {
+    console.error(error);
+    if (error.code === 11000) return res.status(400).json({ message: 'Challenge title must be unique.' });
+    res.status(500).json({ message: 'Error updating challenge' });
+  }
+});
+
 // Delete Challenge
 router.delete('/:id', protect, async (req, res) => {
   try {

@@ -76,7 +76,10 @@
               %>
                 <tr class="hover:bg-white/[0.02] transition-colors group">
                   <td class="p-4 font-bold text-white text-sm font-mono"><%= attempt.studentRollNo %></td>
-                  <td class="p-4 text-gray-400 text-sm"><%= new Date(attempt.submittedAt).toLocaleString() %></td>
+                  <td class="p-4 text-gray-400 text-sm">
+                    <% const submitted = attempt.submittedAt ? new Date(attempt.submittedAt) : null; %>
+                    <%= submitted && !isNaN(submitted) ? submitted.toLocaleString('en-IN') : '—' %>
+                  </td>
                   <td class="p-4">
                     <% const gradeClass = solved === attempt.answers.length && attempt.answers.length > 0 ? 'text-green-400 bg-green-500/10 border border-green-500/20' : 'text-yellow-400 bg-yellow-500/10 border border-yellow-500/20'; %>
                     <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider <%= gradeClass %>">
@@ -84,13 +87,9 @@
                     </span>
                   </td>
                   <td class="p-4 text-right">
-                    <button onclick="openModal('<%= attempt._id %>')" class="bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 border border-white/10 hover:border-white/20 px-4 py-2 rounded-lg text-xs font-medium transition-all ml-auto flex items-center gap-2">
+                    <button data-action="open-modal" data-attempt-id="<%= attempt._id %>" class="bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 border border-white/10 hover:border-white/20 px-4 py-2 rounded-lg text-xs font-medium transition-all ml-auto flex items-center gap-2">
                        <span class="material-symbols-outlined text-[16px]">terminal</span> View Code
                     </button>
-                    <!-- Data Store -->
-                    <script type="application/json" id="data-<%= attempt._id %>">
-                      <%- JSON.stringify(attempt.answers) %>
-                    </script>
                   </td>
                 </tr>
               <% }); %>
@@ -109,7 +108,7 @@
           <span class="material-symbols-outlined text-gray-400 text-[20px]">description</span>
           <h3 class="text-sm font-semibold text-white tracking-wide" id="modalRollNo">Inspect Code</h3>
         </div>
-        <button onclick="closeModal()" class="text-gray-500 hover:text-white transition-colors flex items-center justify-center p-1 rounded-md hover:bg-white/10">
+        <button data-action="close-modal" class="text-gray-500 hover:text-white transition-colors flex items-center justify-center p-1 rounded-md hover:bg-white/10">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
@@ -141,14 +140,14 @@
         html += `
           <div class="bg-[#0a0a0a] rounded-xl border border-white/10 mb-6 overflow-hidden">
             <div class="flex flex-col md:flex-row justify-between md:items-center p-4 border-b border-white/5 bg-[#050505] gap-3">
-              <h4 class="font-medium text-white text-sm">Q${idx + 1}: ${ans.challenge ? ans.challenge.title : 'Deleted Challenge'}</h4>
+              <h4 class="font-medium text-white text-sm">Q${idx + 1}: ${ans.challenge ? escapeHtml(ans.challenge.title) : 'Deleted Challenge'}</h4>
               <div class="flex items-center gap-2">
-                <span class="text-[10px] font-semibold tracking-wider uppercase bg-white/5 border border-white/10 text-gray-400 px-2 py-0.5 rounded">${ans.language}</span>
-                <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded ${statusBadge}">${ans.status} [${ans.passedCases}/${ans.totalCases}]</span>
+                <span class="text-[10px] font-semibold tracking-wider uppercase bg-white/5 border border-white/10 text-gray-400 px-2 py-0.5 rounded">${escapeHtml(ans.language || '')}</span>
+                <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded ${statusBadge}">${escapeHtml(String(ans.status))} [${escapeHtml(String(ans.passedCases))}/${escapeHtml(String(ans.totalCases))}]</span>
               </div>
             </div>
             <div class="bg-[#000] p-4 overflow-x-auto">
-              <pre class="font-code text-[13px] leading-relaxed text-gray-300 m-0"><code class="language-${ans.language.toLowerCase()}">${escapeHtml(ans.code || '// Blank File')}</code></pre>
+              <pre class="font-code text-[13px] leading-relaxed text-gray-300 m-0"><code class="language-${ans.language ? ans.language.toLowerCase() : 'text'}">${escapeHtml(ans.code || '// Blank File')}</code></pre>
             </div>
           </div>
         `;
@@ -156,12 +155,20 @@
       content.innerHTML = html;
       
       modalWrap.classList.remove('hidden');
-      // Trigger animation frame
-      setTimeout(() => {
-        modalWrap.classList.remove('opacity-0');
-        modalDialog.classList.remove('scale-95');
-      }, 10);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          modalWrap.classList.remove('opacity-0');
+          modalDialog.classList.remove('scale-95');
+        });
+      });
     }
+
+    document.addEventListener('click', (e) => {
+      const openBtn = e.target.closest('[data-action="open-modal"]');
+      if (openBtn) openModal(openBtn.dataset.attemptId);
+
+      if (e.target.closest('[data-action="close-modal"]')) closeModal();
+    });
 
     function closeModal() {
       modalWrap.classList.add('opacity-0');

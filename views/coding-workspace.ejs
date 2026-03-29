@@ -19,15 +19,25 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/javascript-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/anyword-hint.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
+  <style>
+    .CodeMirror {
+      height: 100% !important;
+      font-family: 'Fira Code', monospace;
+      padding-bottom: 50px; /* Pre-allocate space for console drawer on mobile */
+    }
+  </style>
 </head>
-<body class="vc-app h-screen overflow-hidden flex flex-col p-3 md:p-5 gap-4 relative selection:bg-white/30 text-white">
+<body class="vc-app min-h-screen md:h-screen overflow-x-hidden md:overflow-hidden flex flex-col p-3 md:p-5 gap-4 relative selection:bg-white/30 text-white">
 
   <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
-  <div id="start-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-    <div class="glass-card rounded-2xl p-8 md:p-12 w-full max-w-md relative overflow-hidden">
+  <div id="start-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 md:p-6 overflow-y-auto">
+    <div class="glass-card rounded-2xl p-6 md:p-10 lg:p-12 w-full max-w-md md:max-w-3xl relative overflow-hidden max-h-[calc(100vh-2rem)] md:max-h-[calc(100vh-3rem)] overflow-y-auto my-auto">
       <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div class="text-center mb-10 relative z-10">
@@ -38,7 +48,7 @@
         <p class="text-gray-400 font-light text-sm">Enter details to begin your Vansh2k26 attempt</p>
       </div>
 
-      <div id="coding-details-form" class="space-y-4 relative z-10">
+      <div id="coding-details-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <span class="material-symbols-outlined text-gray-500 text-[18px]">person</span>
@@ -100,14 +110,14 @@
           <input id="start-college" type="text" placeholder="College Name (leave blank if Vignan)" class="w-full pl-12 pr-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white placeholder-gray-600 focus:bg-[#111] focus:border-white/30 transition-all outline-none">
         </div>
 
-        <button id="start-session-btn" class="w-full bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] flex justify-center items-center gap-2">
+        <button id="start-session-btn" class="btn-primary w-full md:col-span-2 py-3 px-4">
           Start Test <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
         </button>
       </div>
 
       <div id="coding-rules-screen" class="hidden relative z-10">
-        <div class="rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 md:p-6 shadow-inner">
-          <div class="flex items-start gap-3">
+        <div class="rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 md:p-6 lg:p-7 shadow-inner">
+          <div class="flex items-start gap-3 max-w-2xl">
             <div class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-400">
               <span class="material-symbols-outlined text-[20px]">gavel</span>
             </div>
@@ -118,31 +128,56 @@
             </div>
           </div>
 
-          <div class="mt-5 rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+          <div class="mt-5 rounded-2xl border border-[#fda29b] bg-[#fff1f0] p-4 md:p-5">
             <div class="flex items-start gap-3">
-              <span class="material-symbols-outlined text-red-400 text-[20px]">warning</span>
+              <span class="material-symbols-outlined text-[#d92d20] text-[20px]">warning</span>
               <div>
-                <p class="text-sm font-semibold text-red-300">Important fullscreen warning</p>
-                <p class="mt-1 text-sm leading-relaxed text-red-200/90">
+                <p class="text-sm font-semibold text-[#d92d20]">Important fullscreen warning</p>
+                <p class="mt-1 text-sm leading-relaxed text-[#b42318]">
                   If you press <strong>Esc</strong>, leave fullscreen, switch tabs, or come back from fullscreen during the test, your test may be automatically submitted. Please be careful.
                 </p>
               </div>
             </div>
           </div>
 
-          <ul class="mt-5 space-y-3 text-sm text-gray-300 leading-relaxed">
-            <li class="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">Enter only your correct details. You will have only one valid attempt.</li>
-            <li class="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">The timer starts only after you agree and begin the coding session.</li>
-            <li class="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">Do not switch tabs, leave fullscreen, or minimize the window during the test.</li>
-            <li class="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">Use only the allowed editor and tools inside the platform. External help is not allowed.</li>
-            <li class="rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3">Once submitted, your coding answers are locked and cannot be changed.</li>
+          <ul class="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <li class="rounded-xl border border-black/10 bg-white px-4 py-3.5">
+              <div class="flex items-start gap-3">
+                <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-slate-700"></span>
+                <p class="text-sm leading-relaxed text-slate-700">Enter only your correct details. You will have only one valid attempt.</p>
+              </div>
+            </li>
+            <li class="rounded-xl border border-black/10 bg-white px-4 py-3.5">
+              <div class="flex items-start gap-3">
+                <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-slate-700"></span>
+                <p class="text-sm leading-relaxed text-slate-700">The timer starts only after you agree and begin the coding session.</p>
+              </div>
+            </li>
+            <li class="rounded-xl border border-black/10 bg-white px-4 py-3.5">
+              <div class="flex items-start gap-3">
+                <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-slate-700"></span>
+                <p class="text-sm leading-relaxed text-slate-700">Do not switch tabs, leave fullscreen, or minimize the window during the test.</p>
+              </div>
+            </li>
+            <li class="rounded-xl border border-black/10 bg-white px-4 py-3.5">
+              <div class="flex items-start gap-3">
+                <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-slate-700"></span>
+                <p class="text-sm leading-relaxed text-slate-700">Use only the allowed editor and tools inside the platform. External help is not allowed.</p>
+              </div>
+            </li>
+            <li class="rounded-xl border border-black/10 bg-white px-4 py-3.5 lg:col-span-2">
+              <div class="flex items-start gap-3">
+                <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-slate-700"></span>
+                <p class="text-sm leading-relaxed text-slate-700">Once submitted, your coding answers are locked and cannot be changed.</p>
+              </div>
+            </li>
           </ul>
         </div>
-        <div class="mt-5 flex flex-col sm:flex-row gap-3">
-          <button type="button" id="edit-coding-details-btn" class="w-full sm:w-auto border border-white/10 text-gray-300 hover:bg-white/5 hover:text-white py-3 px-4 rounded-xl text-sm font-medium transition-colors">
+        <div class="mt-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <button type="button" id="edit-coding-details-btn" class="btn-ghost w-full md:w-auto py-3 px-5">
             Edit Details
           </button>
-          <button type="button" id="confirm-coding-rules-btn" class="w-full bg-white text-black hover:bg-gray-200 py-3.5 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] flex justify-center items-center gap-2">
+          <button type="button" id="confirm-coding-rules-btn" class="btn-secondary w-full md:w-auto md:min-w-[240px] py-3.5 px-6">
             I Agree, Start Test
             <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
           </button>
@@ -166,10 +201,10 @@
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3">
-        <button id="return-to-coding" class="flex-1 bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors">
+        <button id="return-to-coding" class="btn-secondary flex-1 py-3 px-4">
           Return to Session
         </button>
-        <button id="submit-coding-now" class="w-full sm:w-max bg-transparent text-gray-500 hover:text-white border border-transparent hover:border-white/10 py-3 px-4 rounded-xl text-sm transition-colors">
+        <button id="submit-coding-now" class="btn-ghost w-full sm:w-max py-3 px-4">
           Submit Now
         </button>
       </div>
@@ -177,34 +212,34 @@
   </div>
 
   <!-- Top Nav Pill -->
-  <nav class="glass-nav rounded-2xl h-16 md:h-20 flex items-center justify-between px-6 shrink-0 z-10 shadow-lg relative overflow-hidden">
+  <nav class="glass-nav rounded-2xl px-4 md:px-6 py-4 md:py-0 md:h-20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shrink-0 z-10 shadow-lg relative overflow-hidden">
     <div class="absolute top-0 right-1/2 w-48 h-10 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="flex items-center gap-4 relative z-10">
+    <div class="flex items-center gap-3 md:gap-4 relative z-10 w-full md:w-auto">
       <div class="border border-white/10 bg-white/5 w-10 h-10 rounded-xl flex items-center justify-center">
         <span class="material-symbols-outlined text-white text-[20px]">terminal</span>
       </div>
       <div>
         <h1 class="font-semibold text-sm md:text-base tracking-tight leading-none text-white"><%= test.codingBank.title %></h1>
-        <p id="student-session-meta" class="text-gray-500 text-[10px] font-mono uppercase tracking-widest hidden sm:block mt-1">Vansh2k26 Coding Arena</p>
+        <p id="student-session-meta" class="text-gray-500 text-[10px] font-mono uppercase tracking-widest mt-1">Vansh2k26 Coding Arena</p>
       </div>
     </div>
-      <div class="flex items-center gap-4 relative z-10">
+      <div class="flex w-full md:w-auto flex-wrap items-center gap-3 md:gap-4 relative z-10">
         <div id="session-timer" class="bg-[#0a0a0a] text-white border border-white/10 rounded-lg px-4 py-2 text-sm font-mono tracking-widest min-w-[88px] text-center">
           --:--
         </div>
-        <input type="text" id="roll-no" placeholder="Roll Number" class="bg-[#0a0a0a] text-white placeholder-gray-600 border border-white/10 rounded-lg px-4 py-2 text-sm font-medium outline-none transition-all uppercase tracking-widest text-center w-36 md:w-48 shadow-inner" readonly>
-        <button id="final-submit-btn" class="bg-white text-black hover:bg-gray-200 px-6 py-2 rounded-lg text-sm font-semibold shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-transform active:scale-[0.98] flex items-center gap-2">
+        <input type="text" id="roll-no" placeholder="Roll Number" class="flex-1 md:flex-none min-w-[150px] bg-[#0a0a0a] text-white placeholder-gray-600 border border-white/10 rounded-lg px-4 py-2 text-sm font-medium outline-none transition-all uppercase tracking-widest text-center w-full md:w-48 shadow-inner" readonly>
+        <button id="final-submit-btn" class="btn-secondary w-full sm:w-auto px-6 py-2">
           <span class="material-symbols-outlined text-[18px]">publish</span> <span class="hidden sm:inline">Submit Final Test</span>
       </button>
     </div>
   </nav>
 
   <!-- Complete Workspace Split Panes -->
-  <div class="flex-1 flex flex-col md:flex-row gap-4 overflow-hidden z-10 relative">
+  <div class="flex-1 min-h-0 flex flex-col md:flex-row gap-4 overflow-visible md:overflow-hidden z-10 relative">
     
     <!-- LEFT MOST: Question Navigator -->
-    <div class="w-full h-24 md:h-full md:w-20 lg:w-64 glass-card rounded-2xl flex flex-col shrink-0 overflow-hidden shadow-2xl">
+    <div class="w-full h-28 md:h-full md:w-20 lg:w-64 glass-card rounded-2xl flex flex-col shrink-0 overflow-hidden shadow-2xl">
       <div class="px-5 py-4 border-b border-white/10 bg-[#050505] shrink-0 hidden lg:flex items-center justify-between">
         <h3 class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Question Bank</h3>
         <span class="material-symbols-outlined text-[16px] text-gray-500">format_list_bulleted</span>
@@ -225,32 +260,32 @@
     </div>
 
     <!-- MIDDLE: Problem Description -->
-    <div class="hidden md:flex flex-col w-1/3 xl:w-[35%] glass-card rounded-2xl border border-white/10 overflow-hidden shrink-0 shadow-2xl bg-[#0a0a0a]">
+    <div class="flex flex-col w-full md:w-1/3 xl:w-[35%] min-h-[260px] md:min-h-0 glass-card rounded-2xl border border-white/10 overflow-hidden shrink-0 shadow-2xl bg-[#0a0a0a]">
       <div class="px-6 py-5 border-b border-white/10 bg-[#050505] shrink-0">
         <div class="flex items-center gap-3 mb-2">
           <span id="current-q-diff" class="text-[10px] px-2 py-0.5 border rounded uppercase tracking-widest font-mono">--</span>
         </div>
         <h2 id="current-q-title" class="text-xl font-semibold text-white tracking-tight">Loading...</h2>
       </div>
-      <div id="current-q-desc" class="p-6 md:p-8 overflow-y-auto flex-1 prose prose-invert prose-sm max-w-none text-gray-300 font-normal leading-relaxed">
+      <div id="current-q-desc" class="p-5 md:p-8 overflow-y-auto flex-1 prose prose-invert prose-sm max-w-none text-gray-300 font-normal leading-relaxed">
         <!-- Markdown -->
       </div>
     </div>
 
     <!-- RIGHT: Code Editor & Console -->
-    <div class="flex-1 flex flex-col bg-[#050505] rounded-2xl border border-white/10 overflow-hidden relative shadow-2xl">
-      <div class="h-14 xl:h-16 bg-[#0a0a0a] border-b border-white/10 flex items-center justify-between px-4 shrink-0">
-        <div class="flex items-center gap-2">
+    <div class="flex-1 min-h-[480px] md:min-h-0 flex flex-col bg-[#050505] rounded-2xl border border-white/10 overflow-hidden relative shadow-2xl">
+      <div class="bg-[#0a0a0a] border-b border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3 shrink-0">
+        <div class="flex items-center gap-2 w-full sm:w-auto">
           <span class="material-symbols-outlined text-[16px] text-gray-500">code</span>
-          <select id="language-select" class="bg-transparent text-gray-300 text-xs font-mono outline-none hover:text-white transition-colors cursor-pointer appearance-none border border-transparent hover:border-white/10 px-2 py-1 rounded">
-            <option value="javascript" class="bg-[#111]">JavaScript (Node.js)</option>
-            <option value="python" class="bg-[#111]">Python 3.10</option>
-            <option value="java" class="bg-[#111]">Java 15</option>
-            <option value="cpp" class="bg-[#111]">C++ (GCC 12)</option>
-            <option value="c" class="bg-[#111]">C (GCC 12)</option>
+          <select id="language-select" class="bg-transparent text-gray-300 text-xs font-mono outline-none hover:text-white transition-colors cursor-pointer appearance-none border border-transparent hover:border-white/10 px-2 py-1 rounded w-full sm:w-auto">
+            <option value="javascript" class="bg-[#111]">JavaScript (Node.js 20)</option>
+            <option value="python" class="bg-[#111]">Python 3.12</option>
+            <option value="java" class="bg-[#111]">Java 22</option>
+            <option value="cpp" class="bg-[#111]">C++ (GCC 13)</option>
+            <option value="c" class="bg-[#111]">C (GCC 13)</option>
           </select>
         </div>
-        <button id="run-btn" class="flex items-center gap-2 text-white bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-1.5 rounded-lg text-xs font-medium transition-all active:scale-[0.98]">
+        <button id="run-btn" class="btn-ghost w-full sm:w-auto px-4 py-2 text-xs">
           <span class="material-symbols-outlined text-[16px]">play_arrow</span> Run <span class="hidden xl:inline">Code</span>
         </button>
       </div>
@@ -279,7 +314,6 @@
   <script id="server-data" type="application/json">
     <%- JSON.stringify({
       testId: test._id,
-      uniqueLink: test.uniqueLink,
       challenges: test.codingBank.challenges.map(c => ({
         id: c._id, title: c.title, difficulty: c.difficulty, 
         description: c.description,
@@ -288,23 +322,108 @@
     }) %>
   </script>
 
+  <div id="submit-confirm-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
+    <div class="glass-card rounded-2xl p-6 max-w-sm w-full text-center relative overflow-hidden">
+      <div class="mx-auto w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mb-4">
+        <span class="material-symbols-outlined text-blue-500">publish</span>
+      </div>
+      <h2 class="text-xl font-semibold text-gray-900 mb-2">Submit Final Test?</h2>
+      <p class="text-gray-600 text-sm mb-6">Are you absolutely certain? This will lock your answers and submit the test.</p>
+      <div class="flex gap-3">
+        <button id="cancel-submit-btn" class="btn-ghost flex-1 py-3 px-4 !m-0">Cancel</button>
+        <button id="confirm-submit-btn" class="btn-primary flex-1 py-3 px-4 !m-0">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="success-overlay" class="fixed inset-0 bg-white/60 backdrop-blur-md z-[120] hidden items-center justify-center px-6 transition-opacity duration-500 opacity-0">
+    <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
+    <div class="w-full max-w-lg text-center p-10 md:p-12 glass-card rounded-3xl relative z-10 transition-transform duration-500 translate-y-4 scale-95" id="success-content">
+      <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-green-500/30 bg-green-500/10">
+        <span class="material-symbols-outlined text-green-600 text-[34px] leading-none">task_alt</span>
+      </div>
+      <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">Assessment Complete</h1>
+      <p class="mt-4 text-gray-600 text-sm leading-relaxed">Your coding test has been submitted successfully.</p>
+      <a href="/" class="btn-primary mt-8 inline-flex w-full sm:w-auto px-8 py-3">
+        <span class="material-symbols-outlined text-[18px]">home</span> Return to Home
+      </a>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const data = JSON.parse(document.getElementById('server-data').textContent);
       const testId = data.testId;
-      const uniqueLink = data.uniqueLink;
+      const uniqueLink = window.location.pathname.split('/').pop();
       const challenges = data.challenges;
       const sessionDurationMinutes = <%= Number(test.durationMinutes || 30) %>;
 
+      const STARTER_TEMPLATES = {
+        javascript: `// Read input
+const input = require('fs').readFileSync(0, 'utf8').trim();
+const lines = input.split('\\n');
+
+// Write your solution here
+
+
+`,
+        python: `# Read input
+import sys
+input_data = sys.stdin.read().strip()
+lines = input_data.split('\\n')
+
+# Write your solution here
+
+
+`,
+        java: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Write your solution here
+
+
+        sc.close();
+    }
+}
+`,
+        cpp: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Write your solution here
+
+
+    return 0;
+}
+`,
+        c: `#include <stdio.h>
+
+int main() {
+    // Write your solution here
+
+
+    return 0;
+}
+`,
+      };
+
       const submissions = {};
-      challenges.forEach(c => {
-        submissions[c.id] = { code: '// Enter entry-point logic here...\n', language: 'javascript' };
+      challenges.forEach((c) => {
+        submissions[c.id] = {
+          code: STARTER_TEMPLATES.javascript,
+          language: 'javascript',
+          templateLanguage: 'javascript',
+        };
       });
 
       let activeChallengeId = challenges[0].id;
 
       const editor = CodeMirror(document.getElementById('editor-container'), {
-        lineNumbers: true, theme: 'dracula', mode: 'javascript', indentUnit: 4, tabSize: 4, lineWrapping: true
+        lineNumbers: true, theme: 'dracula', mode: 'javascript', indentUnit: 4, tabSize: 4, lineWrapping: true,
+        extraKeys: {"Ctrl-Space": "autocomplete"}
       });
 
       const langSelect = document.getElementById('language-select');
@@ -339,15 +458,18 @@
       const securityWarningModal = document.getElementById('security-warning-modal');
       const returnToCodingBtn = document.getElementById('return-to-coding');
       const submitCodingNowBtn = document.getElementById('submit-coding-now');
+      const STATE = { IDLE: 0, RUNNING: 1, SUBMITTING: 2, FINISHED: 3 };
+      let currentState = STATE.IDLE;
       let sessionTimeLeftSeconds = Math.max(1, sessionDurationMinutes) * 60;
       let sessionTimerId = null;
-      let hasSubmitted = false;
       let hasStarted = false;
       let warningCount = 0;
+      let warningDebounceToken = 0;
       let studentProfile = null;
       let pendingStudentProfile = null;
-      let isRunningCode = false;
-      let isSubmittingFinal = false;
+
+      const IDLE_RUN_HTML = '<span class="material-symbols-outlined text-[16px]">play_arrow</span> Run <span class="hidden xl:inline">Code</span>';
+      const IDLE_SUBMIT_HTML = '<span class="material-symbols-outlined text-[18px]">publish</span> <span class="hidden sm:inline">Submit Final Test</span>';
 
       function setBusyState(button, isBusy, idleMarkup, busyMarkup) {
         button.disabled = isBusy;
@@ -356,9 +478,18 @@
         button.innerHTML = isBusy ? busyMarkup : idleMarkup;
       }
 
-      function loadChallenge(id) {
+      function getStarterTemplate(language) {
+        return STARTER_TEMPLATES[language] || STARTER_TEMPLATES.javascript;
+      }
+
+      function syncActiveSubmission() {
+        if (!activeChallengeId) return;
         submissions[activeChallengeId].code = editor.getValue();
         submissions[activeChallengeId].language = langSelect.value;
+      }
+
+      function loadChallenge(id, isInitialLoad = false) {
+        if (!isInitialLoad) syncActiveSubmission();
 
         activeChallengeId = id;
         const chal = challenges.find(c => c.id === id);
@@ -388,7 +519,8 @@
       function updateCodeMirrorMode(lang) {
         let mode = 'javascript';
         if (lang === 'python') mode = 'python';
-        if (['cpp', 'c', 'java'].includes(lang)) mode = 'text/x-c++src';
+        if (lang === 'java') mode = 'text/x-java';
+        if (['cpp', 'c'].includes(lang)) mode = 'text/x-c++src';
         editor.setOption('mode', mode);
       }
 
@@ -401,7 +533,7 @@
       function startSessionTimer() {
         renderSessionTimer();
         sessionTimerId = setInterval(() => {
-          if (hasSubmitted) {
+          if (currentState === STATE.FINISHED) {
             clearInterval(sessionTimerId);
             return;
           }
@@ -445,28 +577,35 @@
 
       function addSecurityListeners() {
         window.addEventListener('beforeunload', (event) => {
-          if (!hasSubmitted && hasStarted) {
+          if (currentState !== STATE.FINISHED && hasStarted) {
             event.preventDefault();
             event.returnValue = '';
           }
         });
 
-        document.addEventListener('visibilitychange', () => {
-          if (hasStarted && !hasSubmitted && document.hidden) {
+        const handleVisibilityChange = () => {
+          if (hasStarted && currentState !== STATE.FINISHED && document.hidden) {
             handleWarning();
           }
-        });
+        };
 
-        document.addEventListener('fullscreenchange', () => {
-          if (hasStarted && !hasSubmitted && !document.fullscreenElement) {
+        const handleFullscreenChange = () => {
+          if (hasStarted && currentState !== STATE.FINISHED && !document.fullscreenElement) {
             handleWarning();
-            document.documentElement.requestFullscreen().catch(() => {});
           }
-        });
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
       }
 
       function handleWarning() {
-        if (hasSubmitted) return;
+        if (currentState === STATE.FINISHED) return;
+
+        const now = Date.now();
+        if (now - warningDebounceToken < 500) return;
+        warningDebounceToken = now;
+
         warningCount += 1;
 
         if (warningCount === 1) {
@@ -478,9 +617,28 @@
         submitFinal(true);
       }
 
-      langSelect.addEventListener('change', (e) => updateCodeMirrorMode(e.target.value));
+      langSelect.addEventListener('change', (e) => {
+        const nextLanguage = e.target.value;
+        const submission = submissions[activeChallengeId];
+        const currentCode = editor.getValue();
+        const previousTemplate = getStarterTemplate(submission.templateLanguage || submission.language);
+        const shouldInjectTemplate = !currentCode.trim() || currentCode === previousTemplate;
+
+        submission.language = nextLanguage;
+        submission.templateLanguage = nextLanguage;
+        updateCodeMirrorMode(nextLanguage);
+
+        if (shouldInjectTemplate) {
+          const nextTemplate = getStarterTemplate(nextLanguage);
+          submission.code = nextTemplate;
+          submission.templateLanguage = nextLanguage;
+          editor.setValue(nextTemplate);
+        } else {
+          submission.code = currentCode;
+        }
+      });
       tabs.forEach(t => t.addEventListener('click', () => loadChallenge(t.dataset.id)));
-      loadChallenge(activeChallengeId);
+      loadChallenge(activeChallengeId, true);
       lockWorkspaceUntilStart();
 
       startSessionBtn.addEventListener('click', () => {
@@ -544,10 +702,11 @@
 
           studentProfile = result.student;
           hasStarted = true;
-          rollNoInput.value = studentProfile.rollNo;
+          rollNoInput.value = studentProfile.rollNo.toUpperCase();
           studentSessionMeta.textContent = `${studentProfile.name} • ${studentProfile.department} • ${studentProfile.year}${studentProfile.section ? ` • ${studentProfile.section}` : ''}`;
           startModal.classList.add('hidden');
           unlockWorkspaceAfterStart();
+          setTimeout(() => { editor.refresh(); }, 50);
           document.documentElement.requestFullscreen().catch(() => {});
           addSecurityListeners();
           startSessionTimer();
@@ -598,15 +757,15 @@
       }
 
       document.getElementById('run-btn').addEventListener('click', async () => {
-        if (!hasStarted || isRunningCode || isSubmittingFinal) return;
-        isRunningCode = true;
+        if (!hasStarted || currentState !== STATE.IDLE) return;
+        currentState = STATE.RUNNING;
         forceOpenConsole();
         outputDiv.innerHTML = '<span class="text-white animate-pulse font-mono tracking-widest">Executing code...</span>';
         setStatus('Running', 'warn');
         setBusyState(
           runBtn,
           true,
-          '<span class="material-symbols-outlined text-[16px]">play_arrow</span> Run <span class="hidden xl:inline">Code</span>',
+          IDLE_RUN_HTML,
           '<span class="material-symbols-outlined animate-spin text-[16px]">sync</span> Please wait',
         );
 
@@ -619,10 +778,21 @@
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code, language: langSelect.value, input })
           });
-          const data = await res.json();
 
-          if(data.status === 'Compilation Error') {
-            outputDiv.innerHTML = `<span class="text-red-400"><strong>Compilation Error:</strong>\n${escapeHtml(data.output)}</span>`;
+          let data;
+          try {
+            data = await res.json();
+          } catch (parseErr) {
+            outputDiv.innerHTML = `<span class="text-red-400"><strong>Server Error:</strong>\nReceived a non-JSON response (HTTP ${res.status}). The execution service may be temporarily unavailable.</span>`;
+            setStatus('Error', 'err');
+            return;
+          }
+
+          if (!res.ok) {
+            outputDiv.innerHTML = `<span class="text-red-400"><strong>System Error:</strong>\n${escapeHtml(data.error || data.message || 'Execution Failed')}</span>`;
+            setStatus('Error', 'err');
+          } else if(data.status === 'Compilation Error' || data.status === 'Time Limit Exceeded' || data.status === 'Runtime Error') {
+            outputDiv.innerHTML = `<span class="text-red-400"><strong>${escapeHtml(data.status)}:</strong>\n${escapeHtml(data.output)}</span>`;
             setStatus('Error', 'err');
           } else {
              let expected = chal.sampleTest ? chal.sampleTest.expectedOutput.trim() : '';
@@ -645,42 +815,51 @@
           outputDiv.innerHTML = `<span class="text-red-400">Network Trace Error: ${e.message}</span>`;
           setStatus('Error', 'err');
         } finally {
-          isRunningCode = false;
+          outputDiv.scrollTop = outputDiv.scrollHeight;
+          if (currentState === STATE.RUNNING) {
+            currentState = STATE.IDLE;
+          }
           setBusyState(
             runBtn,
             false,
-            '<span class="material-symbols-outlined text-[16px]">play_arrow</span> Run <span class="hidden xl:inline">Code</span>',
+            IDLE_RUN_HTML,
             '',
           );
         }
       });
 
       document.getElementById('final-submit-btn').addEventListener('click', async () => {
-        await submitFinal(false);
+        if (!hasStarted || currentState !== STATE.IDLE) return;
+        document.getElementById('submit-confirm-modal').classList.remove('hidden');
+        document.getElementById('submit-confirm-modal').classList.add('flex');
+      });
+
+      document.getElementById('cancel-submit-btn').addEventListener('click', () => {
+        document.getElementById('submit-confirm-modal').classList.add('hidden');
+        document.getElementById('submit-confirm-modal').classList.remove('flex');
+      });
+
+      document.getElementById('confirm-submit-btn').addEventListener('click', async () => {
+        document.getElementById('submit-confirm-modal').classList.add('hidden');
+        document.getElementById('submit-confirm-modal').classList.remove('flex');
+        await submitFinal(true);
       });
 
       async function submitFinal(isAutoSubmit) {
-        if (!hasStarted) {
-          return;
-        }
+        if (!hasStarted) return;
+        if (currentState === STATE.FINISHED || currentState === STATE.SUBMITTING) return;
 
-        if (hasSubmitted || isSubmittingFinal) return;
         if (!studentProfile || !studentProfile.rollNo) {
           forceOpenConsole();
           outputDiv.innerHTML = '<span class="text-red-400">Student details are missing. Please start the coding session again.</span>';
           setStatus('Error', 'err');
           return;
         }
-        if(!isAutoSubmit && !confirm('Are you absolutely certain? This will lock your answers and submit the test.')) return;
 
-        hasSubmitted = true;
-        isSubmittingFinal = true;
-        if (sessionTimerId) {
-          clearInterval(sessionTimerId);
-        }
+        currentState = STATE.SUBMITTING;
+        if (sessionTimerId) clearInterval(sessionTimerId);
 
-        submissions[activeChallengeId].code = editor.getValue();
-        submissions[activeChallengeId].language = langSelect.value;
+        syncActiveSubmission();
         
         forceOpenConsole();
         outputDiv.innerHTML = '<span class="text-white animate-pulse font-mono tracking-widest">Grading submission against hidden server test cases...</span>';
@@ -688,7 +867,7 @@
         setBusyState(
           finalSubmitBtn,
           true,
-          '<span class="material-symbols-outlined text-[18px]">publish</span> <span class="hidden sm:inline">Submit Final Test</span>',
+          IDLE_SUBMIT_HTML,
           '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> <span class="hidden sm:inline">Submitting...</span>',
         );
         runBtn.disabled = true;
@@ -713,38 +892,57 @@
           });
           
           if(res.ok) {
+            currentState = STATE.FINISHED;
             if (document.fullscreenElement) {
               document.exitFullscreen().catch(() => {});
             }
             outputDiv.innerHTML = `<span class="text-green-400 font-medium block mb-2">Test Successfully Archived! 🎉</span><div class="text-gray-500 text-xs">Your final score has been logged. You may close this window.</div>`;
             setStatus('Archived', 'ok');
-            setTimeout(() => { document.body.innerHTML = `<div class="h-screen w-full flex items-center justify-center bg-[#000] relative px-6"><div class="absolute inset-0 grid-bg pointer-events-none z-0"></div><div class="w-full max-w-lg text-center p-10 md:p-12 bg-[#0a0a0a] shadow-2xl rounded-3xl border border-white/10 relative z-10"><div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-white/10 bg-white/5"><span class="material-symbols-outlined text-white text-[34px] leading-none">task_alt</span></div><h1 class="text-3xl font-semibold text-white tracking-tight">Assessment Complete</h1><p class="mt-4 text-gray-400 text-sm leading-relaxed">Your coding test has been submitted successfully.</p><p class="text-gray-500 font-mono text-xs uppercase tracking-[0.35em] mt-5">Safe to exit</p></div></div>`; }, 3000);
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            
+            const overlay = document.getElementById('success-overlay');
+            const content = document.getElementById('success-content');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            
+            // Trigger animation
+            setTimeout(() => {
+              overlay.classList.remove('opacity-0');
+              content.classList.remove('translate-y-4', 'scale-95');
+            }, 50);
+            
+            lockWorkspaceUntilStart();
           } else {
             const data = await res.json();
             outputDiv.innerHTML = `<span class="text-red-400">${data.message || 'System fault during commit.'}</span>`;
             setStatus('Error', 'err');
-            hasSubmitted = false;
-            isSubmittingFinal = false;
+            currentState = STATE.IDLE;
           }
         } catch(e) {
           outputDiv.innerHTML = `<span class="text-red-400">Network fault: ${e.message}</span>`;
           setStatus('Error', 'err');
-          hasSubmitted = false;
-          isSubmittingFinal = false;
+          currentState = STATE.IDLE;
         } finally {
-          if (!hasSubmitted) {
+          if (currentState !== STATE.FINISHED) {
             setBusyState(
               finalSubmitBtn,
               false,
-              '<span class="material-symbols-outlined text-[18px]">publish</span> <span class="hidden sm:inline">Submit Final Test</span>',
+              IDLE_SUBMIT_HTML,
               '',
             );
             runBtn.disabled = false;
           }
         }
       }
-
-      function escapeHtml(unsafe) { return unsafe.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+      function escapeHtml(unsafe) { 
+        return String(unsafe)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;")
+          .replace(/`/g, "&#x60;"); 
+      }
     });
   </script>
 </body>

@@ -12,11 +12,11 @@
 
   <%- include('partials/tailwind-setup') %>
 </head>
-<body class="vc-admin flex h-screen overflow-hidden antialiased selection:bg-white/30">
+<body class="vc-admin flex min-h-screen flex-col md:h-screen md:flex-row overflow-x-hidden md:overflow-hidden antialiased selection:bg-white/30">
 
   <%- include('partials/admin-sidebar', { activePage: 'tests' }) %>
 
-  <main class="flex-1 flex flex-col relative overflow-hidden bg-[#000]">
+  <main class="flex-1 flex min-h-0 flex-col relative overflow-hidden bg-[#000]">
     <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
     <header class="h-16 glass-nav flex items-center justify-between px-6 lg:px-10 shrink-0 z-10 relative">
@@ -58,7 +58,7 @@
                 </select>
               </div>
                
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Number of Questions</label>
                   <input type="number" id="numQuestions" min="1" max="100" value="10" required 
@@ -77,7 +77,7 @@
                     class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white focus:bg-[#111] focus:border-white/30 transition-all outline-none">
               </div>
 
-              <button type="submit" class="w-full bg-white text-black hover:bg-gray-200 py-3 px-4 rounded-xl text-sm font-semibold transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98] flex justify-center items-center gap-2 mt-2">
+              <button type="submit" class="btn-primary btn-block mt-2">
                 <span class="material-symbols-outlined text-[18px]">add_link</span> Create Test
               </button>
             </form>
@@ -87,7 +87,7 @@
         <!-- Quick Access (2/3 width) -->
         <div class="xl:col-span-8 space-y-6">
           <div>
-            <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Manage Existing Tests</h1>
+            <h2 class="text-2xl font-semibold tracking-tight text-white mb-2">Manage Existing Tests</h2>
             <p class="text-gray-400 font-light text-sm">Open the dedicated page to view quiz links and results actions.</p>
           </div>
           
@@ -99,7 +99,7 @@
               <p class="mt-3 max-w-xl text-sm text-gray-400 leading-relaxed">
                 View all created quiz links on a separate page with actions for copying links, deleting tests, and opening results.
               </p>
-              <a href="/admin/tests/links" class="mt-6 inline-flex items-center gap-2 rounded-xl bg-white text-black hover:bg-gray-200 py-3 px-5 text-sm font-semibold transition-colors">
+              <a href="/admin/tests/links" class="btn-secondary mt-6">
                 Open Existing Tests
                 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
               </a>
@@ -112,6 +112,23 @@
   </main>
 
   <script>
+    function showToast(message, type = 'success') {
+      const existingToast = document.getElementById('vc-toast');
+      if (existingToast) existingToast.remove();
+      const toast = document.createElement('div');
+      toast.id = 'vc-toast';
+      const colors = type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400';
+      const icon = type === 'success' ? 'check_circle' : 'error';
+      toast.className = `fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-4 py-3 rounded-xl border ${colors} shadow-lg !backdrop-blur-md transform transition-all duration-300 translate-y-4 opacity-0`;
+      toast.innerHTML = `<span class="material-symbols-outlined text-[20px]">${icon}</span><p class="text-sm font-medium tracking-wide">${message}</p>`;
+      document.body.appendChild(toast);
+      requestAnimationFrame(() => { toast.classList.remove('translate-y-4', 'opacity-0'); });
+      setTimeout(() => {
+        toast.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
     async function getErrorMessage(res, fallback) {
       try {
         const data = await res.json();
@@ -125,29 +142,39 @@
       e.preventDefault();
       const btn = e.target.querySelector('button[type="submit"]');
       const originalText = btn.innerHTML;
-      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Processing...';
       btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Processing...';
 
-      const b = document.getElementById('bankId').value;
-      const n = document.getElementById('numQuestions').value;
-      const d = document.getElementById('duration').value;
-      const eHours = document.getElementById('linkExpiryHours').value;
-      const res = await fetch('/api/tests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ questionBankId: b, numQuestions: n, duration: d, linkExpiryHours: eHours }) });
-      if(res.ok) window.location.reload(); 
-      else { alert(await getErrorMessage(res, 'Error generating session link.')); btn.innerHTML = originalText; btn.disabled = false; }
+      const bankId = document.getElementById('bankId').value;
+      const numQuestions = document.getElementById('numQuestions').value;
+      const duration = document.getElementById('duration').value;
+      const linkExpiryHours = document.getElementById('linkExpiryHours').value;
+
+      try {
+        const res = await fetch('/api/tests', { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify({ 
+            questionBankId: bankId, 
+            numQuestions: Number(numQuestions), 
+            duration: Number(duration), 
+            linkExpiryHours: Number(linkExpiryHours) 
+          }) 
+        });
+        
+        if (res.ok) window.location.reload(); 
+        else { 
+          showToast(await getErrorMessage(res, 'Error generating session link.'), 'error');
+          btn.innerHTML = originalText; 
+          btn.disabled = false; 
+        }
+      } catch (err) {
+        showToast('Network error: ' + err.message, 'error');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
     });
 
-    async function deleteTest(id, button) {
-      if(confirm('Terminate session? This deletes the link and all associated attempt results immediately.')) {
-        if (button) button.disabled = true;
-        const res = await fetch(`/api/tests/${id}`, { method: 'DELETE' });
-        if(res.ok) window.location.reload();
-        else {
-          if (button) button.disabled = false;
-          alert(await getErrorMessage(res, 'Failed to delete test.'));
-        }
-      }
-    }
   </script>
 </body>
 </html>

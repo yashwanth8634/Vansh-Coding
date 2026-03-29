@@ -12,10 +12,10 @@
 
   <%- include('partials/tailwind-setup') %>
 </head>
-<body class="vc-admin flex h-screen overflow-hidden antialiased selection:bg-white/30">
+<body class="vc-admin flex min-h-screen flex-col md:h-screen md:flex-row overflow-x-hidden md:overflow-hidden antialiased selection:bg-white/30">
   <%- include('partials/admin-sidebar', { activePage: 'tests-links' }) %>
 
-  <main class="flex-1 flex flex-col relative overflow-hidden bg-[#000]">
+  <main class="flex-1 flex min-h-0 flex-col relative overflow-hidden bg-[#000]">
     <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
     <header class="h-16 glass-nav flex items-center justify-between px-6 lg:px-10 shrink-0 z-10 relative">
@@ -38,13 +38,13 @@
             <h1 class="text-2xl font-semibold tracking-tight text-white mb-2">Existing Tests</h1>
             <p class="text-gray-400 font-light text-sm">List of active test links.</p>
           </div>
-          <a href="/admin/tests" class="inline-flex items-center gap-2 rounded-lg bg-white text-black hover:bg-gray-200 px-4 py-2.5 text-sm font-semibold transition-colors">
+          <a href="/admin/tests" class="btn-secondary btn-sm">
             <span class="material-symbols-outlined text-[18px]">add_link</span>
             Create Test
           </a>
         </div>
 
-        <div class="glass-card rounded-2xl p-2 h-max max-h-[calc(100vh-220px)] overflow-y-auto">
+        <div class="glass-card rounded-2xl p-2 h-max md:max-h-[calc(100vh-220px)] overflow-y-auto">
           <div class="space-y-2 p-2">
             <% tests.forEach(t => { %>
               <div class="bg-black/40 border border-white/5 hover:border-white/10 hover:bg-white/5 p-5 rounded-xl flex flex-col gap-4 transition-all group">
@@ -52,21 +52,22 @@
                   <div>
                     <strong class="text-base font-medium text-white block mb-1"><%= t.questionBank ? t.questionBank.title : 'Unknown Bank' %></strong>
                     <div class="flex items-center gap-2 text-xs">
-                      <span class="inline-block w-2 h-2 rounded-full <%= new Date() > new Date(t.linkExpiresAt) ? 'bg-red-500' : 'bg-green-500 animate-pulse' %>"></span>
-                      <span class="text-gray-400">Expires: <%= new Date(t.linkExpiresAt).toLocaleString() %></span>
+                      <% const expires = t.linkExpiresAt ? new Date(t.linkExpiresAt) : null; %>
+                      <span class="inline-block w-2 h-2 rounded-full <%= expires && new Date() > expires ? 'bg-red-500' : 'bg-green-500 animate-pulse' %>"></span>
+                      <span class="text-gray-400">Expires: <%= expires && !isNaN(expires) ? expires.toLocaleString('en-IN') : '—' %></span>
                     </div>
                   </div>
                   <div class="flex items-center gap-2 shrink-0">
-                    <a href="/admin/test/<%= t._id %>/results" class="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 hover:border-blue-500/40 px-4 py-2 rounded-lg text-xs font-medium transition-colors">View Results</a>
-                    <button onclick="deleteTest('<%= t._id %>', this)" class="bg-transparent text-gray-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 p-2 rounded-lg transition-colors flex items-center justify-center">
+                    <a href="/admin/test/<%= t._id %>/results" class="btn-secondary btn-sm">View Results</a>
+                    <button data-action="delete-test" data-id="<%= t._id %>" class="btn-danger btn-icon btn-sm" type="button" aria-label="Delete test">
                       <span class="material-symbols-outlined text-[18px]">delete</span>
                     </button>
                   </div>
                 </div>
 
                 <div class="bg-[#0a0a0a] border border-white/10 p-3 rounded-lg flex items-center justify-between">
-                  <a href="/test/<%= t.uniqueLink %>" target="_blank" class="text-gray-300 font-mono text-xs hover:text-white transition-colors truncate w-[80%]">/test/<%= t.uniqueLink %></a>
-                  <button onclick="navigator.clipboard.writeText(window.location.origin + '/test/<%= t.uniqueLink %>')" class="text-gray-500 hover:text-white transition-colors">
+                  <a href="/test/<%= t.uniqueLink %>" target="_blank" rel="noopener noreferrer" class="text-gray-300 font-mono text-xs hover:text-white transition-colors truncate flex-1 pr-3">/test/<%= t.uniqueLink %></a>
+                  <button data-action="copy-link" data-link="/test/<%= t.uniqueLink %>" class="btn-ghost btn-icon btn-sm" type="button" aria-label="Copy test link">
                     <span class="material-symbols-outlined text-[16px]">content_copy</span>
                   </button>
                 </div>
@@ -85,26 +86,95 @@
   </main>
 
   <script>
-    async function getErrorMessage(res, fallback) {
-      try {
-        const data = await res.json();
-        return data.message || fallback;
-      } catch (error) {
-        return fallback;
-      }
+    function showToast(message, type = 'success') {
+      const existingToast = document.getElementById('vc-toast');
+      if (existingToast) existingToast.remove();
+      const toast = document.createElement('div');
+      toast.id = 'vc-toast';
+      const colors = type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400';
+      const icon = type === 'success' ? 'check_circle' : 'error';
+      toast.className = `fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-4 py-3 rounded-xl border ${colors} shadow-lg !backdrop-blur-md transform transition-all duration-300 translate-y-4 opacity-0`;
+      toast.innerHTML = `<span class="material-symbols-outlined text-[20px]">${icon}</span><p class="text-sm font-medium tracking-wide">${message}</p>`;
+      document.body.appendChild(toast);
+      requestAnimationFrame(() => { toast.classList.remove('translate-y-4', 'opacity-0'); });
+      setTimeout(() => {
+        toast.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
     }
 
-    async function deleteTest(id, button) {
-      if (confirm('Terminate session? This deletes the link and all associated attempt results immediately.')) {
-        if (button) button.disabled = true;
-        const res = await fetch(`/api/tests/${id}`, { method: 'DELETE' });
-        if (res.ok) window.location.reload();
-        else {
-          if (button) button.disabled = false;
-          alert(await getErrorMessage(res, 'Failed to delete test.'));
+    function vcConfirm(message, proceedText, cancelText) {
+      return new Promise((resolve) => {
+        const bg = document.createElement('div');
+        bg.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4';
+        const box = document.createElement('div');
+        box.className = 'glass-card border border-white/10 rounded-2xl p-6 md:p-8 max-w-sm w-full shadow-2xl';
+        box.innerHTML = `
+          <h3 class="text-xl font-semibold text-white tracking-tight mb-2">Confirm Action</h3>
+          <p class="text-sm text-gray-400 mb-8 leading-relaxed">${message}</p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button id="vc-btn-cancel" class="btn-ghost flex-1 py-3 px-4">${cancelText}</button>
+            <button id="vc-btn-proceed" class="btn-secondary flex-1 py-3 px-4">${proceedText}</button>
+          </div>
+        `;
+        bg.appendChild(box);
+        document.body.appendChild(bg);
+        document.getElementById('vc-btn-cancel').onclick = () => { bg.remove(); resolve(false); };
+        document.getElementById('vc-btn-proceed').onclick = () => { bg.remove(); resolve(true); };
+      });
+    }
+
+    async function getErrorMessage(res, fallback) {
+      try { const data = await res.json(); return data.message || fallback; } 
+      catch { return fallback; }
+    }
+
+    document.addEventListener('click', async (e) => {
+      // Handle Delete Test
+      const delBtn = e.target.closest('[data-action="delete-test"]');
+      if (delBtn) {
+        const id = delBtn.dataset.id;
+        const confirmDelete = await vcConfirm('Terminate session? This deletes the link and all associated attempt results immediately.', 'Delete', 'Cancel');
+        if (!confirmDelete) return;
+
+        delBtn.disabled = true;
+        try {
+          const res = await fetch(`/api/tests/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            window.location.reload();
+          } else {
+            delBtn.disabled = false;
+            showToast(await getErrorMessage(res, 'Failed to delete test.'), 'error');
+          }
+        } catch (err) {
+          delBtn.disabled = false;
+          showToast('Network error while deleting.', 'error');
         }
       }
-    }
+
+      // Handle Copy Link
+      const copyBtn = e.target.closest('[data-action="copy-link"]');
+      if (copyBtn) {
+        const link = window.location.origin + copyBtn.dataset.link;
+        try {
+          await navigator.clipboard.writeText(link);
+          const icon = copyBtn.querySelector('.material-symbols-outlined');
+          if (icon) {
+            const originalIcon = icon.textContent;
+            icon.textContent = 'check';
+            copyBtn.classList.add('text-green-400');
+            setTimeout(() => {
+              icon.textContent = originalIcon;
+              copyBtn.classList.remove('text-green-400');
+            }, 2000);
+          }
+          showToast('Link copied to clipboard!');
+        } catch (err) {
+          showToast('Failed to copy. Clipboard requires HTTPS.', 'error');
+        }
+      }
+    });
+
   </script>
 </body>
 </html>

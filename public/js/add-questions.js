@@ -121,16 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const editButton = e.target.closest('[data-action="edit-question"]');
       if (!editButton) return;
 
-      const id = editButton.dataset.id;
-      const text = editButton.dataset.text;
-      const imageUrl = editButton.dataset.imageurl; // Get imageUrl
-      const options = [
-        editButton.dataset.opt1,
-        editButton.dataset.opt2,
-        editButton.dataset.opt3,
-        editButton.dataset.opt4,
-      ];
-      const correct = editButton.dataset.correct;
+      const q = JSON.parse(editButton.dataset.question);
+      const id = q._id;
+      const text = q.questionText;
+      const imageUrl = q.imageUrl || '';
+      const options = q.options;
+      const correct = q.correctAnswer;
 
       currentEditId = id;
       editQuestionIdInput.value = id;
@@ -146,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       formTitle.textContent = 'Edit Question';
       submitBtn.textContent = 'Update Question';
-      cancelEditBtn.style.display = 'inline-block';
+      cancelEditBtn.classList.remove('hidden');
       
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
@@ -160,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (imageUrlInput) {
     imageUrlInput.addEventListener('input', () => {
       const value = imageUrlInput.value.trim();
-      if (!value) {
+      if (!value || (!value.startsWith('http://') && !value.startsWith('https://'))) {
         imagePreviewWrap.classList.add('hidden');
         imagePreview.removeAttribute('src');
         return;
@@ -209,7 +205,11 @@ document.addEventListener('DOMContentLoaded', () => {
             questionDiv.remove();
           }
           // Update the count
-          questionCount.textContent = parseInt(questionCount.textContent, 10) - 1;
+          const newCount = parseInt(questionCount.textContent, 10) - 1;
+          questionCount.textContent = newCount;
+          if (newCount === 0) {
+            questionList.innerHTML = `<p id="no-questions-message" class="text-gray-500 p-3">No questions have been added to this bank yet.</p>`;
+          }
           messageDiv.textContent = result.message;
           messageDiv.classList.add('text-green-600');
 
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.reset();
     formTitle.textContent = 'Add a New Question';
     submitBtn.textContent = 'Add Question';
-    cancelEditBtn.style.display = 'none';
+    cancelEditBtn.classList.add('hidden');
     messageDiv.textContent = '';
     editQuestionIdInput.value = '';
     imageUrlInput.value = ''; // Reset image URL field
@@ -274,9 +274,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    const imageHTML = q.imageUrl 
+    const imageHTML = q.imageUrl && (q.imageUrl.startsWith('http://') || q.imageUrl.startsWith('https://'))
       ? `<img src="${q.imageUrl}" alt="Question Image" class="w-full max-h-40 object-cover rounded-md mb-3">` 
       : '';
+
+    const qStr = JSON.stringify(q).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
     // Added the delete button here
     questionDiv.innerHTML = `
@@ -288,14 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="flex items-center space-x-3 mt-2">
         <button 
           data-action="edit-question"
-          data-id="${q._id}"
-          data-text="${q.questionText}"
-          data-imageurl="${q.imageUrl || ''}"
-          data-opt1="${q.options[0]}"
-          data-opt2="${q.options[1]}"
-          data-opt3="${q.options[2]}"
-          data-opt4="${q.options[3]}"
-          data-correct="${q.correctAnswer}"
+          data-question="${qStr}"
           class="text-gray-500 hover:text-indigo-600 transition-colors"
           title="Edit Question">
           <span class="material-symbols-outlined">edit</span>

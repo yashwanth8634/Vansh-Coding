@@ -1,5 +1,31 @@
 // public/js/test.js
 document.addEventListener('DOMContentLoaded', () => {
+    const escapeHtml = (str) => {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    };
+
+    function vcConfirm(message, proceedText, cancelText) {
+      return new Promise((resolve) => {
+        const bg = document.createElement('div');
+        bg.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4';
+        const box = document.createElement('div');
+        box.className = 'glass-card border border-white/10 rounded-2xl p-6 md:p-8 max-w-sm w-full shadow-2xl';
+        box.innerHTML = `
+          <h3 class="text-xl font-semibold text-white tracking-tight mb-2">Confirm Action</h3>
+          <p class="text-sm text-gray-400 mb-8 leading-relaxed">${escapeHtml(message)}</p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button id="vc-btn-cancel" class="btn-ghost flex-1 py-3 px-4">${escapeHtml(cancelText)}</button>
+            <button id="vc-btn-proceed" class="btn-secondary flex-1 py-3 px-4">${escapeHtml(proceedText)}</button>
+          </div>
+        `;
+        bg.appendChild(box);
+        document.body.appendChild(bg);
+        document.getElementById('vc-btn-cancel').onclick = () => { bg.remove(); resolve(false); };
+        document.getElementById('vc-btn-proceed').onclick = () => { bg.remove(); resolve(true); };
+      });
+    }
+
   // Page sections
   const loginContainer = document.getElementById('login-container');
   const testContainer = document.getElementById('test-container');
@@ -75,8 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       pendingStudentDetails = { uniqueLink, name, rollNo, department, year, section, collegeName };
+      loginError.classList.add('hidden');
+      loginError.textContent = '';
       startTestForm.classList.add('hidden');
       rulesScreen.classList.remove('hidden');
+      rulesScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }
 
@@ -127,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setButtonLoading(
           confirmRulesBtn,
           false,
-          'I Agree, Start Test<span class="material-symbols-outlined text-[18px]">arrow_forward</span>',
+          'I Agree, Start Test <span class="material-symbols-outlined text-[18px]">arrow_forward</span>',
           '',
         );
       }
@@ -160,15 +189,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const optionsHtml = q.options.map((option, optIdx) => `
         <label class="block p-4 border border-white/10 bg-[#0a0a0a] rounded-xl hover:bg-[#111] hover:border-white/30 cursor-pointer transition-all duration-200 group">
           <div class="flex items-center">
-            <input type="radio" name="question-${q._id}" value="${option}" class="w-5 h-5 bg-black border-white/20 text-white focus:ring-1 focus:ring-white/30 focus:ring-offset-0 focus:ring-offset-transparent">
-            <span class="ml-4 font-medium text-gray-300 text-sm group-hover:text-white">${option}</span>
+            <input type="radio" name="question-${q._id}" value="${escapeHtml(option)}" class="w-5 h-5 bg-black border-white/20 text-white focus:ring-1 focus:ring-white/30 focus:ring-offset-0 focus:ring-offset-transparent">
+            <span class="ml-4 font-medium text-gray-300 text-sm group-hover:text-white">${escapeHtml(option)}</span>
           </div>
         </label>
       `).join('');
 
       // Add image HTML if it exists
-      const imageHTML = q.imageUrl
-        ? `<img src="${q.imageUrl}" alt="Question Content" class="w-full rounded-lg mb-6 max-h-72 object-contain border border-white/10">`
+      const safeImgq = q.imageUrl && (q.imageUrl.startsWith('https://') || q.imageUrl.startsWith('http://')) ? q.imageUrl : '';
+      const imageHTML = safeImgq
+        ? `<img src="${safeImgq}" alt="Question Content" class="w-full rounded-lg mb-6 max-h-72 object-contain border border-white/10">`
         : '';
 
       // Create question card
@@ -178,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
       questionCard.innerHTML = `
         ${imageHTML}
         <h3 class="text-xl md:text-2xl font-semibold mb-8 text-white leading-relaxed tracking-tight">
-          <span class="text-gray-500 mr-2 font-mono text-sm">Q${index + 1}.</span> ${q.questionText}
+          <span class="text-gray-500 mr-2 font-mono text-sm">Q${index + 1}.</span> ${escapeHtml(q.questionText)}
         </h3>
         <div class="space-y-3" data-question-id="${q._id}">
           ${optionsHtml}
@@ -277,14 +307,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('fullscreenchange', () => {
       if (!document.fullscreenElement && !testIsSubmitted) {
         handleWarning();
-        document.documentElement.requestFullscreen().catch();
+        setTimeout(() => {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }, 100);
       }
     });
   }
 
   // --- 6. HANDLE WARNINGS ---
+  let warningLastTriggered = 0;
   function handleWarning() {
     if (testIsSubmitted) return;
+    const now = Date.now();
+    if (now - warningLastTriggered < 2000) return;
+    warningLastTriggered = now;
     warningCount++;
     
     if (warningCount === 1) {
@@ -310,9 +346,10 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // --- 7. SUBMIT TEST LOGIC ---
   if(submitTestBtn) {
-    submitTestBtn.addEventListener('click', () => {
+    submitTestBtn.addEventListener('click', async () => {
       if (isSubmittingTest) return;
-      if (confirm('Are you sure you want to submit your test?')) {
+      const confirmed = await vcConfirm('Are you sure you want to submit your test?', 'Submit', 'Cancel');
+      if (confirmed) {
         forceSubmitTest('You have submitted the test.');
       }
     });
@@ -371,8 +408,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- 8. DISPLAY RESULTS (UPDATED) ---
   function displayResults(results) {
-    testContainer.style.display = 'none';
-    resultsContainer.style.display = 'flex';
+    testContainer.classList.add('hidden');
+    resultsContainer.classList.remove('hidden');
+    resultsContainer.classList.add('flex');
     if(warningModal) warningModal.style.display = 'none';
 
     scoreDisplay.textContent = `You Scored: ${results.score} / ${results.total}`;
@@ -388,31 +426,32 @@ document.addEventListener('DOMContentLoaded', () => {
           answerHtml = `
             <div class="mt-4 p-4 bg-[#050505] rounded-xl border border-white/10">
               <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Your Answer (Correct)</span>
-              <span class="text-white font-medium text-sm">${item.selectedOption || 'Not Answered'}</span>
+              <span class="text-white font-medium text-sm">${escapeHtml(item.selectedOption) || 'Not Answered'}</span>
             </div>`;
         } else {
           answerHtml = `
             <div class="mt-4 flex flex-col md:flex-row gap-3">
               <div class="flex-1 p-4 bg-[#050505] rounded-xl border border-red-500/20">
                 <span class="text-[10px] font-mono uppercase tracking-widest text-red-400 block mb-1">Your Answer</span>
-                <span class="text-gray-500 font-medium text-sm line-through">${item.selectedOption || 'Not Answered'}</span>
+                <span class="text-gray-500 font-medium text-sm line-through">${escapeHtml(item.selectedOption) || 'Not Answered'}</span>
               </div>
               <div class="flex-1 p-4 bg-[#050505] rounded-xl border border-green-500/20">
                 <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Correct Answer</span>
-                <span class="text-white font-medium text-sm">${item.correctAnswer}</span>
+                <span class="text-white font-medium text-sm">${escapeHtml(item.correctAnswer)}</span>
               </div>
             </div>`;
         }
         
-        const imageHTML = item.imageUrl
-          ? `<img src="${item.imageUrl}" alt="Question Content" class="w-full rounded-lg mb-5 max-h-64 object-contain border border-white/10">`
+        const safeImg = item.imageUrl && (item.imageUrl.startsWith('https://') || item.imageUrl.startsWith('http://')) ? item.imageUrl : '';
+        const imageHTML = safeImg
+          ? `<img src="${safeImg}" alt="Question Content" class="w-full rounded-lg mb-5 max-h-64 object-contain border border-white/10">`
           : '';
 
         const resultCard = document.createElement('div');
         resultCard.className = `p-6 border ${borderColor} ${bgColor} rounded-xl bg-[#0a0a0a]`;
         resultCard.innerHTML = `
             ${imageHTML}
-            <h4 class="font-medium text-sm text-gray-200 leading-relaxed"><span class="text-gray-500 mr-2 font-mono">Q${index + 1}.</span> ${item.questionText}</h4>
+            <h4 class="font-medium text-sm text-gray-200 leading-relaxed"><span class="text-gray-500 mr-2 font-mono">Q${index + 1}.</span> ${escapeHtml(item.questionText)}</h4>
             ${answerHtml}
         `;
         resultsBreakdown.appendChild(resultCard);

@@ -23,7 +23,7 @@
         <span class="material-symbols-outlined text-white text-[32px]">task_alt</span>
       </div>
       <h1 class="text-3xl font-semibold text-white tracking-tight mb-2">Mr & Ms Coder Quiz Submitted</h1>
-      <p class="text-gray-400 font-medium uppercase tracking-widest text-xs mb-6"><%= attempt.questionBank ? attempt.questionBank.title : 'Question Bank' %></p>
+      <p class="text-gray-400 font-medium uppercase tracking-widest text-xs mb-6"><%= (attempt.questionBank && attempt.questionBank.title) ? attempt.questionBank.title : 'Question Bank' %></p>
       
       <div class="inline-block bg-[#0a0a0a] border border-white/10 px-8 py-5 rounded-xl">
         <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-2">Score</p>
@@ -48,7 +48,7 @@
         const borderColor = isCorrect ? 'border-green-500/20' : 'border-red-500/20';
       %>
         <div class="p-6 border <%= borderColor %> <%= bgColor %> rounded-xl bg-[#0a0a0a]">
-          <% if(q.imageUrl) { %>
+          <% if(q.imageUrl && (q.imageUrl.startsWith('https://') || q.imageUrl.startsWith('http://'))) { %>
             <img src="<%= q.imageUrl %>" alt="Question Content" class="w-full rounded-lg mb-5 max-h-64 object-contain border border-white/10">
           <% } %>
           <h4 class="font-medium text-sm text-gray-200 leading-relaxed">
@@ -74,6 +74,9 @@
           <% } %>
         </div>
       <% }); %>
+    </div>
+    <div class="text-center mt-10 relative z-10">
+      <a href="/" class="text-gray-500 hover:text-white text-sm font-medium transition-colors">← Back to Home</a>
     </div>
   </div>
 

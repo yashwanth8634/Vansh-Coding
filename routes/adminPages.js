@@ -282,10 +282,25 @@ router.get('/coding/results/:testId', protect, async (req, res) => {
     // Get attempts, select answers for detailed code view
     const attempts = await CodingAttempt.find({ codingTest: test._id })
         .populate('answers.challenge', 'title')
-        .sort({ submittedAt: -1 })
         .lean();
+
+    const rankedAttempts = attempts
+      .map((attempt) => ({
+        ...attempt,
+        solvedCount: (attempt.answers || []).filter((answer) => answer.status === 'Accepted').length,
+      }))
+      .sort((a, b) => {
+        if (b.solvedCount !== a.solvedCount) {
+          return b.solvedCount - a.solvedCount;
+        }
+        return new Date(a.submittedAt) - new Date(b.submittedAt);
+      })
+      .map((attempt, index) => ({
+        ...attempt,
+        rank: index + 1,
+      }));
         
-    res.render('coding-results', { test, attempts, activeTab: 'coding-tests' });
+    res.render('coding-results', { test, attempts: rankedAttempts, activeTab: 'coding-tests' });
   } catch (error) {
     console.error(error);
     res.status(500).send('Error loading coding results page');

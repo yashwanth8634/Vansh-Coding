@@ -1,5 +1,10 @@
 // public/js/test-results.js
 document.addEventListener('DOMContentLoaded', () => {
+    const escapeHtml = (str) => {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    };
+
     // --- Page Elements ---
     const searchForm = document.getElementById('search-form');
     const searchInput = document.getElementById('search-rollno');
@@ -71,13 +76,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Render Table ---
     function renderTable(attempts, isInitial = false) {
+        const rankedAttempts = [...attempts].sort((a, b) => {
+            if ((b.score ?? 0) !== (a.score ?? 0)) {
+                return (b.score ?? 0) - (a.score ?? 0);
+            }
+            return new Date(a.submittedAt) - new Date(b.submittedAt);
+        });
+
         tableBody.innerHTML = ''; 
         
         if (!isInitial) { // Only clear cache if it's a new search
             searchResultsData = {};
         }
         
-        if (attempts.length === 0) {
+        if (rankedAttempts.length === 0) {
             tableBody.innerHTML = `
                 <tr id="no-results-row">
                     <td colspan="4" class="p-4 text-center text-gray-500">
@@ -89,9 +101,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        attemptCount.textContent = attempts.length;
+        attemptCount.textContent = rankedAttempts.length;
         
-        attempts.forEach(attempt => {
+        rankedAttempts.forEach(attempt => {
             if (!isInitial) {
                 searchResultsData[attempt.studentRollNo] = attempt;
             }
@@ -194,19 +206,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     marker = ' (Your Answer)';
                 }
 
-                return `<li class="${styles}">${option}${marker}</li>`;
+                return `<li class="${styles}">${escapeHtml(option)}${marker}</li>`;
             }).join('');
 
-            // Add image HTML if it exists
-            const imageHTML = answer.imageUrl
-                ? `<img src="${answer.imageUrl}" alt="Question Content" class="w-full rounded-lg mb-3 max-h-48 object-contain border border-white/10">`
+            // Add image HTML if it exists securely
+            const safeUrl = answer.imageUrl && (answer.imageUrl.startsWith('http://') || answer.imageUrl.startsWith('https://')) ? answer.imageUrl : '';
+            const imageHTML = safeUrl
+                ? `<img src="${safeUrl}" alt="Question Content" class="w-full rounded-lg mb-3 max-h-48 object-contain border border-white/10">`
                 : '';
 
             const questionCard = document.createElement('div');
             questionCard.className = `p-4 border ${borderColor} ${bgColor} rounded-lg bg-[#050505]`;
             questionCard.innerHTML = `
                 ${imageHTML}
-                <p class="font-semibold text-lg text-white">${index + 1}. ${answer.questionText}</p>
+                <p class="font-semibold text-lg text-white">${index + 1}. ${escapeHtml(answer.questionText)}</p>
                 <ul class="list-disc list-inside mt-2 space-y-1">
                     ${optionsHtml}
                 </ul>

@@ -71,17 +71,22 @@ const gracefulShutdown = (signal) => {
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-// --- Start the Server only after DB connection ---
-const startServer = async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error.message);
-    process.exit(1);
-  }
-};
+// --- Start the Server only if not in Vercel environment ---
+if (!process.env.VERCEL) {
+  const startServer = async () => {
+    try {
+      await connectDB();
+      app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+      });
+    } catch (error) {
+      console.error('Failed to start server:', error.message);
+      process.exit(1);
+    }
+  };
 
-startServer();
+  startServer();
+}
+
+// Export the app for Vercel serverless functions
+module.exports = app;
