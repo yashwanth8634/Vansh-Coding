@@ -13,9 +13,10 @@ if (isRedisConfigured) {
       url: process.env.UPSTASH_REDIS_REST_URL,
       token: process.env.UPSTASH_REDIS_REST_TOKEN,
     });
-    console.log('Redis Cache Initialized (Upstash)');
+    console.log('Redis Cache initialized (Upstash)');
   } catch (error) {
-    console.error('Failed to initialize Redis:', error.message);
+    console.error('Redis Initial Connection Error:', error.message);
+    redis = null; // Ensure we fall back if init fails
   }
 } else {
   console.log('Using Local Memory Cache (NodeCache fallback)');
@@ -34,37 +35,75 @@ const localCaches = {
 const createCacheInterface = (namespace, stdTTL) => ({
   get: async (key) => {
     if (redis) {
-      return await redis.get(`${namespace}:${key}`);
+      try {
+        const val = await redis.get(`${namespace}:${key}`);
+        return val ?? undefined; // normalize null → undefined
+      } catch (err) {
+        console.error(`Redis get failed [${namespace}:${key}]:`, err.message);
+      }
     }
     return localCaches[namespace].get(key);
   },
   set: async (key, value, ttl = stdTTL) => {
     if (redis) {
-      // Upstash uses seconds for EX (default for NodeCache is also seconds)
-      return await redis.set(`${namespace}:${key}`, value, { ex: ttl });
+      try {
+        return await redis.set(`${namespace}:${key}`, value, { ex: ttl });
+      } catch (err) {
+        console.error(`Redis set failed [${namespace}:${key}]:`, err.message);
+      }
     }
     return localCaches[namespace].set(key, value, ttl);
   },
   del: async (key) => {
     if (redis) {
-      return await redis.del(`${namespace}:${key}`);
+      try {
+        return await redis.del(`${namespace}:${key}`);
+      } catch (err) {
+        console.error(`Redis del failed [${namespace}:${key}]:`, err.message);
+      }
     }
     return localCaches[namespace].del(key);
   },
   flushAll: async () => {
     if (redis) {
-      // Caution: flushall clears the entire DB. 
-      // For Upstash Free tier, this is usually what you want if using one DB.
-      // Alternatively, we could scan and delete by prefix, but flushall is simpler for this use case.
-      return await redis.flushall();
+      try {
+        let cursor = 0;
+        do {
+          const [nextCursor, keys] = await redis.scan(cursor, {
+            match: `${namespace}:*`,
+            count: 100,
+          });
+          cursor = Number(nextCursor);
+          if (keys && keys.length) {
+            await redis.del(...keys);
+          }
+        } while (cursor !== 0);
+        return;
+      } catch (err) {
+        console.error(`Redis flushAll failed [${namespace}]:`, err.message);
+      }
     }
     return localCaches[namespace].flushAll();
   },
-  // Added helper for warmup route
   keys: async () => {
     if (redis) {
-      // Note: Upstash doesn't support glob keys() in the same way, but we can approximate or return []
-      return []; 
+      try {
+        const keys = [];
+        let cursor = 0;
+        do {
+          const [nextCursor, batch] = await redis.scan(cursor, {
+            match: `${namespace}:*`,
+            count: 100,
+          });
+          cursor = Number(nextCursor);
+          if (batch && batch.length) {
+            keys.push(...batch);
+          }
+        } while (cursor !== 0);
+        return keys;
+      } catch (err) {
+        console.error(`Redis keys failed [${namespace}]:`, err.message);
+      }
     }
     return localCaches[namespace].keys();
   }
@@ -106,8 +145,6 @@ const invalidateQuestionData = async () => {
   await invalidatePages();
 };
 
-const invalidatePagesCache = async () => await caches.pages.flushAll();
-
 module.exports = {
   caches,
   invalidateTest,
@@ -118,5 +155,4 @@ module.exports = {
   invalidatePages,
   invalidateUser,
   invalidateQuestionData,
-  invalidatePagesCache, // Added for codingAdmin usage
 };

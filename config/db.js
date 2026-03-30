@@ -21,9 +21,10 @@ const connectDB = async () => {
       // This prevents hitting the 500 connection limit on MongoDB Free Tier.
       globalMongo.promise = mongoose.connect(MONGO_URI, {
         maxPoolSize: 1, 
-        serverSelectionTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 10000,
         socketTimeoutMS: 45000,
       });
+      console.log('Attempting to connect to MongoDB...');
     }
 
     const connection = await globalMongo.promise;
@@ -33,6 +34,9 @@ const connectDB = async () => {
   } catch (err) {
     globalMongo.promise = null;
     console.error('MongoDB Connection Error:', err.message);
+    if (err.name === 'MongooseServerSelectionError') {
+      console.error('TIP: Check your Atlas IP allow-list or network connectivity.');
+    }
     throw err;
   }
 };

@@ -10,6 +10,7 @@ const testRoutes = require('./test');
 const questionRoutes = require('./questions');
 const codingAdminRoutes = require('./codingAdmin');
 const codingStudentRoutes = require('./codingStudent');
+const healthRoutes = require('./health');
 
 // Mount sub-routers at their respective prefixes
 router.use('/admin', adminRoutes);       // /api/admin/*
@@ -17,6 +18,7 @@ router.use('/', testRoutes);             // /api/banks/*, /api/tests/*, /api/tes
 router.use('/questions', questionRoutes); // /api/questions/*
 router.use('/coding/admin', codingAdminRoutes); // /api/coding/admin/*
 router.use('/coding/student', codingStudentRoutes); // /api/coding/student/*
+router.use('/', healthRoutes);           // /api/health
 
 router.get('/warmup', async (req, res) => {
   try {

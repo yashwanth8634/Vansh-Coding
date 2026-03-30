@@ -19,31 +19,37 @@ async function getActiveTests() {
   const now = new Date();
   const [quizTests, codingTests] = await Promise.all([
     Test.find({ linkExpiresAt: { $gt: now } })
-      .populate('questionBank', 'title')
+      .select('questionBank duration uniqueLink linkExpiresAt createdAt')
+      .populate('questionBank', 'title text description') // Populate only needed fields if bank was larger
       .sort({ createdAt: -1 })
       .lean(),
     CodingTest.find({ linkExpiresAt: { $gt: now } })
-      .populate('codingBank', 'title')
+      .select('codingBank durationMinutes uniqueLink linkExpiresAt createdAt')
+      .populate('codingBank', 'title description')
       .sort({ createdAt: -1 })
       .lean(),
   ]);
 
+  const LOCALE = 'en-IN';
+
   const activeQuizTests = quizTests.map((test) => ({
     id: test._id,
-    title: test.questionBank ? test.questionBank.title : 'Quiz Test',
+    title: test.questionBank?.title || 'Quiz Test',
     type: 'Quiz',
     duration: test.duration,
     link: `/test/${test.uniqueLink}`,
     expiresAt: test.linkExpiresAt,
+    expiryText: test.linkExpiresAt ? new Date(test.linkExpiresAt).toLocaleString(LOCALE, { dateStyle: 'medium', timeStyle: 'short' }) : 'No expiry set',
   }));
 
   const activeCodingTests = codingTests.map((test) => ({
     id: test._id,
-    title: test.codingBank ? test.codingBank.title : 'Coding Test',
+    title: test.codingBank?.title || 'Coding Test',
     type: 'Coding',
     duration: test.durationMinutes,
     link: `/coding/test/${test.uniqueLink}`,
     expiresAt: test.linkExpiresAt,
+    expiryText: test.linkExpiresAt ? new Date(test.linkExpiresAt).toLocaleString(LOCALE, { dateStyle: 'medium', timeStyle: 'short' }) : 'No expiry set',
   }));
 
   const result = [...activeQuizTests, ...activeCodingTests].sort(
