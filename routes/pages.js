@@ -7,8 +7,15 @@ const adminPages = require('./adminPages');
 const testPages = require('./testPages');
 const Test = require('../models/Test');
 const CodingTest = require('../models/CodingTest');
+const { caches } = require('../utils/cache');
 
 async function getActiveTests() {
+  const cacheKey = 'active-tests-list';
+  const cachedData = await caches.pages.get(cacheKey).catch(() => null);
+  
+  if (cachedData) {
+    return cachedData;
+  }
   const now = new Date();
   const [quizTests, codingTests] = await Promise.all([
     Test.find({ linkExpiresAt: { $gt: now } })
@@ -39,9 +46,13 @@ async function getActiveTests() {
     expiresAt: test.linkExpiresAt,
   }));
 
-  return [...activeQuizTests, ...activeCodingTests].sort(
+  const result = [...activeQuizTests, ...activeCodingTests].sort(
     (a, b) => new Date(a.expiresAt) - new Date(b.expiresAt),
   );
+
+  // Cache for 2 minutes
+  await caches.pages.set(cacheKey, result).catch(() => null);
+  return result;
 }
 
 // GET / - Homepage Marketing Landing

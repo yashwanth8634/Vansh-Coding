@@ -7,37 +7,15 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Playfair+Display:wght@700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" rel="stylesheet" />
   <%- include('partials/tailwind-setup') %>
 </head>
 <body class="font-brand bg-[radial-gradient(1200px_700px_at_-10%_-20%,rgba(239,77,141,0.16),transparent_50%),radial-gradient(1000px_600px_at_110%_-10%,rgba(33,197,165,0.16),transparent_55%),radial-gradient(900px_500px_at_50%_120%,rgba(127,109,255,0.14),transparent_55%),#f7f6f3] text-[#1c1a18] selection:bg-emerald-200/70">
 
   <div class="fixed inset-0 soft-grid pointer-events-none z-0"></div>
 
-  <nav class="sticky top-0 z-40 border-b border-black/5 bg-white/50 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-5 md:px-8 py-4 md:py-0 min-h-24 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center w-20 md:w-52">
-        <img src="/images/1.png" alt="Vansh2k26 Logo" class="h-12 md:h-20 w-auto object-contain">
-      </div>
-
-      <div class="hidden md:flex items-center gap-8 text-sm font-bold text-stone-700">
-        <a href="#about" class="hover:text-stone-900 transition-colors">About</a>
-        <a href="#format" class="hover:text-stone-900 transition-colors">Format</a>
-        <a href="#rules" class="hover:text-stone-900 transition-colors">Rules</a>
-        <a href="#highlights" class="hover:text-stone-900 transition-colors">Highlights</a>
-      </div>
-
-      <div class="flex items-center justify-end gap-3 ml-auto md:ml-0 md:w-52 lg:w-56">
-        <a
-          href="/active-tests"
-          class="btn-pill"
-        >
-          Active Tests
-        </a>
-      </div>
-    </div>
-  </nav>
+  <%- include('partials/navbar', { isHome: true }) %>
 
   <main class="relative z-10">
     <section class="px-5 md:px-8 pt-8 md:pt-12 pb-20">
@@ -79,7 +57,7 @@
             
 
             <div class="mt-5 rounded-2xl border border-stone-200 bg-white/80 p-3">
-              <img src="/images/2.png" alt="Mr and Ms Coder Hero" class="w-full h-auto object-cover rounded-xl">
+              <img src="/images/2.png" alt="Mr and Ms Coder Hero" class="w-full h-auto object-cover rounded-xl" loading="lazy">
             </div>
 
             <div class="mt-6 grid grid-cols-2 gap-3">

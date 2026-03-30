@@ -42,16 +42,9 @@ app.use(express.static(path.join(__dirname, 'public'), {
   lastModified: true,
 }));
 
-// --- Database Connection Middleware (Standard for Serverless) ---
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (err) {
-    console.error('Database connection error:', err.message);
-    res.status(500).json({ message: 'Database connection failed' });
-  }
-});
+// Initialize DB connection immediately (Non-blocking for server startup)
+// Mongoose buffers queries until the connection is established.
+connectDB().catch(err => console.error('Initial DB connection error:', err.message));
 
 // ===================================
 // --- ROUTES ---

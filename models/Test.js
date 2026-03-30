@@ -28,8 +28,11 @@ const testSchema = new mongoose.Schema({
   linkExpiresAt: {
     type: Date,
     required: true,
+    index: true, // Speed up active test filtering
   },
-});
+}, { timestamps: true });
+
+testSchema.index({ createdAt: -1 }); // Speed up sorting by creation date
 
 // --- REMOVE THIS LINE ---
 // testSchema.index({ uniqueLink: 1 }); // This was the duplicate

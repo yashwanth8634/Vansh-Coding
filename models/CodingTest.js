@@ -15,16 +15,15 @@ const codingTestSchema = new mongoose.Schema({
   linkExpiresAt: {
     type: Date,
     required: true,
+    index: true,
   },
   durationMinutes: {
     type: Number,
     default: 30,
     min: 1,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+}, { timestamps: true });
+
+codingTestSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('CodingTest', codingTestSchema);

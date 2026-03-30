@@ -11,72 +11,75 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <%- include('partials/tailwind-setup') %>
 </head>
-<body class="vc-app min-h-screen relative selection:bg-white/30 selection:text-white pb-24 flex items-start justify-center p-6 pt-20 antialiased overflow-x-hidden">
+<body class="vc-app min-h-screen relative selection:bg-white/30 selection:text-white pb-24 antialiased overflow-x-hidden">
+  <%- include('partials/navbar', { isHome: false }) %>
 
   <div class="absolute inset-0 grid-bg pointer-events-none z-0"></div>
 
-  <div class="glass-card rounded-2xl p-8 md:p-12 w-full max-w-4xl relative overflow-hidden z-10">
-    <div class="absolute top-0 right-0 w-48 h-48 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    
-    <div class="text-center mb-12 border-b border-white/10 pb-10 relative z-10">
-      <div class="inline-flex items-center justify-center w-16 h-16 bg-white/5 border border-white/10 rounded-xl mb-6 shadow-inner">
-        <span class="material-symbols-outlined text-white text-[32px]">task_alt</span>
-      </div>
-      <h1 class="text-3xl font-semibold text-white tracking-tight mb-2">Mr & Ms Coder Quiz Submitted</h1>
-      <p class="text-gray-400 font-medium uppercase tracking-widest text-xs mb-6"><%= (attempt.questionBank && attempt.questionBank.title) ? attempt.questionBank.title : 'Question Bank' %></p>
+  <div class="relative z-10 flex items-start justify-center p-6 pt-10 md:pt-16">
+    <div class="glass-card rounded-2xl p-8 md:p-12 w-full max-w-4xl relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-48 h-48 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
       
-      <div class="inline-block bg-[#0a0a0a] border border-white/10 px-8 py-5 rounded-xl">
-        <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-2">Score</p>
-        <div class="text-3xl font-mono text-green-400 tracking-widest">
-          <%= attempt.score %> <span class="text-gray-600 text-2xl">/</span> <span class="text-gray-400 text-2xl"><%= attempt.totalQuestions %></span>
+      <div class="text-center mb-12 border-b border-white/10 pb-10 relative z-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-white/5 border border-white/10 rounded-xl mb-6 shadow-inner">
+          <span class="material-symbols-outlined text-white text-[32px]">task_alt</span>
+        </div>
+        <h1 class="text-3xl font-semibold text-white tracking-tight mb-2">Mr & Ms Coder Quiz Submitted</h1>
+        <p class="text-gray-400 font-medium uppercase tracking-widest text-xs mb-6"><%= (attempt.questionBank && attempt.questionBank.title) ? attempt.questionBank.title : 'Question Bank' %></p>
+        
+        <div class="inline-block bg-[#0a0a0a] border border-white/10 px-8 py-5 rounded-xl">
+          <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-2">Score</p>
+          <div class="text-3xl font-mono text-green-400 tracking-widest">
+            <%= attempt.score %> <span class="text-gray-600 text-2xl">/</span> <span class="text-gray-400 text-2xl"><%= attempt.totalQuestions %></span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 relative z-10 gap-4">
-      <h2 class="text-sm font-semibold text-white uppercase tracking-widest">Question Breakdown</h2>
-      <span class="text-[10px] font-mono text-gray-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded uppercase tracking-wider">Roll No: <%= attempt.studentRollNo %></span>
-    </div>
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 relative z-10 gap-4">
+        <h2 class="text-sm font-semibold text-white uppercase tracking-widest">Question Breakdown</h2>
+        <span class="text-[10px] font-mono text-gray-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded uppercase tracking-wider">Roll No: <%= attempt.studentRollNo %></span>
+      </div>
 
-    <div class="space-y-4 relative z-10">
-      <% attempt.answers.forEach((ans, index) => { 
-        const isCorrect = ans.isCorrect;
-        const q = ans.question; 
-        if (!q) return; 
-        
-        const bgColor = isCorrect ? 'bg-green-500/5' : 'bg-red-500/5';
-        const borderColor = isCorrect ? 'border-green-500/20' : 'border-red-500/20';
-      %>
-        <div class="p-6 border <%= borderColor %> <%= bgColor %> rounded-xl bg-[#0a0a0a]">
-          <% if(q.imageUrl && (q.imageUrl.startsWith('https://') || q.imageUrl.startsWith('http://'))) { %>
-            <img src="<%= q.imageUrl %>" alt="Question Content" class="w-full rounded-lg mb-5 max-h-64 object-contain border border-white/10">
-          <% } %>
-          <h4 class="font-medium text-sm text-gray-200 leading-relaxed">
-            <span class="text-gray-500 mr-2 font-mono">Q<%= index + 1 %>.</span> <%= q.questionText %>
-          </h4>
+      <div class="space-y-4 relative z-10">
+        <% attempt.answers.forEach((ans, index) => { 
+          const isCorrect = ans.isCorrect;
+          const q = ans.question; 
+          if (!q) return; 
+          
+          const bgColor = isCorrect ? 'bg-green-500/5' : 'bg-red-500/5';
+          const borderColor = isCorrect ? 'border-green-500/20' : 'border-red-500/20';
+        %>
+          <div class="p-6 border <%= borderColor %> <%= bgColor %> rounded-xl bg-[#0a0a0a]">
+            <% if(q.imageUrl && (q.imageUrl.startsWith('https://') || q.imageUrl.startsWith('http://'))) { %>
+              <img src="<%= q.imageUrl %>" alt="Question Content" class="w-full rounded-lg mb-5 max-h-64 object-contain border border-white/10">
+            <% } %>
+            <h4 class="font-medium text-sm text-gray-200 leading-relaxed">
+              <span class="text-gray-500 mr-2 font-mono">Q<%= index + 1 %>.</span> <%= q.questionText %>
+            </h4>
 
-          <% if(isCorrect) { %>
-            <div class="mt-4 p-4 bg-[#050505] rounded-xl border border-white/10">
-              <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Your Answer (Correct)</span>
-              <span class="text-white font-medium text-sm"><%= ans.selectedOption || 'Not Answered' %></span>
-            </div>
-          <% } else { %>
-            <div class="mt-4 flex flex-col md:flex-row gap-3">
-              <div class="flex-1 p-4 bg-[#050505] rounded-xl border border-red-500/20">
-                <span class="text-[10px] font-mono uppercase tracking-widest text-red-400 block mb-1">Your Answer</span>
-                <span class="text-gray-500 font-medium text-sm line-through"><%= ans.selectedOption || 'Not Answered' %></span>
+            <% if(isCorrect) { %>
+              <div class="mt-4 p-4 bg-[#050505] rounded-xl border border-white/10">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Your Answer (Correct)</span>
+                <span class="text-white font-medium text-sm"><%= ans.selectedOption || 'Not Answered' %></span>
               </div>
-              <div class="flex-1 p-4 bg-[#050505] rounded-xl border border-green-500/20">
-                <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Correct Answer</span>
-                <span class="text-white font-medium text-sm"><%= q.correctAnswer %></span>
+            <% } else { %>
+              <div class="mt-4 flex flex-col md:flex-row gap-3">
+                <div class="flex-1 p-4 bg-[#050505] rounded-xl border border-red-500/20">
+                  <span class="text-[10px] font-mono uppercase tracking-widest text-red-400 block mb-1">Your Answer</span>
+                  <span class="text-gray-500 font-medium text-sm line-through"><%= ans.selectedOption || 'Not Answered' %></span>
+                </div>
+                <div class="flex-1 p-4 bg-[#050505] rounded-xl border border-green-500/20">
+                  <span class="text-[10px] font-mono uppercase tracking-widest text-green-400 block mb-1">Correct Answer</span>
+                  <span class="text-white font-medium text-sm"><%= q.correctAnswer %></span>
+                </div>
               </div>
-            </div>
-          <% } %>
-        </div>
-      <% }); %>
-    </div>
-    <div class="text-center mt-10 relative z-10">
-      <a href="/" class="text-gray-500 hover:text-white text-sm font-medium transition-colors">← Back to Home</a>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+      <div class="text-center mt-10 relative z-10">
+        <a href="/" class="text-gray-500 hover:text-white text-sm font-medium transition-colors">← Back to Home</a>
+      </div>
     </div>
   </div>
 

@@ -1,0 +1,74 @@
+<nav id="main-navbar" class="sticky top-0 z-40 border-b border-black/5 bg-white/50 backdrop-blur-xl">
+  <div class="max-w-7xl mx-auto px-5 md:px-8 py-4 md:py-0 min-h-20 flex items-center justify-between gap-3">
+    <!-- Logo -->
+    <a href="/" class="flex items-center w-20 md:w-52">
+      <img src="/images/1.png" alt="Vansh2k26 Logo" class="h-12 md:h-16 w-auto object-contain" width="160" height="64">
+    </a>
+
+    <!-- Navigation Links (Desktop) -->
+    <div class="hidden md:flex items-center gap-8 text-sm font-bold text-stone-700">
+      <% if (typeof isHome !== 'undefined' && isHome) { %>
+        <a href="#about" class="hover:text-stone-900 transition-colors">About</a>
+        <a href="#format" class="hover:text-stone-900 transition-colors">Format</a>
+        <a href="#rules" class="hover:text-stone-900 transition-colors">Rules</a>
+        <a href="#highlights" class="hover:text-stone-900 transition-colors">Highlights</a>
+      <% } else { %>
+        <a href="/" class="hover:text-stone-900 transition-colors">Home</a>
+        <a href="/active-tests" class="hover:text-stone-900 transition-colors">Active Tests</a>
+      <% } %>
+    </div>
+
+    <!-- Action Buttons & Mobile Trigger -->
+    <div class="flex items-center justify-end gap-3 ml-auto md:ml-0 md:w-52 lg:w-56">
+      <a href="/active-tests" class="btn-pill hidden sm:inline-flex">
+        Active Tests
+      </a>
+      
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-toggle" class="md:hidden p-2 text-stone-700 hover:text-stone-900 transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu (Hidden by default) -->
+  <div id="mobile-menu" class="hidden md:hidden border-t border-black/5 bg-white backdrop-blur-xl">
+    <div class="px-5 py-6 space-y-4 flex flex-col items-center text-center">
+      <% if (typeof isHome !== 'undefined' && isHome) { %>
+        <a href="#about" class="block text-sm font-bold text-stone-700 hover:text-stone-900 transition-colors">About</a>
+        <a href="#format" class="block text-sm font-bold text-stone-700 hover:text-stone-900 transition-colors">Format</a>
+        <a href="#rules" class="block text-sm font-bold text-stone-700 hover:text-stone-900 transition-colors">Rules</a>
+        <a href="#highlights" class="block text-sm font-bold text-stone-700 hover:text-stone-900 transition-colors">Highlights</a>
+      <% } else { %>
+        <a href="/" class="block text-sm font-bold text-stone-700 hover:text-stone-900 transition-colors">Home</a>
+        <a href="/active-tests" class="block text-sm font-bold text-stone-700 hover:text-stone-900 transition-colors">Active Tests</a>
+      <% } %>
+      <a href="/active-tests" class="btn-pill w-full mt-2">Active Tests</a>
+    </div>
+  </div>
+</nav>
+
+<script>
+  (function() {
+    const toggle = document.getElementById('mobile-menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    if (toggle && menu) {
+      toggle.addEventListener('click', () => {
+        menu.classList.toggle('hidden');
+        const icon = toggle.querySelector('.material-symbols-outlined');
+        if (icon) {
+          icon.textContent = menu.classList.contains('hidden') ? 'menu' : 'close';
+        }
+      });
+
+      // Close menu when clicking links (especially anchor links on homepage)
+      menu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          menu.classList.add('hidden');
+          const icon = toggle.querySelector('.material-symbols-outlined');
+          if (icon) icon.textContent = 'menu';
+        });
+      });
+    }
+  })();
+</script>
