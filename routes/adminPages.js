@@ -287,6 +287,7 @@ router.get('/coding/results/:testId/pdf', protect, async (req, res) => {
       .map((attempt, index) => ({
         ...attempt,
         rank: index + 1,
+        score: `${attempt.solvedCount || 0} Solved | ${attempt.passedTestCases || 0}/${attempt.totalTestCases || 0} Cases`,
       }));
 
     const testTitle = test.codingBank ? test.codingBank.title : 'Coding';

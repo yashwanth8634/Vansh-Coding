@@ -351,6 +351,10 @@
             class="hidden xl:inline">Code</span>
         </button>
       </div>
+      <div id="java-note"
+        class="hidden px-4 py-2 border-b border-amber-500/20 bg-amber-500/10 text-amber-300 text-[11px] font-medium tracking-wide">
+        Java Note: Your Java code must use class name <code class="font-mono text-amber-200">prog</code> exactly (case-sensitive).
+      </div>
 
       <!-- Editor -->
       <div class="flex-1 min-h-0 relative p-0" id="editor-container"></div>
@@ -458,6 +462,7 @@
       });
 
       const langSelect = document.getElementById('language-select');
+      const javaNote = document.getElementById('java-note');
       const currentTitle = document.getElementById('current-q-title');
       const currentDiff = document.getElementById('current-q-diff');
       const currentDesc = document.getElementById('current-q-desc');
@@ -581,6 +586,7 @@
         if (lang === 'java') mode = 'text/x-java';
         if (['cpp', 'c'].includes(lang)) mode = 'text/x-c++src';
         editor.setOption('mode', mode);
+        javaNote.classList.toggle('hidden', lang !== 'java');
       }
 
       function renderSessionTimer() {

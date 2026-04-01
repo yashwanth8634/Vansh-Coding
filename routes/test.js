@@ -300,7 +300,7 @@ router.post('/test/start', async (req, res) => {
 
     const existingAttempt = await Attempt.findOne({ test: test._id, studentRollNo: rollNo });
     if (existingAttempt) {
-      return res.status(403).json({ message: 'Test already taken.' });
+      return res.status(403).json({ message: 'Test taken already for this roll number.' });
     }
     
     let allQuestions = test.questionBank.questions;
