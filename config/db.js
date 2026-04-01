@@ -7,8 +7,8 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/quizApp';
 // Detect if running in serverless environment
 const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
 
-// Pool size: 1 for serverless (cold start optimization), higher for traditional servers
-const poolSize = isServerless ? 1 : (parseInt(process.env.MONGO_POOL_SIZE, 10) || 5);
+// Pool size: slightly higher for serverless to reduce queued DB ops on warm instances
+const poolSize = isServerless ? 2 : (parseInt(process.env.MONGO_POOL_SIZE, 10) || 5);
 
 const globalMongo = global.__vanshMongo || {
   conn: null,
@@ -26,8 +26,9 @@ const connectDB = async () => {
     if (!globalMongo.promise) {
       globalMongo.promise = mongoose.connect(MONGO_URI, {
         maxPoolSize: poolSize,
-        serverSelectionTimeoutMS: 10000,
-        socketTimeoutMS: 45000,
+        serverSelectionTimeoutMS: isServerless ? 5000 : 10000,
+        socketTimeoutMS: isServerless ? 20000 : 45000,
+        maxIdleTimeMS: isServerless ? 10000 : 30000,
         bufferCommands: false,
       });
       console.log(`Attempting to connect to MongoDB (pool size: ${poolSize})...`);

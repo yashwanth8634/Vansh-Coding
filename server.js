@@ -24,7 +24,9 @@ app.use(helmet({
   contentSecurityPolicy: false, // Disable CSP for EJS inline scripts
 }));
 app.use(compression()); // Gzip all responses (~70% smaller)
-app.use(morgan('short')); // HTTP request logging
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('short')); // HTTP request logging
+}
 
 // --- Parsing Middleware ---
 app.use(express.json());

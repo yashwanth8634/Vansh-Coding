@@ -7,13 +7,27 @@ const { Redis } = require('@upstash/redis');
 const isRedisConfigured = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN;
 
 let redis = null;
+const REDIS_TIMEOUT_MS = Number.parseInt(process.env.REDIS_TIMEOUT_MS, 10) || 250;
+
+const withTimeout = (promise, timeoutMs) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`Redis timeout after ${timeoutMs}ms`)), timeoutMs);
+    }),
+  ]);
+};
+
+const localOnlyOnServerless = !!process.env.VERCEL && process.env.REDIS_MODE === 'local-only';
 if (isRedisConfigured) {
   try {
     redis = new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL,
       token: process.env.UPSTASH_REDIS_REST_TOKEN,
     });
-    console.log('Redis Cache initialized (Upstash) - using hybrid L1/L2 caching');
+    console.log(localOnlyOnServerless
+      ? 'Redis configured but disabled in Vercel (REDIS_MODE=local-only)'
+      : 'Redis Cache initialized (Upstash) - using hybrid L1/L2 caching');
   } catch (error) {
     console.error('Redis Initial Connection Error:', error.message);
     redis = null;
@@ -53,9 +67,9 @@ const createCacheInterface = (namespace) => ({
     }
     
     // L2: Check Redis if configured
-    if (redis) {
+    if (redis && !localOnlyOnServerless) {
       try {
-        const val = await redis.get(fullKey);
+        const val = await withTimeout(redis.get(fullKey), REDIS_TIMEOUT_MS);
         if (val !== null && val !== undefined) {
           // Populate L1 cache for future hits
           localCaches[namespace].set(key, val);
@@ -77,9 +91,9 @@ const createCacheInterface = (namespace) => ({
     localCaches[namespace].set(key, value);
     
     // L2: Set Redis asynchronously (don't await unless necessary)
-    if (redis) {
+    if (redis && !localOnlyOnServerless) {
       // Fire and forget for better performance, but catch errors
-      redis.set(fullKey, value, { ex: redisTTL }).catch(err => {
+      withTimeout(redis.set(fullKey, value, { ex: redisTTL }), REDIS_TIMEOUT_MS).catch(err => {
         console.error(`Redis set failed [${fullKey}]:`, err.message);
       });
     }
@@ -94,9 +108,9 @@ const createCacheInterface = (namespace) => ({
     localCaches[namespace].del(key);
     
     // L2: Delete from Redis
-    if (redis) {
+    if (redis && !localOnlyOnServerless) {
       try {
-        await redis.del(fullKey);
+        await withTimeout(redis.del(fullKey), REDIS_TIMEOUT_MS);
       } catch (err) {
         console.error(`Redis del failed [${fullKey}]:`, err.message);
       }
@@ -110,19 +124,19 @@ const createCacheInterface = (namespace) => ({
     localCaches[namespace].flushAll();
     
     // L2: Flush Redis namespace (async, but don't block on it for perf)
-    if (redis) {
+    if (redis && !localOnlyOnServerless) {
       // Fire and forget - the local cache is already cleared
       (async () => {
         try {
           let cursor = 0;
           do {
-            const [nextCursor, keys] = await redis.scan(cursor, {
+            const [nextCursor, keys] = await withTimeout(redis.scan(cursor, {
               match: `${namespace}:*`,
               count: 100,
-            });
+            }), REDIS_TIMEOUT_MS);
             cursor = Number(nextCursor);
             if (keys && keys.length) {
-              await redis.del(...keys);
+              await withTimeout(redis.del(...keys), REDIS_TIMEOUT_MS);
             }
           } while (cursor !== 0);
         } catch (err) {
@@ -136,15 +150,15 @@ const createCacheInterface = (namespace) => ({
   
   keys: async () => {
     // For keys listing, check Redis (more authoritative) or fall back to local
-    if (redis) {
+    if (redis && !localOnlyOnServerless) {
       try {
         const keys = [];
         let cursor = 0;
         do {
-          const [nextCursor, batch] = await redis.scan(cursor, {
+          const [nextCursor, batch] = await withTimeout(redis.scan(cursor, {
             match: `${namespace}:*`,
             count: 100,
-          });
+          }), REDIS_TIMEOUT_MS);
           cursor = Number(nextCursor);
           if (batch && batch.length) {
             keys.push(...batch);
