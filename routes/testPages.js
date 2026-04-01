@@ -9,9 +9,7 @@ const { sanitizeFilename, drawRankingPdf } = require('../utils/helpers');
 const Test = require('../models/Test');
 const Attempt = require('../models/Attempt');
 const CodingTest = require('../models/CodingTest');
-const CodingAttempt = require('../models/CodingAttempt');
-
-
+ 
 // GET /admin/test/:testId/results - Page to view attempts (cached, protected)
 router.get('/admin/test/:testId/results', protect, async (req, res) => {
     try {
@@ -115,36 +113,13 @@ router.get('/coding/test/:link', async (req, res) => {
     // Default numChallenges to 0 if not set
     const numChallenges = test.numChallenges || 0;
 
-    // Check for an existing session/attempt to handle refreshes/resuming
     let challengesToRender = [];
-    let existingAttempt = null;
-
-    const token = req.cookies.token;
-    if (token && process.env.JWT_SECRET) {
-      try {
-        const decoded = require('jsonwebtoken').verify(token, process.env.JWT_SECRET);
-        // If we found an attempt in the token, fetch its specific challenges
-        if (decoded.attemptId) {
-          existingAttempt = await CodingAttempt.findById(decoded.attemptId).populate('answers.challenge').lean();
-          if (existingAttempt && existingAttempt.codingTest.toString() === test._id.toString()) {
-            const assignedIds = existingAttempt.answers.map(ans => ans.challenge._id.toString());
-            challengesToRender = test.codingBank.challenges.filter(c => assignedIds.includes(c._id.toString()));
-          }
-        }
-      } catch (err) {
-        // Token invalid or expired, ignore and treat as fresh visit
-      }
-    }
-
-    // If no existing session found, decide what to render initially
-    if (!existingAttempt) {
-      if (numChallenges === 0) {
-        // Backward compatibility or explicitly set to 'All'
-        challengesToRender = test.codingBank.challenges;
-      } else {
-        // Randomization active: don't leak all challenges in EJS render
-        challengesToRender = [];
-      }
+    if (numChallenges === 0) {
+      // Backward compatibility or explicitly set to 'All'
+      challengesToRender = test.codingBank.challenges;
+    } else {
+      // Randomization active: don't leak all challenges in EJS render
+      challengesToRender = [];
     }
 
     res.render('coding-workspace', { 

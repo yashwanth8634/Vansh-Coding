@@ -715,6 +715,29 @@ int main() {
         submitFinal(true);
       }
 
+      window.addEventListener('pagehide', () => {
+        if (!hasStarted || currentState === STATE.FINISHED || currentState === STATE.SUBMITTING || !studentProfile || !studentProfile.rollNo) {
+          return;
+        }
+        syncActiveSubmission();
+        const payload = Object.keys(submissions).map((id) => ({
+          challengeId: id,
+          code: submissions[id].code,
+          language: submissions[id].language,
+        }));
+        const data = JSON.stringify({
+          studentName: studentProfile.name,
+          studentRollNo: studentProfile.rollNo,
+          studentDepartment: studentProfile.department,
+          studentYear: studentProfile.year,
+          studentSection: studentProfile.section,
+          studentCollege: studentProfile.collegeName,
+          testId,
+          submissions: payload,
+        });
+        navigator.sendBeacon('/api/coding/student/submit', new Blob([data], { type: 'application/json' }));
+      });
+
       langSelect.addEventListener('change', (e) => {
         const nextLanguage = e.target.value;
         const submission = submissions[activeChallengeId];

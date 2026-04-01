@@ -213,10 +213,15 @@ router.get('/coding/results/:testId', protect, async (req, res) => {
       .map((attempt) => ({
         ...attempt,
         solvedCount: (attempt.answers || []).filter((answer) => answer.status === 'Accepted').length,
+        passedTestCases: (attempt.answers || []).reduce((sum, answer) => sum + (answer.passedCases || 0), 0),
+        totalTestCases: (attempt.answers || []).reduce((sum, answer) => sum + (answer.totalCases || 0), 0),
       }))
       .sort((a, b) => {
         if (b.solvedCount !== a.solvedCount) {
           return b.solvedCount - a.solvedCount;
+        }
+        if (b.passedTestCases !== a.passedTestCases) {
+          return b.passedTestCases - a.passedTestCases;
         }
         return new Date(a.submittedAt) - new Date(b.submittedAt);
       })
@@ -249,10 +254,15 @@ router.get('/coding/results/:testId/pdf', protect, async (req, res) => {
       .map((attempt) => ({
         ...attempt,
         solvedCount: (attempt.answers || []).filter((answer) => answer.status === 'Accepted').length,
+        passedTestCases: (attempt.answers || []).reduce((sum, answer) => sum + (answer.passedCases || 0), 0),
+        totalTestCases: (attempt.answers || []).reduce((sum, answer) => sum + (answer.totalCases || 0), 0),
       }))
       .sort((a, b) => {
         if (b.solvedCount !== a.solvedCount) {
           return b.solvedCount - a.solvedCount;
+        }
+        if (b.passedTestCases !== a.passedTestCases) {
+          return b.passedTestCases - a.passedTestCases;
         }
         return new Date(a.submittedAt) - new Date(b.submittedAt);
       })

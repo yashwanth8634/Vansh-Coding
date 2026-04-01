@@ -446,27 +446,13 @@ router.post('/coding/student/start', async (req, res) => {
       return res.status(400).json({ message: 'This coding test link has expired.' });
     }
 
-    let attempt = await CodingAttempt.findOne({
+    const existingAttempt = await CodingAttempt.findOne({
       codingTest: codingTest._id,
       studentRollNo: rollNo,
-    }).populate('answers.challenge');
+    }).select('_id');
 
-    if (attempt) {
-      // Return existing challenges for this student (resume)
-      const questionsForStudent = attempt.answers.map(ans => ({
-        id: ans.challenge._id,
-        title: ans.challenge.title,
-        difficulty: ans.challenge.difficulty,
-        description: ans.challenge.description,
-        sampleTest: (ans.challenge.testCases || []).find(tc => !tc.isHidden) || null
-      }));
-
-      return res.json({
-        message: 'Resuming coding test.',
-        student: { name, rollNo, department, year, section, collegeName },
-        challenges: questionsForStudent,
-        durationMinutes: codingTest.durationMinutes
-      });
+    if (existingAttempt) {
+      return res.status(403).json({ message: 'You have already started/submitted this coding test. Refresh is not allowed.' });
     }
 
     // New attempt - handle randomization
@@ -506,23 +492,6 @@ router.post('/coding/student/start', async (req, res) => {
       description: c.description,
       sampleTest: (c.testCases || []).find(tc => !tc.isHidden) || null
     }));
-
-    // Generate a token so the student can resume session on refresh
-    const jwt = require('jsonwebtoken');
-    if (!process.env.JWT_SECRET) {
-      console.error('JWT_SECRET not configured - cannot generate session token');
-      return res.status(500).json({ message: 'Server configuration error.' });
-    }
-    const token = jwt.sign({ 
-      attemptId: newAttempt._id,
-      rollNo,
-      testId: codingTest._id
-    }, process.env.JWT_SECRET, { expiresIn: '2h' });
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      maxAge: 2 * 60 * 60 * 1000, // 2 hours
-    });
 
     res.json({
       message: 'Student details accepted. Test started.',
