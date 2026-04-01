@@ -203,9 +203,11 @@ router.delete('/banks/:bankId/challenges/:challengeId', protect, async (req, res
 // Create Test (Link)
 router.post('/tests', protect, async (req, res) => {
   try {
-    const { codingBankId, validityHours, durationMinutes } = req.body;
+    const { codingBankId, validityHours, durationMinutes, numChallenges } = req.body;
     const parsedValidityHours = Number.parseInt(validityHours, 10);
     const parsedDurationMinutes = Number.parseInt(durationMinutes, 10);
+    const parsedNumChallenges = Number.parseInt(numChallenges, 10) || 0;
+
     if (!codingBankId || Number.isNaN(parsedValidityHours) || parsedValidityHours <= 0) {
       return res.status(400).json({ message: 'Invalid codingBankId or validityHours.' });
     }
@@ -223,6 +225,10 @@ router.post('/tests', protect, async (req, res) => {
       return res.status(400).json({ message: 'Cannot create test from an empty coding bank' });
     }
 
+    if (parsedNumChallenges > bank.challenges.length) {
+      return res.status(400).json({ message: `Bank only has ${bank.challenges.length} challenges.` });
+    }
+
     const expiresAt = new Date(Date.now() + parsedValidityHours * 60 * 60 * 1000);
     const uniqueLink = crypto.randomUUID().slice(0, 8); 
 
@@ -231,6 +237,7 @@ router.post('/tests', protect, async (req, res) => {
       uniqueLink,
       linkExpiresAt: expiresAt,
       durationMinutes: parsedDurationMinutes,
+      numChallenges: parsedNumChallenges,
     });
     await newTest.save();
     await caches.pages.flushAll();
@@ -251,7 +258,7 @@ router.delete('/tests/:id', protect, async (req, res) => {
     }
     await CodingAttempt.deleteMany({ codingTest: req.params.id }); 
     await caches.pages.flushAll();
-    invalidateAllCodingTests();
+    await invalidateAllCodingTests();
     res.json({ message: 'Test and attempts deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting test' });

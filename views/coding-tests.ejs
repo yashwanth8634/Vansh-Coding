@@ -69,6 +69,12 @@
                   class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white focus:bg-[#111] focus:border-white/30 transition-all outline-none">
               </div>
 
+              <div>
+                <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Number of Random Questions (0 = All)</label>
+                <input type="number" id="numChallenges" min="0" max="50" value="0" required
+                  class="w-full px-4 py-3 bg-[#0a0a0a] border border-white/10 rounded-xl text-sm font-medium text-white focus:bg-[#111] focus:border-white/30 transition-all outline-none">
+              </div>
+
               <button type="submit" class="btn-primary btn-block mt-2">
                 <span class="material-symbols-outlined text-[18px]">add_link</span> Create Session
               </button>
@@ -136,12 +142,18 @@
       const bankId = document.getElementById('bankId').value;
       const validityHours = document.getElementById('validityHours').value;
       const durationMinutes = document.getElementById('durationMinutes').value;
+      const numChallenges = document.getElementById('numChallenges').value;
 
       try {
         const res = await fetch('/api/coding/admin/tests', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ codingBankId: bankId, validityHours: Number(validityHours), durationMinutes: Number(durationMinutes) })
+          body: JSON.stringify({ 
+            codingBankId: bankId, 
+            validityHours: Number(validityHours), 
+            durationMinutes: Number(durationMinutes),
+            numChallenges: Number(numChallenges)
+          })
         });
 
         if(res.ok) { window.location.reload(); }

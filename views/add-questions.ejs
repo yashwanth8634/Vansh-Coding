@@ -217,9 +217,19 @@
               />
               <% } %>
 
-              <p class="font-medium text-gray-100 break-words">
-                <%= q.questionText %>
-              </p>
+              <% 
+                const lines = q.questionText.split('\n');
+                const title = lines[0];
+                const code = lines.slice(1).join('\n').trim();
+              %>
+              <div class="mb-3">
+                <p class="font-semibold text-white text-sm mb-2"><%= title %></p>
+                <% if (code) { %>
+                  <div class="bg-black/40 border border-white/5 rounded-lg p-3 font-code text-[11px] text-gray-400 whitespace-pre-wrap leading-relaxed shadow-inner">
+                    <%= code %>
+                  </div>
+                <% } %>
+              </div>
               <ul
                 class="list-disc list-inside text-sm text-gray-400 my-2 space-y-1"
               >

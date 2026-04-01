@@ -167,29 +167,31 @@ router.post('/submit', executionLimiter, async (req, res) => {
     const fetchedChallenges = await CodingChallenge.find({ _id: { $in: uniqueRequestedChallengeIds } });
     const challengeMap = new Map(fetchedChallenges.map((challenge) => [challenge._id.toString(), challenge]));
 
+    // Process challenges in parallel with concurrency limit to avoid overwhelming Wandbox
+    const CONCURRENCY_LIMIT = 2;
     const finalAnswers = [];
     
-    // Evaluate each submission sequentially to respect Wandbox compiler limits
-    for (const sub of submissions) {
+    // Helper to evaluate a single submission
+    const evaluateSubmission = async (sub) => {
       if (!sub.challengeId || !allowedChallengeIds.has(sub.challengeId.toString())) {
-        continue;
+        return null;
       }
 
       if (!sub.code || sub.code.trim() === '') {
-        finalAnswers.push({
+        return {
           challenge: sub.challengeId,
           code: '', language: sub.language,
           status: 'Unattempted', passedCases: 0, totalCases: 0
-        });
-        continue;
+        };
       }
       
       const challenge = challengeMap.get(sub.challengeId.toString());
-      if (!challenge) continue;
+      if (!challenge) return null;
 
       let passedCases = 0;
       let finalStatus = 'Accepted';
 
+      // Run test cases sequentially per challenge (they depend on same code)
       for (const testCase of challenge.testCases) {
         try {
           const result = await executeCode(sub.code, sub.language, testCase.input);
@@ -210,32 +212,49 @@ router.post('/submit', executionLimiter, async (req, res) => {
         }
       }
 
-      finalAnswers.push({
+      return {
         challenge: sub.challengeId,
         code: sub.code,
         language: sub.language,
         status: finalStatus,
         passedCases,
         totalCases: challenge.testCases.length
-      });
+      };
+    };
+
+    // Process submissions with controlled concurrency
+    for (let i = 0; i < submissions.length; i += CONCURRENCY_LIMIT) {
+      const batch = submissions.slice(i, i + CONCURRENCY_LIMIT);
+      const results = await Promise.all(batch.map(evaluateSubmission));
+      finalAnswers.push(...results.filter(Boolean));
     }
 
-    // Save Unified Attempt to DB
-    const attempt = new CodingAttempt({
-      studentName,
+    // Save Unified Attempt to DB - Update existing draft if found
+    let attempt = await CodingAttempt.findOne({
       studentRollNo,
-      studentDepartment,
-      studentYear,
-      studentSection,
-      studentCollege,
       codingTest: testId,
-      answers: finalAnswers
     });
-    await attempt.save();
+
+    if (attempt) {
+      attempt.answers = finalAnswers;
+      await attempt.save();
+    } else {
+      attempt = new CodingAttempt({
+        studentName,
+        studentRollNo,
+        studentDepartment,
+        studentYear,
+        studentSection,
+        studentCollege,
+        codingTest: testId,
+        answers: finalAnswers
+      });
+      await attempt.save();
+    }
 
     // Invalidate cached pages so admin results page shows new submission
     const { invalidatePages } = require('../utils/cache');
-    invalidatePages();
+    await invalidatePages();
 
     res.json({ message: 'Test submitted successfully', result: finalAnswers });
 

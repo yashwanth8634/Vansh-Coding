@@ -1,5 +1,5 @@
 // utils/cache.js
-// Centralized cache module — all cache instances in one place
+// Centralized cache module — hybrid L1 (local) + L2 (Redis) architecture
 const NodeCache = require('node-cache');
 const { Redis } = require('@upstash/redis');
 
@@ -13,79 +13,129 @@ if (isRedisConfigured) {
       url: process.env.UPSTASH_REDIS_REST_URL,
       token: process.env.UPSTASH_REDIS_REST_TOKEN,
     });
-    console.log('Redis Cache initialized (Upstash)');
+    console.log('Redis Cache initialized (Upstash) - using hybrid L1/L2 caching');
   } catch (error) {
     console.error('Redis Initial Connection Error:', error.message);
-    redis = null; // Ensure we fall back if init fails
+    redis = null;
   }
 } else {
-  console.log('Using Local Memory Cache (NodeCache fallback)');
+  console.log('Using Local Memory Cache only (no Redis configured)');
 }
 
-// Local cache instances as fallbacks (or primary if no Redis)
+// L1 Local cache instances (fast, in-memory, per-process)
+// These have shorter TTLs and serve as a buffer to reduce Redis HTTP calls
 const localCaches = {
-  test: new NodeCache({ stdTTL: 3600 }),
-  codingTest: new NodeCache({ stdTTL: 3600 }),
-  user: new NodeCache({ stdTTL: 300 }),
-  banks: new NodeCache({ stdTTL: 600 }),
-  pages: new NodeCache({ stdTTL: 120 }),
+  test: new NodeCache({ stdTTL: 60, checkperiod: 30 }),       // 1 min local, reduces Redis hits
+  codingTest: new NodeCache({ stdTTL: 60, checkperiod: 30 }),
+  user: new NodeCache({ stdTTL: 60, checkperiod: 30 }),       // 1 min local for user data
+  banks: new NodeCache({ stdTTL: 120, checkperiod: 60 }),     // 2 min local
+  pages: new NodeCache({ stdTTL: 30, checkperiod: 15 }),      // 30 sec local for pages
 };
 
-// Unified Cache Wrapper (Namespace based)
-const createCacheInterface = (namespace, stdTTL) => ({
+// Redis TTLs (longer, shared across instances)
+const redisTTLs = {
+  test: 3600,       // 1 hour
+  codingTest: 3600,
+  user: 300,        // 5 min
+  banks: 600,       // 10 min
+  pages: 120,       // 2 min
+};
+
+// Hybrid Cache Wrapper (L1 Local + L2 Redis)
+const createCacheInterface = (namespace) => ({
   get: async (key) => {
+    const fullKey = `${namespace}:${key}`;
+    
+    // L1: Check local cache first (synchronous, fast)
+    const localVal = localCaches[namespace].get(key);
+    if (localVal !== undefined) {
+      return localVal;
+    }
+    
+    // L2: Check Redis if configured
     if (redis) {
       try {
-        const val = await redis.get(`${namespace}:${key}`);
-        return val ?? undefined; // normalize null → undefined
+        const val = await redis.get(fullKey);
+        if (val !== null && val !== undefined) {
+          // Populate L1 cache for future hits
+          localCaches[namespace].set(key, val);
+          return val;
+        }
       } catch (err) {
-        console.error(`Redis get failed [${namespace}:${key}]:`, err.message);
+        console.error(`Redis get failed [${fullKey}]:`, err.message);
       }
     }
-    return localCaches[namespace].get(key);
+    
+    return undefined;
   },
-  set: async (key, value, ttl = stdTTL) => {
+  
+  set: async (key, value, ttl) => {
+    const fullKey = `${namespace}:${key}`;
+    const redisTTL = ttl || redisTTLs[namespace];
+    
+    // L1: Always set local cache (synchronous)
+    localCaches[namespace].set(key, value);
+    
+    // L2: Set Redis asynchronously (don't await unless necessary)
     if (redis) {
-      try {
-        return await redis.set(`${namespace}:${key}`, value, { ex: ttl });
-      } catch (err) {
-        console.error(`Redis set failed [${namespace}:${key}]:`, err.message);
-      }
+      // Fire and forget for better performance, but catch errors
+      redis.set(fullKey, value, { ex: redisTTL }).catch(err => {
+        console.error(`Redis set failed [${fullKey}]:`, err.message);
+      });
     }
-    return localCaches[namespace].set(key, value, ttl);
+    
+    return true;
   },
+  
   del: async (key) => {
+    const fullKey = `${namespace}:${key}`;
+    
+    // L1: Delete from local cache immediately
+    localCaches[namespace].del(key);
+    
+    // L2: Delete from Redis
     if (redis) {
       try {
-        return await redis.del(`${namespace}:${key}`);
+        await redis.del(fullKey);
       } catch (err) {
-        console.error(`Redis del failed [${namespace}:${key}]:`, err.message);
+        console.error(`Redis del failed [${fullKey}]:`, err.message);
       }
     }
-    return localCaches[namespace].del(key);
+    
+    return true;
   },
+  
   flushAll: async () => {
+    // L1: Flush local cache immediately (synchronous, fast)
+    localCaches[namespace].flushAll();
+    
+    // L2: Flush Redis namespace (async, but don't block on it for perf)
     if (redis) {
-      try {
-        let cursor = 0;
-        do {
-          const [nextCursor, keys] = await redis.scan(cursor, {
-            match: `${namespace}:*`,
-            count: 100,
-          });
-          cursor = Number(nextCursor);
-          if (keys && keys.length) {
-            await redis.del(...keys);
-          }
-        } while (cursor !== 0);
-        return;
-      } catch (err) {
-        console.error(`Redis flushAll failed [${namespace}]:`, err.message);
-      }
+      // Fire and forget - the local cache is already cleared
+      (async () => {
+        try {
+          let cursor = 0;
+          do {
+            const [nextCursor, keys] = await redis.scan(cursor, {
+              match: `${namespace}:*`,
+              count: 100,
+            });
+            cursor = Number(nextCursor);
+            if (keys && keys.length) {
+              await redis.del(...keys);
+            }
+          } while (cursor !== 0);
+        } catch (err) {
+          console.error(`Redis flushAll failed [${namespace}]:`, err.message);
+        }
+      })();
     }
-    return localCaches[namespace].flushAll();
+    
+    return true;
   },
+  
   keys: async () => {
+    // For keys listing, check Redis (more authoritative) or fall back to local
     if (redis) {
       try {
         const keys = [];
@@ -110,11 +160,11 @@ const createCacheInterface = (namespace, stdTTL) => ({
 });
 
 const caches = {
-  test: createCacheInterface('test', 3600),
-  codingTest: createCacheInterface('codingTest', 3600),
-  user: createCacheInterface('user', 300),
-  banks: createCacheInterface('banks', 600),
-  pages: createCacheInterface('pages', 120),
+  test: createCacheInterface('test'),
+  codingTest: createCacheInterface('codingTest'),
+  user: createCacheInterface('user'),
+  banks: createCacheInterface('banks'),
+  pages: createCacheInterface('pages'),
 };
 
 // --- Targeted Invalidation Helpers ---

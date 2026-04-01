@@ -1,8 +1,14 @@
 // config/db.js
 const mongoose = require('mongoose');
 
-// In a real app, this should be an environment variable
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/quizApp';
+
+// Detect if running in serverless environment
+const isServerless = !!process.env.VERCEL || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+// Pool size: 1 for serverless (cold start optimization), higher for traditional servers
+const poolSize = isServerless ? 1 : (parseInt(process.env.MONGO_POOL_SIZE, 10) || 5);
+
 const globalMongo = global.__vanshMongo || {
   conn: null,
   promise: null,
@@ -17,14 +23,12 @@ const connectDB = async () => {
 
   try {
     if (!globalMongo.promise) {
-      // For Serverless, we want a very small pool size (1) because scaling opens many instances.
-      // This prevents hitting the 500 connection limit on MongoDB Free Tier.
       globalMongo.promise = mongoose.connect(MONGO_URI, {
-        maxPoolSize: 1, 
+        maxPoolSize: poolSize,
         serverSelectionTimeoutMS: 10000,
         socketTimeoutMS: 45000,
       });
-      console.log('Attempting to connect to MongoDB...');
+      console.log(`Attempting to connect to MongoDB (pool size: ${poolSize})...`);
     }
 
     const connection = await globalMongo.promise;

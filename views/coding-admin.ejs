@@ -133,7 +133,7 @@
                     </div>
                   </div>
                   
-                  <div class="flex items-center gap-2 mt-1">
+                  <div class="flex items-center gap-2 mt-1 mb-3">
                     <% 
                        let badgeClass = 'bg-green-500/10 text-green-400 border-green-500/20';
                        if(c.difficulty === 'Medium') badgeClass = 'bg-orange-500/10 text-orange-400 border-orange-500/20';
@@ -143,9 +143,10 @@
                       <%= c.difficulty %>
                     </span>
                     <span class="inline-flex items-center text-[10px] font-semibold text-gray-400 tracking-wider uppercase border border-white/10 bg-white/5 px-2 py-0.5 rounded">
-                      <%= c.testCases.length %> Test Cases
+                      <%= c.testCases ? c.testCases.length : 0 %> Test Cases
                     </span>
                   </div>
+                  <p class="text-xs text-gray-500 line-clamp-3 whitespace-pre-wrap leading-relaxed"><%= c.description %></p>
                 </div>
               <% }); %>
               <% if(challenges.length === 0) { %>

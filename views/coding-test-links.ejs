@@ -57,8 +57,11 @@
                       <span class="inline-block w-2 h-2 rounded-full <%= isExpired ? 'bg-red-500' : 'bg-green-500 animate-pulse' %>"></span>
                       <span class="text-gray-400">Expires: <%= expiry && !isNaN(expiry) ? expiry.toLocaleString('en-IN') : '—' %></span>
                     </div>
-                    <div class="mt-1 text-gray-500 text-xs font-mono uppercase tracking-wider">
-                      Timer: <%= t.durationMinutes || 30 %> min
+                    <div class="mt-1 text-gray-500 text-xs font-mono uppercase tracking-wider flex items-center gap-3">
+                      <span>Timer: <%= t.durationMinutes || 30 %> min</span>
+                      <span class="inline-flex items-center px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-medium text-gray-400">
+                        Questions: <%= t.numChallenges && t.numChallenges > 0 ? t.numChallenges : 'All' %>
+                      </span>
                     </div>
                   </div>
                   <div class="flex items-center gap-2 shrink-0">

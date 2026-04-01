@@ -42,7 +42,7 @@ router.put('/:questionId', protect, async (req, res) => {
             return res.status(404).json({ message: 'Question not found.' });
         }
         
-        invalidateQuestionData();
+        await invalidateQuestionData();
         
         res.json(updatedQuestion);
 
@@ -70,7 +70,7 @@ router.delete('/:questionId', protect, async (req, res) => {
 
         await Question.findByIdAndDelete(questionId);
 
-        invalidateQuestionData();
+        await invalidateQuestionData();
 
         res.json({ message: 'Question deleted successfully.' });
 

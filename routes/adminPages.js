@@ -151,9 +151,17 @@ router.get('/coding', protect, async (req, res) => {
 // GET /admin/coding/banks - Show Coding Banks page
 router.get('/coding/banks', protect, async (req, res) => {
   try {
-    const banks = await CodingBank.find().populate('challenges').sort({ createdAt: -1 }).lean();
-    const challenges = await CodingChallenge.find().sort({ createdAt: -1 }).lean();
-    res.render('coding-banks', { banks, challenges, activeTab: 'coding-banks' }); 
+    const cacheKey = 'admin-coding-banks';
+    let data = await caches.pages.get(cacheKey);
+    
+    if (!data) {
+      const banks = await CodingBank.find().populate('challenges').sort({ createdAt: -1 }).lean();
+      const challenges = await CodingChallenge.find().sort({ createdAt: -1 }).lean();
+      data = { banks, challenges };
+      await caches.pages.set(cacheKey, data);
+    }
+    
+    res.render('coding-banks', { ...data, activeTab: 'coding-banks' }); 
   } catch (error) {
     console.error(error);
     res.status(500).send('Error loading coding banks page');
@@ -163,9 +171,17 @@ router.get('/coding/banks', protect, async (req, res) => {
 // GET /admin/coding/tests - Show Coding Tests page
 router.get('/coding/tests', protect, async (req, res) => {
   try {
-    const tests = await CodingTest.find().populate('codingBank').sort({ createdAt: -1 }).lean();
-    const banks = await CodingBank.find().sort({ createdAt: -1 }).lean();
-    res.render('coding-tests', { tests, banks, activeTab: 'coding-tests' }); 
+    const cacheKey = 'admin-coding-tests';
+    let data = await caches.pages.get(cacheKey);
+    
+    if (!data) {
+      const tests = await CodingTest.find().populate('codingBank').sort({ createdAt: -1 }).lean();
+      const banks = await CodingBank.find().sort({ createdAt: -1 }).lean();
+      data = { tests, banks };
+      await caches.pages.set(cacheKey, data);
+    }
+    
+    res.render('coding-tests', { ...data, activeTab: 'coding-tests' }); 
   } catch (error) {
     console.error(error);
     res.status(500).send('Error loading coding tests page');

@@ -268,22 +268,29 @@ document.addEventListener('DOMContentLoaded', () => {
     let optionsHTML = '';
     q.options.forEach(opt => {
       if (opt === q.correctAnswer) {
-        optionsHTML += `<li class="text-green-600 font-bold">${opt} (Correct)</li>`;
+        optionsHTML += `<li class="text-green-600 font-bold">${escapeHtml(opt)} (Correct)</li>`;
       } else {
-        optionsHTML += `<li>${opt}</li>`;
+        optionsHTML += `<li>${escapeHtml(opt)}</li>`;
       }
     });
 
     const imageHTML = q.imageUrl && (q.imageUrl.startsWith('http://') || q.imageUrl.startsWith('https://'))
-      ? `<img src="${q.imageUrl}" alt="Question Image" class="w-full max-h-40 object-cover rounded-md mb-3">` 
+      ? `<img src="${escapeHtml(q.imageUrl)}" alt="Question Image" class="w-full max-h-40 object-cover rounded-md mb-3">` 
       : '';
 
     const qStr = JSON.stringify(q).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+    const qlines = q.questionText.split('\n');
+    const qtitle = qlines[0];
+    const qcode = qlines.slice(1).join('\n').trim();
+
     // Added the delete button here
     questionDiv.innerHTML = `
       ${imageHTML}
-      <p class="font-medium text-gray-200 break-words">${q.questionText}</p>
+      <div class="mb-3">
+        <p class="font-semibold text-white text-sm mb-2">${escapeHtml(qtitle)}</p>
+        ${qcode ? `<div class="bg-black/40 border border-white/5 rounded-lg p-3 font-code text-[11px] text-gray-400 whitespace-pre-wrap leading-relaxed shadow-inner">${escapeHtml(qcode)}</div>` : ''}
+      </div>
       <ul class="list-disc list-inside text-sm text-gray-600 my-2 space-y-1">
         ${optionsHTML}
       </ul>
@@ -305,5 +312,15 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     `;
     return questionDiv;
+  }
+
+  function escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return String(unsafe)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 });

@@ -5,6 +5,24 @@ document.addEventListener('DOMContentLoaded', () => {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     };
 
+    const dedentText = (text) => {
+      if (!text) return "";
+      const expandedText = text.replace(/\t/g, "    ");
+      const lines = expandedText.split("\n");
+      while (lines.length > 0 && lines[0].trim() === "") lines.shift();
+      while (lines.length > 0 && lines[lines.length - 1].trim() === "") lines.pop();
+      if (lines.length === 0) return "";
+      const indents = lines
+        .filter(line => line.trim().length > 0)
+        .map(line => {
+          const match = line.match(/^\s*/);
+          return match ? match[0].length : 0;
+        });
+      if (indents.length === 0) return lines.join("\n").trim();
+      const minIndent = Math.min(...indents);
+      return lines.map(line => line.slice(minIndent)).join("\n");
+    };
+
     // --- Page Elements ---
     const searchForm = document.getElementById('search-form');
     const searchInput = document.getElementById('search-rollno');
@@ -215,12 +233,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? `<img src="${safeUrl}" alt="Question Content" class="w-full rounded-lg mb-3 max-h-48 object-contain border border-white/10">`
                 : '';
 
+            const qlines = answer.questionText.split('\n');
+            const qtitle = qlines[0];
+            const qcode = qlines.slice(1).join('\n').trim();
+
             const questionCard = document.createElement('div');
-            questionCard.className = `p-4 border ${borderColor} ${bgColor} rounded-lg bg-[#050505]`;
+            questionCard.className = `p-4 border ${borderColor} ${bgColor} rounded-lg bg-[#050505] shadow-sm`;
             questionCard.innerHTML = `
                 ${imageHTML}
-                <p class="font-semibold text-lg text-white">${index + 1}. ${escapeHtml(answer.questionText)}</p>
-                <ul class="list-disc list-inside mt-2 space-y-1">
+                <div class="flex items-start gap-3 mb-3">
+                  <span class="text-gray-500 font-mono text-xs mt-0.5 shrink-0 min-w-[1.5rem]">Q${index + 1}.</span>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-white text-sm ${qcode ? 'mb-3' : ''}">
+                      ${escapeHtml(qtitle)}
+                    </p>
+                    ${qcode ? `
+                      <div class="font-code text-[11px] text-gray-500 whitespace-pre-wrap leading-relaxed min-w-0 mt-3">
+                        ${escapeHtml(dedentText(qcode))}
+                      </div>
+                    ` : ''}
+                  </div>
+                </div>
+                <ul class="list-disc list-inside mt-2 space-y-1 text-xs">
                     ${optionsHtml}
                 </ul>
             `;

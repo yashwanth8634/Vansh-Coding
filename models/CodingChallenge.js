@@ -29,4 +29,7 @@ const codingChallengeSchema = new mongoose.Schema({
   },
 });
 
+// Index for sorting
+codingChallengeSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('CodingChallenge', codingChallengeSchema);

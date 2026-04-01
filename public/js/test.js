@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const questionArea = document.getElementById('question-area');
   const submitTestBtn = document.getElementById('submit-test-btn');
   const progressText = document.getElementById('progress-text');
+  const progressTextMobile = document.getElementById('progress-text-mobile');
+  const progressFooter = document.getElementById('progress-footer');
   const questionNav = document.getElementById('question-nav');
   const questionNavButtons = document.getElementById('question-nav-buttons');
 
@@ -165,6 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- 2. INITIALIZE TEST UI ---
   async function startTest() {
+    // Hide main navbar during test
+    const mainNavbar = document.getElementById('main-navbar');
+    if (mainNavbar) mainNavbar.style.display = 'none';
+    
     loginContainer.style.display = 'none';
     testContainer.style.display = 'block';
 
@@ -187,10 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
     questions.forEach((q, index) => {
       // Create options HTML
       const optionsHtml = q.options.map((option, optIdx) => `
-        <label class="block p-4 border border-white/10 bg-[#0a0a0a] rounded-xl hover:bg-[#111] hover:border-white/30 cursor-pointer transition-all duration-200 group">
-          <div class="flex items-center">
-            <input type="radio" name="question-${q._id}" value="${escapeHtml(option)}" class="w-5 h-5 bg-black border-white/20 text-white focus:ring-1 focus:ring-white/30 focus:ring-offset-0 focus:ring-offset-transparent">
-            <span class="ml-4 font-medium text-gray-300 text-sm group-hover:text-white">${escapeHtml(option)}</span>
+        <label class="block p-3 md:p-4 border border-white/10 bg-[#0a0a0a] rounded-xl hover:bg-[#111] hover:border-white/30 cursor-pointer transition-all duration-200 group">
+          <div class="flex items-start gap-3">
+            <input type="radio" name="question-${q._id}" value="${escapeHtml(option)}" class="w-5 h-5 mt-0.5 bg-black border-white/20 text-white focus:ring-1 focus:ring-white/30 focus:ring-offset-0 focus:ring-offset-transparent shrink-0">
+            <span class="font-medium text-gray-300 text-sm group-hover:text-white break-words">${escapeHtml(option)}</span>
           </div>
         </label>
       `).join('');
@@ -198,18 +204,39 @@ document.addEventListener('DOMContentLoaded', () => {
       // Add image HTML if it exists
       const safeImgq = q.imageUrl && (q.imageUrl.startsWith('https://') || q.imageUrl.startsWith('http://')) ? q.imageUrl : '';
       const imageHTML = safeImgq
-        ? `<img src="${safeImgq}" alt="Question Content" class="w-full rounded-lg mb-6 max-h-72 object-contain border border-white/10">`
+        ? `<img src="${safeImgq}" alt="Question Content" class="w-full rounded-lg mb-4 md:mb-6 max-h-48 md:max-h-72 object-contain border border-white/10">`
         : '';
 
+      const lines = q.questionText.split('\n');
+      const questionTitle = lines[0];
+      const rawRestOfText = lines.slice(1).join('\n');
+      const restOfText = rawRestOfText;
+      
+      const questionHTML = `
+        <div class="mb-6">
+          <div class="flex items-start gap-3 md:gap-4 mb-4">
+            <span class="text-gray-500 font-mono text-sm shrink-0 mt-1.5 min-w-[2rem] md:min-w-[2.5rem]">Q${index + 1}.</span>
+            <div class="flex-1 min-w-0 overflow-hidden">
+              <h3 class="text-lg md:text-xl lg:text-2xl font-semibold text-white leading-snug tracking-tight break-words ${restOfText ? 'mb-4' : ''}">
+                ${escapeHtml(questionTitle)}
+              </h3>
+              ${restOfText ? `
+                <div class="bg-black/30 border border-white/5 rounded-lg p-3 md:p-4 mt-3 overflow-x-auto">
+                  <pre class="font-code text-xs md:text-sm text-gray-400 whitespace-pre leading-relaxed m-0">${escapeHtml(restOfText)}</pre>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+      
       // Create question card
       const questionCard = document.createElement('div');
-      questionCard.className = 'bg-[#0a0a0a] p-6 md:p-10 rounded-2xl border border-white/10 mb-8 w-full';
+      questionCard.className = 'bg-[#0a0a0a] p-4 md:p-6 lg:p-10 rounded-2xl border border-white/10 mb-6 md:mb-8 w-full overflow-hidden';
       questionCard.id = `question-card-${q._id}`;
       questionCard.innerHTML = `
         ${imageHTML}
-        <h3 class="text-xl md:text-2xl font-semibold mb-8 text-white leading-relaxed tracking-tight">
-          <span class="text-gray-500 mr-2 font-mono text-sm">Q${index + 1}.</span> ${escapeHtml(q.questionText)}
-        </h3>
+        ${questionHTML}
         <div class="space-y-3" data-question-id="${q._id}">
           ${optionsHtml}
         </div>
@@ -265,6 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (progressText) progressText.textContent = `Answered ${answered} / ${total}`;
+    if (progressTextMobile) progressTextMobile.textContent = `Answered ${answered} / ${total}`;
+    if (progressFooter) progressFooter.textContent = `Answered ${answered} / ${total}`;
   }
   
   // --- 4. START TIMER ---
@@ -333,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if(returnToTestBtn) {
     returnToTestBtn.addEventListener('click', () => {
       if(warningModal) warningModal.style.display = 'none';
-      document.documentElement.requestFullscreen().catch();
+      document.documentElement.requestFullscreen().catch(() => {});
     });
   }
 
@@ -452,11 +481,34 @@ document.addEventListener('DOMContentLoaded', () => {
           ? `<img src="${safeImg}" alt="Question Content" class="w-full rounded-lg mb-5 max-h-64 object-contain border border-white/10">`
           : '';
 
+        const lines = item.questionText.split('\n');
+        const questionTitle = lines[0];
+        const rawRestOfText = lines.slice(1).join('\n');
+        const restOfText = rawRestOfText;
+        
+        const questionHtmlRes = `
+          <div class="mb-4">
+            <div class="flex items-start gap-3 mb-2">
+              <span class="text-gray-500 font-mono text-xs mt-1 shrink-0 min-w-[2rem]">Q${index + 1}.</span>
+              <div class="flex-1 min-w-0">
+                <h4 class="font-semibold text-white leading-snug tracking-tight text-sm ${restOfText ? 'mb-3' : ''}">
+                  ${escapeHtml(questionTitle)}
+                </h4>
+                ${restOfText ? `
+                  <div class="bg-black/30 border border-white/5 rounded-lg p-3 mt-3 overflow-x-auto">
+                    <pre class="font-code text-[11px] md:text-xs text-gray-400 whitespace-pre leading-relaxed m-0">${escapeHtml(restOfText)}</pre>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+        
         const resultCard = document.createElement('div');
         resultCard.className = `p-6 border ${borderColor} ${bgColor} rounded-xl bg-[#0a0a0a]`;
         resultCard.innerHTML = `
             ${imageHTML}
-            <h4 class="font-medium text-sm text-gray-200 leading-relaxed"><span class="text-gray-500 mr-2 font-mono">Q${index + 1}.</span> ${escapeHtml(item.questionText)}</h4>
+            ${questionHtmlRes}
             ${answerHtml}
         `;
         resultsBreakdown.appendChild(resultCard);

@@ -431,7 +431,12 @@ router.post('/coding/student/start', async (req, res) => {
       return res.status(400).json({ message: 'Invalid year selected.' });
     }
 
-    const codingTest = await getCachedCodingTest(uniqueLink);
+    const codingTest = await CodingTest.findOne({ uniqueLink })
+      .populate({
+        path: 'codingBank',
+        populate: { path: 'challenges' }
+      })
+      .lean();
 
     if (!codingTest) {
       return res.status(404).json({ message: 'Coding test link is invalid.' });
@@ -441,17 +446,86 @@ router.post('/coding/student/start', async (req, res) => {
       return res.status(400).json({ message: 'This coding test link has expired.' });
     }
 
-    const existingAttempt = await CodingAttempt.findOne({
+    let attempt = await CodingAttempt.findOne({
       codingTest: codingTest._id,
       studentRollNo: rollNo,
-    }).select('_id');
+    }).populate('answers.challenge');
 
-    if (existingAttempt) {
-      return res.status(403).json({ message: 'You have already attempted this coding test.' });
+    if (attempt) {
+      // Return existing challenges for this student (resume)
+      const questionsForStudent = attempt.answers.map(ans => ({
+        id: ans.challenge._id,
+        title: ans.challenge.title,
+        difficulty: ans.challenge.difficulty,
+        description: ans.challenge.description,
+        sampleTest: (ans.challenge.testCases || []).find(tc => !tc.isHidden) || null
+      }));
+
+      return res.json({
+        message: 'Resuming coding test.',
+        student: { name, rollNo, department, year, section, collegeName },
+        challenges: questionsForStudent,
+        durationMinutes: codingTest.durationMinutes
+      });
     }
 
+    // New attempt - handle randomization
+    let selectedChallenges = [];
+    const allChallenges = (codingTest.codingBank && codingTest.codingBank.challenges) || [];
+
+    if (codingTest.numChallenges > 0 && allChallenges.length > 0) {
+      selectedChallenges = shuffleArray([...allChallenges]).slice(0, codingTest.numChallenges);
+    } else {
+      selectedChallenges = allChallenges;
+    }
+
+    if (selectedChallenges.length === 0) {
+      return res.status(400).json({ message: 'No challenges available in this test.' });
+    }
+
+    // Create Draft Attempt
+    const newAttempt = new CodingAttempt({
+      studentName: name,
+      studentRollNo: rollNo,
+      studentDepartment: department,
+      studentYear: year,
+      studentSection: section,
+      studentCollege: collegeName,
+      codingTest: codingTest._id,
+      answers: selectedChallenges.map(c => ({
+        challenge: c._id,
+        status: 'Unattempted'
+      }))
+    });
+    await newAttempt.save();
+
+    const questionsForStudent = selectedChallenges.map(c => ({
+      id: c._id,
+      title: c.title,
+      difficulty: c.difficulty,
+      description: c.description,
+      sampleTest: (c.testCases || []).find(tc => !tc.isHidden) || null
+    }));
+
+    // Generate a token so the student can resume session on refresh
+    const jwt = require('jsonwebtoken');
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET not configured - cannot generate session token');
+      return res.status(500).json({ message: 'Server configuration error.' });
+    }
+    const token = jwt.sign({ 
+      attemptId: newAttempt._id,
+      rollNo,
+      testId: codingTest._id
+    }, process.env.JWT_SECRET, { expiresIn: '2h' });
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 2 * 60 * 60 * 1000, // 2 hours
+    });
+
     res.json({
-      message: 'Student details accepted.',
+      message: 'Student details accepted. Test started.',
       student: {
         name,
         rollNo,
@@ -460,6 +534,8 @@ router.post('/coding/student/start', async (req, res) => {
         section,
         collegeName,
       },
+      challenges: questionsForStudent,
+      durationMinutes: codingTest.durationMinutes
     });
   } catch (error) {
     console.error(error);

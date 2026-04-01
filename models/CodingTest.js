@@ -22,6 +22,10 @@ const codingTestSchema = new mongoose.Schema({
     default: 30,
     min: 1,
   },
+  numChallenges: {
+    type: Number,
+    default: 0, // 0 means use all challenges in the bank
+  },
 }, { timestamps: true });
 
 codingTestSchema.index({ createdAt: -1 });

@@ -309,8 +309,8 @@
 
     <!-- MIDDLE: Problem Description -->
     <div
-      class="flex flex-col w-full md:w-1/3 xl:w-[35%] min-h-[260px] md:min-h-0 glass-card rounded-2xl border border-white/10 overflow-hidden shrink-0 shadow-2xl bg-[#0a0a0a]">
-      <div class="px-6 py-5 border-b border-white/10 bg-[#050505] shrink-0">
+      class="flex flex-col w-full md:w-1/3 xl:w-[35%] min-h-[260px] md:min-h-0 rounded-2xl border border-white/10 overflow-hidden shrink-0 bg-[#0a0a0a]">
+      <div class="px-6 py-5 border-b border-white/10 bg-transparent shrink-0">
         <div class="flex items-center gap-3 mb-2">
           <span id="current-q-diff"
             class="text-[10px] px-2 py-0.5 border rounded uppercase tracking-widest font-mono">--</span>
@@ -318,7 +318,7 @@
         <h2 id="current-q-title" class="text-xl font-semibold text-white tracking-tight">Loading...</h2>
       </div>
       <div id="current-q-desc"
-        class="p-5 md:p-8 overflow-y-auto flex-1 prose prose-invert prose-sm max-w-none text-gray-300 font-normal leading-relaxed">
+        class="p-5 md:p-8 overflow-y-auto flex-1 max-w-none text-gray-300 font-normal leading-relaxed whitespace-pre-wrap">
         <!-- Markdown -->
       </div>
     </div>
@@ -425,8 +425,8 @@
       const data = JSON.parse(document.getElementById('server-data').textContent);
       const testId = data.testId;
       const uniqueLink = window.location.pathname.split('/').pop();
-      const challenges = data.challenges;
-      const sessionDurationMinutes = <%= Number(test.durationMinutes || 30) %>;
+      let challenges = data.challenges || [];
+      let sessionDurationMinutes = <%= Number(test.durationMinutes || 30) %>;
 
       const STARTER_TEMPLATES = {
         javascript: `// Read input
@@ -500,7 +500,35 @@ int main() {
       const currentTitle = document.getElementById('current-q-title');
       const currentDiff = document.getElementById('current-q-diff');
       const currentDesc = document.getElementById('current-q-desc');
-      const tabs = document.querySelectorAll('.challenge-tab');
+      const questionTabsContainer = document.getElementById('question-tabs');
+      let tabs = document.querySelectorAll('.challenge-tab');
+
+      function renderQuestionTabs() {
+        questionTabsContainer.innerHTML = '';
+        challenges.forEach((c, index) => {
+          const btn = document.createElement('button');
+          btn.dataset.id = c.id;
+          btn.className = `challenge-tab shrink-0 md:shrink w-auto md:w-full text-left p-3 rounded-xl border border-transparent hover:bg-white/5 transition-all flex items-center gap-3 group ${activeChallengeId === c.id ? 'active' : ''}`;
+          
+          btn.innerHTML = `
+            <div class="w-8 h-8 rounded-lg shrink-0 bg-[#0a0a0a] border border-white/10 group-[.active]:bg-white group-[.active]:text-black text-gray-400 flex items-center justify-center font-mono text-sm transition-colors">
+              ${index + 1}
+            </div>
+            <div class="hidden lg:block truncate">
+              <div class="text-sm font-medium text-gray-300 group-[.active]:text-white truncate mb-0.5">
+                ${c.title}
+              </div>
+              <div class="text-[10px] font-mono uppercase tracking-widest text-gray-500 group-[.active]:text-gray-400">
+                ${c.difficulty}
+              </div>
+            </div>
+          `;
+          
+          btn.addEventListener('click', () => loadChallenge(c.id));
+          questionTabsContainer.appendChild(btn);
+        });
+        tabs = document.querySelectorAll('.challenge-tab');
+      }
 
       const consoleDrawer = document.getElementById('console-drawer');
       const consoleToggle = document.getElementById('console-toggle');
@@ -575,7 +603,7 @@ int main() {
 
         currentDiff.className = `text-[10px] px-2 py-0.5 border rounded uppercase tracking-widest font-mono ${diffClass}`;
 
-        currentDesc.innerHTML = marked.parse(chal.description);
+        currentDesc.textContent = chal.description;
 
         langSelect.value = submissions[id].language;
         updateCodeMirrorMode(submissions[id].language);
@@ -772,6 +800,32 @@ int main() {
 
           studentProfile = result.student;
           hasStarted = true;
+          
+          // Update challenges from API response
+          if (result.challenges && result.challenges.length > 0) {
+            challenges = result.challenges;
+            activeChallengeId = challenges[0].id;
+            
+            // Re-initialize submissions object for the new challenges
+            challenges.forEach((c) => {
+              if (!submissions[c.id]) {
+                submissions[c.id] = {
+                  code: STARTER_TEMPLATES.javascript,
+                  language: 'javascript',
+                  templateLanguage: 'javascript',
+                };
+              }
+            });
+            
+            renderQuestionTabs();
+            loadChallenge(activeChallengeId, true);
+          }
+
+          if (result.durationMinutes) {
+            sessionDurationMinutes = result.durationMinutes;
+            sessionTimeLeftSeconds = Math.max(1, sessionDurationMinutes) * 60;
+          }
+
           rollNoInput.value = studentProfile.rollNo.toUpperCase();
           studentSessionMeta.textContent = `${studentProfile.name} • ${studentProfile.department} • ${studentProfile.year}${studentProfile.section ? ` • ${studentProfile.section}` : ''}`;
           startModal.classList.add('hidden');
@@ -781,6 +835,7 @@ int main() {
           addSecurityListeners();
           startSessionTimer();
         } catch (error) {
+          console.error('Start error:', error);
           startModalError.textContent = 'A network error occurred while starting the coding test.';
           startModalError.classList.remove('hidden');
           codingRulesScreen.classList.add('hidden');

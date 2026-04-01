@@ -23,4 +23,7 @@ const codingBankSchema = new mongoose.Schema({
   },
 });
 
+// Indexes for sorting and lookup
+codingBankSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('CodingBank', codingBankSchema);
