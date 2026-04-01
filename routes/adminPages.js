@@ -2,6 +2,7 @@
 // Admin page-rendering routes (dashboard, question banks, tests)
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const { protect } = require('../middleware/auth');
 const { caches } = require('../utils/cache');
 const { sanitizeFilename, drawRankingPdf } = require('../utils/helpers');
@@ -201,6 +202,10 @@ router.get('/coding/tests/links', protect, async (req, res) => {
 // GET /admin/coding/results/:testId - View Coding Test Results
 router.get('/coding/results/:testId', protect, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.testId)) {
+      return res.status(400).send('Invalid coding test ID');
+    }
+
     const test = await CodingTest.findById(req.params.testId).populate('codingBank').lean();
     if (!test) return res.status(404).send('Coding test not found');
     
@@ -212,9 +217,13 @@ router.get('/coding/results/:testId', protect, async (req, res) => {
     const rankedAttempts = attempts
       .map((attempt) => ({
         ...attempt,
-        solvedCount: (attempt.answers || []).filter((answer) => answer.status === 'Accepted').length,
-        passedTestCases: (attempt.answers || []).reduce((sum, answer) => sum + (answer.passedCases || 0), 0),
-        totalTestCases: (attempt.answers || []).reduce((sum, answer) => sum + (answer.totalCases || 0), 0),
+        answers: Array.isArray(attempt.answers) ? attempt.answers : [],
+      }))
+      .map((attempt) => ({
+        ...attempt,
+        solvedCount: attempt.answers.filter((answer) => answer.status === 'Accepted').length,
+        passedTestCases: attempt.answers.reduce((sum, answer) => sum + (answer.passedCases || 0), 0),
+        totalTestCases: attempt.answers.reduce((sum, answer) => sum + (answer.totalCases || 0), 0),
       }))
       .sort((a, b) => {
         if (b.solvedCount !== a.solvedCount) {
@@ -239,6 +248,10 @@ router.get('/coding/results/:testId', protect, async (req, res) => {
 
 router.get('/coding/results/:testId/pdf', protect, async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.testId)) {
+      return res.status(400).send('Invalid coding test ID');
+    }
+
     const test = await CodingTest.findById(req.params.testId).populate('codingBank');
     if (!test) return res.status(404).send('Coding test not found');
 
@@ -253,9 +266,13 @@ router.get('/coding/results/:testId/pdf', protect, async (req, res) => {
     const rankedAttempts = attempts
       .map((attempt) => ({
         ...attempt,
-        solvedCount: (attempt.answers || []).filter((answer) => answer.status === 'Accepted').length,
-        passedTestCases: (attempt.answers || []).reduce((sum, answer) => sum + (answer.passedCases || 0), 0),
-        totalTestCases: (attempt.answers || []).reduce((sum, answer) => sum + (answer.totalCases || 0), 0),
+        answers: Array.isArray(attempt.answers) ? attempt.answers : [],
+      }))
+      .map((attempt) => ({
+        ...attempt,
+        solvedCount: attempt.answers.filter((answer) => answer.status === 'Accepted').length,
+        passedTestCases: attempt.answers.reduce((sum, answer) => sum + (answer.passedCases || 0), 0),
+        totalTestCases: attempt.answers.reduce((sum, answer) => sum + (answer.totalCases || 0), 0),
       }))
       .sort((a, b) => {
         if (b.solvedCount !== a.solvedCount) {
