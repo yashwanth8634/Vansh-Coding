@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
     <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
@@ -332,7 +333,10 @@
           <select id="language-select"
             class="bg-transparent text-gray-300 text-xs font-mono outline-none hover:text-white transition-colors cursor-pointer appearance-none border border-transparent hover:border-white/10 px-2 py-1 rounded w-full sm:w-auto">
             <option value="javascript" class="bg-[#111]">JavaScript (Node.js 20)</option>
+            <option value="python" class="bg-[#111]">Python 3.12</option>
+            <option value="java" class="bg-[#111]">Java 22</option>
             <option value="cpp" class="bg-[#111]">C++ (GCC 13)</option>
+            <option value="c" class="bg-[#111]">C (GCC 13)</option>
           </select>
         </div>
         <button id="run-btn" class="btn-ghost w-full sm:w-auto px-4 py-2 text-xs">
@@ -434,8 +438,39 @@ const lines = input.split('\\n');
 
 
 `,
+        python: `# Read input
+import sys
+input_data = sys.stdin.read().strip()
+lines = input_data.split('\\n')
+
+# Write your solution here
+
+
+`,
+        java: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Write your solution here
+
+
+        sc.close();
+    }
+}
+`,
         cpp: `#include <iostream>
 using namespace std;
+
+int main() {
+    // Write your solution here
+
+
+    return 0;
+}
+`,
+        c: `#include <stdio.h>
 
 int main() {
     // Write your solution here
@@ -584,7 +619,9 @@ int main() {
 
       function updateCodeMirrorMode(lang) {
         let mode = 'javascript';
-        if (lang === 'cpp') mode = 'text/x-c++src';
+        if (lang === 'python') mode = 'python';
+        if (lang === 'java') mode = 'text/x-java';
+        if (['cpp', 'c'].includes(lang)) mode = 'text/x-c++src';
         editor.setOption('mode', mode);
       }
 

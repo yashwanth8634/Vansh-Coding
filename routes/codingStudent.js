@@ -34,8 +34,10 @@ const executionLimiter = rateLimit({
 // Wandbox API mapping for languages
 const WANDBOX_API_URL = 'https://wandbox.org/api/compile.json';
 const LANGUAGE_MAP = {
-  javascript: 'nodejs-20.17.0',
+  python: 'cpython-3.12.7',
+  java: 'openjdk-jdk-22+36',
   cpp: 'gcc-13.2.0',
+  c: 'gcc-13.2.0-c',
 };
 
 // Helper function to call Wandbox API with strict timeout
