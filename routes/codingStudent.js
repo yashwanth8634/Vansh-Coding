@@ -258,7 +258,7 @@ router.post('/submit', executionLimiter, async (req, res) => {
     res.json({ message: 'Test submitted successfully', result: finalAnswers });
 
   } catch (err) {
-    if (err.code === 11000) return res.status(400).json({ message: 'You have already submitted this test.' });
+    if (err.code === 11000) return res.status(403).json({ message: 'Test already taken.' });
     console.error(err);
     res.status(500).json({ message: 'Execution failed', error: err.message });
   }

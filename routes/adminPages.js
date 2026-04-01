@@ -237,6 +237,7 @@ router.get('/coding/results/:testId', protect, async (req, res) => {
       .map((attempt, index) => ({
         ...attempt,
         rank: index + 1,
+        score: `${attempt.solvedCount || 0} Solved | ${attempt.passedTestCases || 0}/${attempt.totalTestCases || 0} Cases`,
       }));
         
     res.render('coding-results', { test, attempts: rankedAttempts, activeTab: 'coding-tests' });

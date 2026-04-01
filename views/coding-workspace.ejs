@@ -32,8 +32,16 @@
       .CodeMirror {
         height: 100% !important;
         font-family: 'Fira Code', monospace;
-        padding-bottom: 50px;
-        /* Pre-allocate space for console drawer on mobile */
+      }
+      .CodeMirror-scroll {
+        overflow: auto !important;
+      }
+      .CodeMirror-vscrollbar, .CodeMirror-hscrollbar {
+        scrollbar-width: thin;
+      }
+      #editor-container {
+        min-height: 0;
+        overflow: hidden;
       }
     </style>
 </head>
@@ -332,7 +340,6 @@
           <span class="material-symbols-outlined text-[16px] text-gray-500">code</span>
           <select id="language-select"
             class="bg-transparent text-gray-300 text-xs font-mono outline-none hover:text-white transition-colors cursor-pointer appearance-none border border-transparent hover:border-white/10 px-2 py-1 rounded w-full sm:w-auto">
-            <option value="javascript" class="bg-[#111]">JavaScript (Node.js 20)</option>
             <option value="python" class="bg-[#111]">Python 3.12</option>
             <option value="java" class="bg-[#111]">Java 22</option>
             <option value="cpp" class="bg-[#111]">C++ (GCC 13)</option>
@@ -346,23 +353,20 @@
       </div>
 
       <!-- Editor -->
-      <div class="flex-1 relative p-0" id="editor-container"></div>
+      <div class="flex-1 min-h-0 relative p-0" id="editor-container"></div>
 
       <!-- Console Drawer -->
       <div id="console-drawer"
-        class="h-[45px] bg-[#0a0a0a] border-t border-white/10 flex flex-col shrink-0 transition-all duration-300 z-10 relative">
-        <div
-          class="flex items-center justify-between px-6 h-[45px] cursor-pointer select-none group hover:bg-[#111] transition-colors"
-          id="console-toggle">
+        class="h-[35%] bg-[#0a0a0a] border-t border-white/10 flex flex-col shrink-0 transition-all duration-300 z-10 relative">
+        <div class="flex items-center justify-between px-6 h-[45px] select-none bg-[#0a0a0a]" id="console-toggle">
           <h3
-            class="text-gray-400 hover:text-white text-xs font-semibold flex items-center gap-2 uppercase tracking-widest transition-colors">
+            class="text-gray-400 text-xs font-semibold flex items-center gap-2 uppercase tracking-widest">
             <span class="material-symbols-outlined text-[16px]">terminal</span> Execution Console
           </h3>
           <div class="flex items-center gap-4">
             <span id="status-badge"
               class="hidden text-[10px] px-2 py-0.5 border rounded uppercase tracking-widest font-mono"></span>
-            <span class="material-symbols-outlined text-[16px] text-gray-500 group-hover:text-white transition-colors"
-              id="console-icon">expand_less</span>
+            <span class="material-symbols-outlined text-[16px] text-gray-500" id="console-icon">dock_to_bottom</span>
           </div>
         </div>
         <div
@@ -371,6 +375,7 @@
           <span class="text-gray-600">Waiting for execution...</span>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -380,7 +385,7 @@
       challenges: test.codingBank.challenges.map(c => ({
         id: c._id, title: c.title, difficulty: c.difficulty, 
         description: c.description,
-        sampleTest: c.testCases.find(tc => !tc.isHidden) || null
+        sampleTest: c.testCases.find(tc => !tc.isHidden) || null,
       }))
     }) %>
   </script>
@@ -430,70 +435,25 @@
       let sessionDurationMinutes = <%= Number(test.durationMinutes || 30) %>;
 
       const STARTER_TEMPLATES = {
-        javascript: `// Read input
-const input = require('fs').readFileSync(0, 'utf8').trim();
-const lines = input.split('\\n');
-
-// Write your solution here
-
-
-`,
-        python: `# Read input
-import sys
-input_data = sys.stdin.read().strip()
-lines = input_data.split('\\n')
-
-# Write your solution here
-
-
-`,
-        java: `import java.util.Scanner;
-
-public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        // Write your solution here
-
-
-        sc.close();
-    }
-}
-`,
-        cpp: `#include <iostream>
-using namespace std;
-
-int main() {
-    // Write your solution here
-
-
-    return 0;
-}
-`,
-        c: `#include <stdio.h>
-
-int main() {
-    // Write your solution here
-
-
-    return 0;
-}
-`,
+        python: '# Write your code here',
+        java: '// Write your code here',
+        cpp: '// Write your code here',
+        c: '// Write your code here',
       };
 
       const submissions = {};
       challenges.forEach((c) => {
         submissions[c.id] = {
-          code: STARTER_TEMPLATES.javascript,
-          language: 'javascript',
-          templateLanguage: 'javascript',
+          code: STARTER_TEMPLATES.python,
+          language: 'python',
+          templateLanguage: 'python',
         };
       });
 
       let activeChallengeId = challenges.length > 0 ? challenges[0].id : null;
 
       const editor = CodeMirror(document.getElementById('editor-container'), {
-        lineNumbers: true, theme: 'dracula', mode: 'javascript', indentUnit: 4, tabSize: 4, lineWrapping: true,
+        lineNumbers: true, theme: 'dracula', mode: 'python', indentUnit: 4, tabSize: 4, lineWrapping: false,
         extraKeys: { "Ctrl-Space": "autocomplete" }
       });
 
@@ -569,7 +529,6 @@ int main() {
 
       const IDLE_RUN_HTML = '<span class="material-symbols-outlined text-[16px]">play_arrow</span> Run <span class="hidden xl:inline">Code</span>';
       const IDLE_SUBMIT_HTML = '<span class="material-symbols-outlined text-[18px]">publish</span> <span class="hidden sm:inline">Submit Final Test</span>';
-
       function setBusyState(button, isBusy, idleMarkup, busyMarkup) {
         button.disabled = isBusy;
         button.classList.toggle('opacity-70', isBusy);
@@ -578,7 +537,7 @@ int main() {
       }
 
       function getStarterTemplate(language) {
-        return STARTER_TEMPLATES[language] || STARTER_TEMPLATES.javascript;
+        return STARTER_TEMPLATES[language] || STARTER_TEMPLATES.python;
       }
 
       function syncActiveSubmission() {
@@ -612,13 +571,12 @@ int main() {
         updateCodeMirrorMode(submissions[id].language);
         editor.setValue(submissions[id].code);
 
-        if (consoleIcon.textContent === 'expand_more') consoleToggle.click();
         statusBadge.classList.add('hidden');
         outputDiv.innerHTML = '<span class="text-gray-600">Awaiting execution trace...</span>';
       }
 
       function updateCodeMirrorMode(lang) {
-        let mode = 'javascript';
+        let mode = 'python';
         if (lang === 'python') mode = 'python';
         if (lang === 'java') mode = 'text/x-java';
         if (['cpp', 'c'].includes(lang)) mode = 'text/x-c++src';
@@ -848,9 +806,9 @@ int main() {
             challenges.forEach((c) => {
               if (!submissions[c.id]) {
                 submissions[c.id] = {
-                  code: STARTER_TEMPLATES.javascript,
-                  language: 'javascript',
-                  templateLanguage: 'javascript',
+                  code: STARTER_TEMPLATES.python,
+                  language: 'python',
+                  templateLanguage: 'python',
                 };
               }
             });
@@ -905,14 +863,9 @@ int main() {
         });
       });
 
-      consoleToggle.addEventListener('click', () => {
-        if (consoleDrawer.style.height === '40%') {
-          consoleDrawer.style.height = '45px'; consoleIcon.textContent = 'expand_less';
-        } else {
-          consoleDrawer.style.height = '40%'; consoleIcon.textContent = 'expand_more';
-        }
-      });
-      function forceOpenConsole() { if (consoleDrawer.style.height !== '40%') consoleToggle.click(); }
+      function forceOpenConsole() {
+        consoleDrawer.style.height = '35%';
+      }
       function setStatus(msg, type) {
         statusBadge.textContent = msg;
         statusBadge.classList.remove('hidden');
@@ -990,7 +943,6 @@ int main() {
           );
         }
       });
-
       document.getElementById('final-submit-btn').addEventListener('click', async () => {
         if (!hasStarted || currentState !== STATE.IDLE) return;
         document.getElementById('submit-confirm-modal').classList.remove('hidden');

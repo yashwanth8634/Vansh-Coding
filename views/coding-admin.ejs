@@ -221,7 +221,6 @@
       document.getElementById('title').value = c.title;
       document.getElementById('difficulty').value = c.difficulty;
       document.getElementById('description').value = c.description;
-
       // Rebuild test cases
       const container = document.getElementById('testCasesContainer');
       container.innerHTML = '';
@@ -250,7 +249,6 @@
       document.getElementById('form-subheading').textContent = 'Define a new coding problem.';
       document.getElementById('submitBtn').innerHTML = '<span class="material-symbols-outlined text-[18px]">add_circle</span> Create Challenge';
       document.getElementById('cancelEditBtn').classList.add('hidden');
-
       // Reset test cases to one blank card
       const container = document.getElementById('testCasesContainer');
       container.innerHTML = '';
@@ -268,7 +266,6 @@
         const title = document.getElementById('title').value;
         const difficulty = document.getElementById('difficulty').value;
         const description = document.getElementById('description').value;
-
         const testCaseElements = document.querySelectorAll('.test-case-card');
         const testCases = [];
         let hasInvalidCase = false;

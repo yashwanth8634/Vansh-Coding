@@ -300,7 +300,7 @@ router.post('/test/start', async (req, res) => {
 
     const existingAttempt = await Attempt.findOne({ test: test._id, studentRollNo: rollNo });
     if (existingAttempt) {
-      return res.status(403).json({ message: 'You have already attempted this test.' });
+      return res.status(403).json({ message: 'Test already taken.' });
     }
     
     let allQuestions = test.questionBank.questions;
@@ -339,7 +339,7 @@ router.post('/test/start', async (req, res) => {
   } catch (error) {
     console.error(error);
     if (error.code === 11000) {
-        return res.status(403).json({ message: 'You have already attempted this test.' });
+        return res.status(403).json({ message: 'Test already taken.' });
     }
     res.status(500).json({ message: 'Server error starting test.' });
   }
@@ -452,7 +452,7 @@ router.post('/coding/student/start', async (req, res) => {
     }).select('_id');
 
     if (existingAttempt) {
-      return res.status(403).json({ message: 'You have already started/submitted this coding test. Refresh is not allowed.' });
+      return res.status(403).json({ message: 'Test already taken.' });
     }
 
     // New attempt - handle randomization
@@ -490,7 +490,7 @@ router.post('/coding/student/start', async (req, res) => {
       title: c.title,
       difficulty: c.difficulty,
       description: c.description,
-      sampleTest: (c.testCases || []).find(tc => !tc.isHidden) || null
+      sampleTest: (c.testCases || []).find(tc => !tc.isHidden) || null,
     }));
 
     res.json({

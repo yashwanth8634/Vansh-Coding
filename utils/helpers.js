@@ -17,8 +17,8 @@ function drawRankingPdf({ res, title, subtitle, rows }) {
 
   doc.pipe(res);
 
-  const headers = ['Rank', 'Name', 'Roll No', 'Year', 'Department', 'Section', 'Clg'];
-  const columnWidths = [45, 145, 110, 55, 120, 70, 150];
+  const headers = ['Rank', 'Name', 'Roll No', 'Score', 'Year', 'Department', 'Section', 'Clg'];
+  const columnWidths = [45, 130, 95, 85, 50, 105, 65, 110];
   const startX = doc.page.margins.left;
   const bottomLimit = doc.page.height - doc.page.margins.bottom;
   let y = doc.page.margins.top;
@@ -52,6 +52,7 @@ function drawRankingPdf({ res, title, subtitle, rows }) {
       String(row.rank),
       row.studentName || '',
       row.studentRollNo || '',
+      row.score !== undefined && row.score !== null ? String(row.score) : '-',
       row.studentYear || '',
       row.studentDepartment || '',
       row.studentSection || '-',
@@ -61,7 +62,7 @@ function drawRankingPdf({ res, title, subtitle, rows }) {
     const cellHeights = values.map((value, index) => (
       doc.heightOfString(String(value), {
         width: columnWidths[index] - 12,
-        align: index === 0 || index === 3 ? 'center' : 'left',
+        align: index === 0 || index === 3 || index === 4 ? 'center' : 'left',
       })
     ));
 
@@ -82,7 +83,7 @@ function drawRankingPdf({ res, title, subtitle, rows }) {
         .fontSize(10)
         .text(String(value), x + 6, y + 6, {
           width: columnWidths[index] - 12,
-          align: index === 0 || index === 3 ? 'center' : 'left',
+          align: index === 0 || index === 3 || index === 4 ? 'center' : 'left',
         });
       x += columnWidths[index];
     });
