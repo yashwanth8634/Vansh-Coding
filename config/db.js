@@ -1,5 +1,6 @@
 // config/db.js
 const mongoose = require('mongoose');
+mongoose.set('bufferCommands', false);
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/quizApp';
 
@@ -27,6 +28,7 @@ const connectDB = async () => {
         maxPoolSize: poolSize,
         serverSelectionTimeoutMS: 10000,
         socketTimeoutMS: 45000,
+        bufferCommands: false,
       });
       console.log(`Attempting to connect to MongoDB (pool size: ${poolSize})...`);
     }

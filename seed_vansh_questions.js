@@ -667,54 +667,61 @@ print(a.add(4))`,
 const codingChallenges = [
   {
     title: 'Binary Range Collapse',
-    description: `Given two non-negative integers a and b where a ≤ b, compute the bitwise AND of all numbers in the inclusive range [a, b].
+    description: `Given two non-negative integers a and b where a <= b, compute the bitwise AND of all numbers in the inclusive range [a, b].
 
-You are given multiple such pairs. For each pair, determine the resulting value after applying the AND operation across the entire range.
-
-**Input Format:**
-- First line contains an integer t — number of test cases
+Input Format:
+- First line contains an integer t (number of test cases)
 - Next t lines each contain two space-separated integers a and b
 
-**Output Format:**
-- For each test case, print a single integer — the bitwise AND of all numbers from a to b
+Output Format:
+- For each test case, print a single integer
 
-**Constraints:**
-- 1 ≤ t ≤ 10⁵
-- 0 ≤ a ≤ b ≤ 10¹⁸
+Constraints:
+- 1 <= t <= 10^5
+- 0 <= a <= b <= 10^18
 
-**Note:** A naive iteration over the range will not pass all test cases. The result depends on common prefix bits of a and b.`,
-    sampleInput: `3
+Sample Input:
+3
 12 15
 2 3
-8 13`,
-    sampleOutput: `12
+8 13
+
+Sample Output:
+12
 2
 8`,
-    explanation: `Range [12,15] → 12 & 13 & 14 & 15 = 12
-Range [2,3] → 2 & 3 = 2
-Range [8,13] → common bits result in 8`,
     difficulty: 'Medium',
-    defaultLanguage: 'python'
+    testCases: [
+      { input: '3\n12 15\n2 3\n8 13', expectedOutput: '12\n2\n8', isHidden: false },
+      { input: '2\n17 23\n11 15', expectedOutput: '16\n8', isHidden: false },
+      { input: '1\n5 5', expectedOutput: '5', isHidden: true },
+      { input: '1\n5 6', expectedOutput: '4', isHidden: true },
+      { input: '1\n7 8', expectedOutput: '0', isHidden: true },
+      { input: '1\n8 11', expectedOutput: '8', isHidden: true },
+      { input: '1\n10 15', expectedOutput: '8', isHidden: true },
+      { input: '1\n100 120', expectedOutput: '96', isHidden: true },
+      { input: '1\n3 7', expectedOutput: '0', isHidden: true },
+    ],
   },
   {
     title: 'Minimum Difference Window',
-    description: `You are given a list of integers and an integer k. You must select exactly k elements from the list such that the difference between the maximum and minimum elements in the selected group is minimized.
+    description: `You are given a list of integers and an integer k. Select exactly k elements such that the difference between the maximum and minimum elements is minimized.
 
-Return the minimum possible difference.
+Input Format:
+- First line contains n
+- Second line contains k
+- Next n lines contain one integer each
 
-**Input Format:**
-- First line contains an integer n — number of elements
-- Second line contains an integer k
-- Next n lines each contain one integer representing the array elements
+Output Format:
+- Print the minimum possible difference
 
-**Output Format:**
-- Print a single integer — the minimum possible difference
+Constraints:
+- 1 <= n <= 10^5
+- 1 <= k <= n
+- 0 <= arr[i] <= 10^9
 
-**Constraints:**
-- 1 ≤ n ≤ 10⁵
-- 1 ≤ k ≤ n
-- 0 ≤ arr[i] ≤ 10⁹`,
-    sampleInput: `7
+Sample Input:
+7
 3
 10
 100
@@ -722,133 +729,171 @@ Return the minimum possible difference.
 200
 1000
 20
-30`,
-    sampleOutput: `20`,
-    explanation: `Selecting elements [10, 20, 30] gives difference = 30 - 10 = 20, which is minimum.`,
+30
+
+Sample Output:
+20`,
     difficulty: 'Medium',
-    defaultLanguage: 'python'
+    testCases: [
+      { input: '7\n3\n10\n100\n300\n200\n1000\n20\n30', expectedOutput: '20', isHidden: false },
+      { input: '10\n4\n1\n2\n3\n4\n10\n20\n30\n40\n100\n200', expectedOutput: '3', isHidden: false },
+      { input: '5\n3\n5\n5\n5\n5\n5', expectedOutput: '0', isHidden: true },
+      { input: '4\n1\n8\n6\n7\n5', expectedOutput: '0', isHidden: true },
+      { input: '6\n3\n1\n2\n3\n4\n5\n6', expectedOutput: '2', isHidden: true },
+      { input: '6\n2\n10\n9\n8\n7\n6\n5', expectedOutput: '1', isHidden: true },
+      { input: '5\n3\n1\n100\n50\n60\n55', expectedOutput: '10', isHidden: true },
+      { input: '5\n2\n1\n1000\n2000\n3000\n4000', expectedOutput: '999', isHidden: true },
+    ],
   },
   {
     title: 'Next Greater Word',
-    description: `Given a string consisting of lowercase English letters, rearrange its characters to form the next lexicographically greater string.
+    description: `Given a lowercase string, rearrange its characters to form the next lexicographically greater string.
+If no such arrangement exists, print "no answer".
 
-If no such arrangement exists (i.e., the string is already the highest possible), print "no answer".
-
-**Input Format:**
-- First line contains an integer t — number of test cases
+Input Format:
+- First line contains t
 - Next t lines each contain a string s
 
-**Output Format:**
-- For each test case, print the next lexicographically greater string
-- If not possible, print "no answer"
+Output Format:
+- For each test case, print the answer for that string
 
-**Constraints:**
-- 1 ≤ t ≤ 100
-- 1 ≤ |s| ≤ 10⁵
-- Strings contain only lowercase letters (a–z)`,
-    sampleInput: `5
+Constraints:
+- 1 <= t <= 100
+- 1 <= |s| <= 10^5
+
+Sample Input:
+5
 ab
 bb
 hefg
 dhck
-dkhc`,
-    sampleOutput: `ba
+dkhc
+
+Sample Output:
+ba
 no answer
 hegf
 dhkc
 hcdk`,
-    explanation: `For "ab" → next permutation is "ba"
-For "bb" → already highest, no answer
-For "hefg" → next is "hegf"`,
     difficulty: 'Medium',
-    defaultLanguage: 'python'
+    testCases: [
+      { input: '5\nab\nbb\nhefg\ndhck\ndkhc', expectedOutput: 'ba\nno answer\nhegf\ndhkc\nhcdk', isHidden: false },
+      { input: '3\nabcd\ndcba\nabdc', expectedOutput: 'abdc\nno answer\nacbd', isHidden: false },
+      { input: '1\na', expectedOutput: 'no answer', isHidden: true },
+      { input: '1\naaa', expectedOutput: 'no answer', isHidden: true },
+      { input: '1\nzyx', expectedOutput: 'no answer', isHidden: true },
+      { input: '1\nabdc', expectedOutput: 'acbd', isHidden: true },
+      { input: '1\ndkhc', expectedOutput: 'hcdk', isHidden: true },
+      { input: '1\nfedcbabcd', expectedOutput: 'fedcbabdc', isHidden: true },
+    ],
   },
   {
     title: 'Minimum Loss Trade',
-    description: `You are given a list of distinct integers representing the price of a property over several years.
-
-You must buy before selling (buy index < sell index). However, the selling price must be lower than the buying price (i.e., you incur a loss).
-
+    description: `You are given distinct property prices over years. You must buy before selling, and selling price must be lower than buying price.
 Find the minimum possible loss.
 
-**Input Format:**
-- First line contains an integer n — number of years
-- Second line contains n space-separated integers representing prices
+Input Format:
+- First line contains n
+- Second line contains n space-separated prices
 
-**Output Format:**
-- Print a single integer — the minimum loss possible
+Output Format:
+- Print the minimum loss
 
-**Constraints:**
-- 2 ≤ n ≤ 2 × 10⁵
-- 1 ≤ price[i] ≤ 10¹⁶
+Constraints:
+- 2 <= n <= 2 * 10^5
+- 1 <= price[i] <= 10^16
 - All prices are distinct
-- A valid answer always exists`,
-    sampleInput: `5
-20 7 8 2 5`,
-    sampleOutput: `2`,
-    explanation: `Buy at price 7, sell at price 5. Loss = 7 - 5 = 2, which is minimum.`,
+
+Sample Input:
+5
+20 7 8 2 5
+
+Sample Output:
+2`,
     difficulty: 'Hard',
-    defaultLanguage: 'python'
+    testCases: [
+      { input: '3\n5 10 3', expectedOutput: '2', isHidden: false },
+      { input: '5\n20 7 8 2 5', expectedOutput: '2', isHidden: false },
+      { input: '5\n10 9 8 7 6', expectedOutput: '1', isHidden: true },
+      { input: '5\n1 2 3 4 5', expectedOutput: '1', isHidden: true },
+      { input: '4\n1000 200 800 100', expectedOutput: '100', isHidden: true },
+      { input: '2\n9 3', expectedOutput: '6', isHidden: true },
+      { input: '6\n15 3 20 7 8 10', expectedOutput: '2', isHidden: true },
+      { input: '5\n100 1 99 2 98', expectedOutput: '1', isHidden: true },
+    ],
   },
   {
     title: 'Mirror Difference Check',
-    description: `A string is considered "Funny" if the absolute difference between the ASCII values of adjacent characters is the same for the string and its reverse.
+    description: `A string is "Funny" if the absolute differences of adjacent ASCII values are the same for the string and its reverse.
+For each string, print "Funny" or "Not Funny".
 
-Given a string, determine whether it is "Funny" or "Not Funny".
+Input Format:
+- First line contains q
+- Next q lines each contain a string
 
-**Input Format:**
-- First line contains an integer q — number of test cases
-- Next q lines each contain a string s
+Output Format:
+- For each string, print Funny or Not Funny
 
-**Output Format:**
-- For each string, print "Funny" or "Not Funny"
+Constraints:
+- 1 <= q <= 10^3
+- 1 <= length of string <= 10^5
 
-**Constraints:**
-- 1 ≤ q ≤ 10³
-- 1 ≤ length of string ≤ 10⁵
-- String contains only lowercase English letters`,
-    sampleInput: `2
+Sample Input:
+2
 acxz
-bcxz`,
-    sampleOutput: `Funny
-Not Funny`,
-    explanation: `For "acxz":
-Differences → |a-c| = 2, |c-x| = 21, |x-z| = 2
-Reverse "zxca" → same differences → Funny
+bcxz
 
-For "bcxz":
-Differences differ → Not Funny`,
+Sample Output:
+Funny
+Not Funny`,
     difficulty: 'Easy',
-    defaultLanguage: 'python'
+    testCases: [
+      { input: '2\nacxz\nbcxz', expectedOutput: 'Funny\nNot Funny', isHidden: false },
+      { input: '1\na', expectedOutput: 'Funny', isHidden: true },
+      { input: '1\nab', expectedOutput: 'Funny', isHidden: true },
+      { input: '1\nmadam', expectedOutput: 'Funny', isHidden: true },
+      { input: '1\nabcd', expectedOutput: 'Not Funny', isHidden: true },
+      { input: '1\nazby', expectedOutput: 'Funny', isHidden: true },
+      { input: '1\nabcdefg', expectedOutput: 'Not Funny', isHidden: true },
+    ],
   },
   {
     title: 'Penalty Rules Engine',
-    description: `A library charges a fine for late book returns based on how late the book is returned.
+    description: `A library charges a fine for late return based on delay:
+- Returned on or before due date: 0
+- Late in same month and year: 15 x days late
+- Late in same year but different month: 500 x months late
+- Returned in later calendar year: 10000
 
-Given the actual return date and the expected due date, calculate the fine based on the following rules:
-- If returned on or before the due date → print 0
-- If returned late within same month & year → 15 × days late
-- If returned late within same year but different month → 500 × months late
-- If returned in a later calendar year → 10000
+Input Format:
+- First line: d1 m1 y1 (actual return date)
+- Second line: d2 m2 y2 (due date)
 
-**Input Format:**
-- First line: d1 m1 y1 → actual return date
-- Second line: d2 m2 y2 → due date
+Output Format:
+- Print the fine amount
 
-**Output Format:**
-- Print a single integer — the fine amount
+Constraints:
+- 1 <= d <= 31
+- 1 <= m <= 12
+- 1 <= y <= 3000
 
-**Constraints:**
-- 1 ≤ d ≤ 31
-- 1 ≤ m ≤ 12
-- 1 ≤ y ≤ 3000`,
-    sampleInput: `9 6 2015
-6 6 2015`,
-    sampleOutput: `45`,
-    explanation: `Returned 3 days late within same month → Fine = 3 × 15 = 45`,
+Sample Input:
+9 6 2015
+6 6 2015
+
+Sample Output:
+45`,
     difficulty: 'Easy',
-    defaultLanguage: 'python'
-  }
+    testCases: [
+      { input: '9 6 2015\n6 6 2015', expectedOutput: '45', isHidden: false },
+      { input: '1 1 2020\n1 1 2020', expectedOutput: '0', isHidden: true },
+      { input: '10 5 2020\n5 5 2020', expectedOutput: '75', isHidden: true },
+      { input: '10 7 2020\n5 5 2020', expectedOutput: '1000', isHidden: true },
+      { input: '1 1 2021\n31 12 2020', expectedOutput: '10000', isHidden: true },
+      { input: '5 5 2020\n10 5 2020', expectedOutput: '0', isHidden: true },
+      { input: '5 3 2020\n10 5 2020', expectedOutput: '0', isHidden: true },
+    ],
+  },
 ];
 
 async function seedDatabase() {
@@ -904,9 +949,7 @@ async function seedDatabase() {
           $set: {
             description: c.description,
             difficulty: c.difficulty,
-            testCases: [
-              { input: c.sampleInput, expectedOutput: c.sampleOutput, isHidden: false }
-            ]
+            testCases: c.testCases,
           }
         },
         { upsert: true, new: true }
