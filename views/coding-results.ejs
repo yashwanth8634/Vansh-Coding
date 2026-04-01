@@ -85,9 +85,9 @@
                         <%= submitted && !isNaN(submitted) ? submitted.toLocaleString('en-IN') : '—' %>
                     </td>
                     <td class="p-4">
-                      <% const gradeClass=attempt.solvedCount===answers.length && answers.length > 0 ? 'text-green-400
-                        bg-green-500/10 border border-green-500/20' : 'text-yellow-400 bg-yellow-500/10 border
-                        border-yellow-500/20'; %>
+                      <% const gradeClass = attempt.solvedCount === answers.length && answers.length > 0
+                        ? 'text-green-400 bg-green-500/10 border border-green-500/20'
+                        : 'text-yellow-400 bg-yellow-500/10 border border-yellow-500/20'; %>
                         <span
                           class="inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold uppercase tracking-wider <%= gradeClass %>">
                           <%= attempt.solvedCount || 0 %> Solved • <%= attempt.passedTestCases || 0 %> / <%= attempt.totalTestCases || 0 %> Cases
