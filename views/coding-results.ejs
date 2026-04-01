@@ -141,7 +141,14 @@
         const modalDialog = document.getElementById('modalDialog');
 
         function openModal(attemptId) {
-          const answers = JSON.parse(document.getElementById(`data-${attemptId}`).textContent);
+          const dataNode = document.getElementById(`data-${attemptId}`);
+          if (!dataNode || !dataNode.textContent) return;
+          let answers = [];
+          try {
+            answers = JSON.parse(dataNode.textContent);
+          } catch (e) {
+            return;
+          }
           const content = document.getElementById('modalContent');
 
           let html = '';

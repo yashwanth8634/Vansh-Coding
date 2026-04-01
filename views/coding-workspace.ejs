@@ -422,7 +422,8 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const data = JSON.parse(document.getElementById('server-data').textContent);
+      const serverDataNode = document.getElementById('server-data');
+      const data = serverDataNode && serverDataNode.textContent ? JSON.parse(serverDataNode.textContent) : { testId: null, challenges: [] };
       const testId = data.testId;
       const uniqueLink = window.location.pathname.split('/').pop();
       let challenges = data.challenges || [];
@@ -489,7 +490,7 @@ int main() {
         };
       });
 
-      let activeChallengeId = challenges[0].id;
+      let activeChallengeId = challenges.length > 0 ? challenges[0].id : null;
 
       const editor = CodeMirror(document.getElementById('editor-container'), {
         lineNumbers: true, theme: 'dracula', mode: 'javascript', indentUnit: 4, tabSize: 4, lineWrapping: true,
@@ -587,10 +588,12 @@ int main() {
       }
 
       function loadChallenge(id, isInitialLoad = false) {
+        if (!id) return;
         if (!isInitialLoad) syncActiveSubmission();
 
         activeChallengeId = id;
         const chal = challenges.find(c => c.id === id);
+        if (!chal) return;
 
         tabs.forEach(t => t.classList.toggle('active', t.dataset.id === id));
         currentTitle.textContent = chal.title;
@@ -759,7 +762,14 @@ int main() {
         }
       });
       tabs.forEach(t => t.addEventListener('click', () => loadChallenge(t.dataset.id)));
-      loadChallenge(activeChallengeId, true);
+      if (activeChallengeId) {
+        loadChallenge(activeChallengeId, true);
+      } else {
+        currentTitle.textContent = 'Click Start Test to load your coding questions';
+        currentDiff.textContent = 'Pending';
+        currentDiff.className = 'text-[10px] px-2 py-0.5 border rounded uppercase tracking-widest font-mono border-gray-500/30 text-gray-400 bg-gray-500/10';
+        currentDesc.textContent = 'Questions are assigned after student verification.';
+      }
       lockWorkspaceUntilStart();
 
       startSessionBtn.addEventListener('click', () => {
@@ -811,7 +821,12 @@ int main() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(pendingStudentProfile),
           });
-          const result = await response.json();
+          let result = {};
+          try {
+            result = await response.json();
+          } catch (parseErr) {
+            result = {};
+          }
 
           if (!response.ok) {
             startModalError.textContent = result.message || 'Unable to start coding test.';
@@ -827,7 +842,7 @@ int main() {
           // Update challenges from API response
           if (result.challenges && result.challenges.length > 0) {
             challenges = result.challenges;
-            activeChallengeId = challenges[0].id;
+            activeChallengeId = challenges[0] ? challenges[0].id : null;
             
             // Re-initialize submissions object for the new challenges
             challenges.forEach((c) => {
@@ -841,7 +856,7 @@ int main() {
             });
             
             renderQuestionTabs();
-            loadChallenge(activeChallengeId, true);
+            if (activeChallengeId) loadChallenge(activeChallengeId, true);
           }
 
           if (result.durationMinutes) {
